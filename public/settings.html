@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Account Settings — RBA-2FA</title>
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body>
+<nav class="navbar">
+  <a href="/dashboard.html" class="nav-brand"><span>🔐</span> RBA-2FA System</a>
+  <div class="nav-actions">
+    <span class="nav-user" id="navUser"></span>
+    <a href="/dashboard.html" class="btn btn-outline">← Dashboard</a>
+  </div>
+</nav>
+
+<div style="max-width:620px;margin:40px auto;padding:0 24px;">
+
+  <div style="margin-bottom:28px;">
+    <h1 style="margin-bottom:6px;">⚙️ Account Settings</h1>
+    <p>Update your account information and security preferences.</p>
+  </div>
+
+  <!-- Profile card -->
+  <div class="card" style="margin-bottom:24px;">
+    <h3 style="margin-bottom:20px;">👤 Profile Information</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div>
+        <div style="font-size:0.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">Username</div>
+        <div id="infoUsername" style="font-size:1rem;font-weight:600;color:var(--text);">—</div>
+      </div>
+      <div>
+        <div style="font-size:0.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">Email</div>
+        <div id="infoEmail" style="font-size:1rem;font-weight:600;color:var(--text);">—</div>
+      </div>
+      <div>
+        <div style="font-size:0.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">Phone</div>
+        <div id="infoPhone" style="font-size:1rem;font-weight:600;color:var(--text);">—</div>
+      </div>
+      <div>
+        <div style="font-size:0.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">Authenticator</div>
+        <div id="infoTotp" style="font-size:1rem;font-weight:600;">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change password -->
+  <div class="card" style="margin-bottom:24px;">
+    <h3 style="margin-bottom:20px;">🔑 Change Password</h3>
+    <div class="form-group">
+      <label>Current password</label>
+      <div style="position:relative;">
+        <input type="password" id="currentPwd" placeholder="Enter current password" style="padding-right:44px;"/>
+        <button type="button" onclick="togglePwd('currentPwd','e1')" id="e1"
+          style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--muted);">👁️</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>New password</label>
+      <div style="position:relative;">
+        <input type="password" id="newPwd" placeholder="Minimum 8 characters" style="padding-right:44px;"/>
+        <button type="button" onclick="togglePwd('newPwd','e2')" id="e2"
+          style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--muted);">👁️</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Confirm new password</label>
+      <div style="position:relative;">
+        <input type="password" id="confirmPwd" placeholder="Repeat new password" style="padding-right:44px;"/>
+        <button type="button" onclick="togglePwd('confirmPwd','e3')" id="e3"
+          style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--muted);">👁️</button>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+    <div id="pwdMsg"></div>
+  </div>
+
+  <!-- Security summary -->
+  <div class="card">
+    <h3 style="margin-bottom:16px;">🛡️ Security Summary</h3>
+    <div id="securitySummary" style="display:grid;gap:10px;"></div>
+  </div>
+
+</div>
+
+<script>
+function togglePwd(inputId, btnId) {
+  const input = document.getElementById(inputId);
+  const btn   = document.getElementById(btnId);
+  input.type  = input.type === "password" ? "text" : "password";
+  btn.textContent = input.type === "password" ? "👁️" : "🙈";
+}
+
+async function init() {
+  const res = await fetch("/api/auth/me");
+  if (!res.ok) { location.href = "/login.html"; return; }
+  const { user, lastLogin } = await res.json();
+
+  document.getElementById("navUser").textContent     = `👤 ${user.username}`;
+  document.getElementById("infoUsername").textContent = user.username;
+  document.getElementById("infoEmail").textContent    = user.email;
+  document.getElementById("infoPhone").textContent    = user.phone || "Not set";
+  document.getElementById("infoTotp").innerHTML       = user.totp_enabled
+    ? `<span style="color:var(--success);">✅ Enabled</span>`
+    : `<span style="color:var(--danger);">❌ Not set up — <a href="/dashboard.html" class="link">Set up now</a></span>`;
+
+  document.getElementById("securitySummary").innerHTML = `
+    <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#f8faff;border-radius:10px;border:1px solid var(--border);">
+      <span style="font-weight:600;font-size:0.9rem;">Last login</span>
+      <span style="color:var(--muted);font-size:0.88rem;">${lastLogin ? lastLogin.timestamp : "Never"}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#f8faff;border-radius:10px;border:1px solid var(--border);">
+      <span style="font-weight:600;font-size:0.9rem;">Last login location</span>
+      <span style="color:var(--muted);font-size:0.88rem;">${lastLogin && lastLogin.city && lastLogin.city !== "Local Network" ? lastLogin.city+", "+lastLogin.country : "Local Network"}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#f8faff;border-radius:10px;border:1px solid var(--border);">
+      <span style="font-weight:600;font-size:0.9rem;">Last risk tier</span>
+      <span>${lastLogin ? `<span class="badge badge-${lastLogin.risk_tier}">${lastLogin.risk_tier}</span>` : "—"}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#f8faff;border-radius:10px;border:1px solid var(--border);">
+      <span style="font-weight:600;font-size:0.9rem;">Authenticator app</span>
+      <a href="/dashboard.html" style="color:var(--primary-light);font-size:0.88rem;font-weight:600;">
+        ${user.totp_enabled ? "Manage →" : "Set up now →"}
+      </a>
+    </div>`;
+}
+
+async function changePassword() {
+  const current = document.getElementById("currentPwd").value;
+  const newPwd  = document.getElementById("newPwd").value;
+  const confirm = document.getElementById("confirmPwd").value;
+  const msg     = document.getElementById("pwdMsg");
+  msg.innerHTML = "";
+
+  if (!current || !newPwd || !confirm) {
+    msg.innerHTML = `<div class="alert alert-error" style="margin-top:12px;">❌ Please fill in all three fields.</div>`; return;
+  }
+  if (newPwd.length < 8) {
+    msg.innerHTML = `<div class="alert alert-error" style="margin-top:12px;">❌ New password must be at least 8 characters.</div>`; return;
+  }
+  if (newPwd !== confirm) {
+    msg.innerHTML = `<div class="alert alert-error" style="margin-top:12px;">❌ New passwords do not match.</div>`; return;
+  }
+
+  const res  = await fetch("/api/auth/change-password", {
+    method:  "POST",
+    headers: { "Content-Type": "application/json" },
+    body:    JSON.stringify({ current_password: current, new_password: newPwd }),
+  });
+  const data = await res.json();
+
+  if (!res.ok) {
+    msg.innerHTML = `<div class="alert alert-error" style="margin-top:12px;">❌ ${data.error}</div>`;
+  } else {
+    msg.innerHTML = `<div class="alert alert-success" style="margin-top:12px;">✅ Password updated successfully.</div>`;
+    document.getElementById("currentPwd").value = "";
+    document.getElementById("newPwd").value     = "";
+    document.getElementById("confirmPwd").value = "";
+  }
+}
+
+init();
+</script>
+</body>
+</html>

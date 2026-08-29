@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Dashboard — RBA-2FA</title>
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="/" class="nav-brand"><span>🔐</span> RBA-2FA System</a>
+  <div class="nav-actions">
+    <span class="nav-user" id="navUser"></span>
+    <a href="/settings.html" class="btn btn-secondary" style="font-size:0.85rem;">⚙️ Settings</a>
+    <button class="btn btn-outline" onclick="doLogout()">Sign Out</button>
+  </div>
+</nav>
+
+<div class="dash-layout">
+
+  <aside class="dash-sidebar">
+    <div style="padding:0 8px 16px;margin-bottom:12px;border-bottom:1px solid var(--border);">
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Navigation</div>
+    </div>
+    <button class="sidebar-item active" onclick="showSection('overview')"><span>🏠</span> Overview</button>
+    <button class="sidebar-item" onclick="showSection('history')"><span>📋</span> Login History</button>
+    <button class="sidebar-item" onclick="showSection('devices')"><span>💻</span> Known Devices</button>
+    <button class="sidebar-item" onclick="showSection('totp')"><span>🔑</span> Authenticator App</button>
+    <div style="padding:0 8px;margin:16px 0 10px;border-top:1px solid var(--border);padding-top:16px;">
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Research Evaluation</div>
+    </div>
+    <a href="/evaluation.html" class="sidebar-item" style="text-decoration:none;"><span>📊</span> Evaluation Metrics</a>
+    <a href="/sus.html"        class="sidebar-item" style="text-decoration:none;"><span>📝</span> SUS Questionnaire</a>
+    <div style="padding:0 8px;margin:16px 0 10px;border-top:1px solid var(--border);padding-top:16px;">
+      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Account</div>
+    </div>
+    <a href="/settings.html" class="sidebar-item" style="text-decoration:none;"><span>⚙️</span> Settings</a>
+  </aside>
+
+  <main class="dash-main">
+
+    <!-- OVERVIEW -->
+    <section id="sec-overview">
+      <div style="margin-bottom:24px;">
+        <h2>Welcome back, <span id="welcomeName" style="color:var(--primary-light);"></span> 👋</h2>
+        <p style="margin-top:4px;">Here is your security overview and recent activity.</p>
+      </div>
+
+      <div class="stat-grid" style="margin-bottom:24px;">
+        <div class="stat-card">
+          <div class="stat-value" id="statScore">—</div>
+          <div class="stat-label">Last Risk Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statTier">—</div>
+          <div class="stat-label">Last Risk Tier</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statDevices">—</div>
+          <div class="stat-label">Known Devices</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statTotp">—</div>
+          <div class="stat-label">Authenticator</div>
+        </div>
+      </div>
+
+      <div class="location-card" style="margin-bottom:24px;">
+        <div class="location-icon">📍</div>
+        <div class="location-info">
+          <div class="label">Last Login Location</div>
+          <div class="value" id="locCity">Loading…</div>
+          <div class="sub"   id="locDetails"></div>
+        </div>
+      </div>
+
+      <div class="section-title">Recent login attempts</div>
+      <div style="background:var(--card);border-radius:12px;box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;">
+        <div class="table-wrap" style="margin-top:0;">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th><th>Location</th><th>Risk Tier</th>
+                <th>Auth Method</th><th>Outcome</th>
+              </tr>
+            </thead>
+            <tbody id="recentBody">
+              <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted);">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOGIN HISTORY -->
+    <section id="sec-history" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h2>Login History</h2>
+          <p style="margin-top:4px;">Your 50 most recent login attempts with full risk analysis.</p>
+        </div>
+        <button class="btn btn-secondary" onclick="exportCSV()" style="flex-shrink:0;">
+          📥 Export CSV
+        </button>
+      </div>
+      <div style="background:var(--card);border-radius:12px;box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;">
+        <div class="table-wrap" style="margin-top:0;">
+          <table>
+            <thead>
+              <tr>
+                <th>Timestamp</th><th>IP Address</th><th>Location</th><th>ISP</th>
+                <th>Risk Score</th><th>Tier</th><th>Auth Method</th><th>Outcome</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody">
+              <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted);">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- KNOWN DEVICES -->
+    <section id="sec-devices" style="display:none;">
+      <div style="margin-bottom:20px;">
+        <h2>Known Devices</h2>
+        <p style="margin-top:4px;">Devices that have previously completed a successful login on your account.</p>
+      </div>
+      <div style="background:var(--card);border-radius:12px;box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;">
+        <div class="table-wrap" style="margin-top:0;">
+          <table>
+            <thead><tr><th>Device Fingerprint</th><th>First Seen</th><th>Last Seen</th></tr></thead>
+            <tbody id="devicesBody">
+              <tr><td colspan="3" style="text-align:center;padding:24px;color:var(--muted);">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOTP -->
+    <section id="sec-totp" style="display:none;">
+      <div style="margin-bottom:20px;">
+        <h2>Authenticator App (TOTP)</h2>
+        <p style="margin-top:4px;">Set up Google Authenticator, Authy, or Microsoft Authenticator for 6-digit codes on Medium and High-risk logins.</p>
+      </div>
+      <div id="totpStatusBox" class="alert" style="margin-bottom:20px;"></div>
+      <button class="btn btn-secondary" id="setupTotpBtn" onclick="setupTotp()">
+        📱 Set up authenticator app
+      </button>
+      <div id="qrArea" class="qr-box" style="display:none;max-width:340px;margin-top:20px;">
+        <img id="qrImg" width="200" height="200" alt="QR Code" style="margin-bottom:16px;"/>
+        <p style="font-size:0.88rem;color:var(--muted);margin-bottom:16px;">
+          Scan this QR code with your authenticator app, then enter the 6-digit code below to confirm.
+        </p>
+        <div class="form-group">
+          <label>Confirmation code</label>
+          <input type="number" id="totpConfirmCode" class="otp-input" placeholder="000000"/>
+        </div>
+        <button class="btn btn-primary btn-block" style="margin-top:12px;" onclick="confirmTotp()">
+          ✅ Confirm &amp; Enable
+        </button>
+      </div>
+      <div id="totpMsg"></div>
+    </section>
+
+  </main>
+</div>
+
+<script src="/js/dashboard.js"></script>
+</body>
+</html>

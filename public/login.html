@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Sign In — RBA-2FA</title>
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body>
+<div class="page-center">
+  <div class="card card-sm">
+
+    <div class="auth-header">
+      <div class="logo-icon">🛡️</div>
+      <h1>Welcome back</h1>
+      <p>Sign in to your secured account</p>
+    </div>
+
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="username" placeholder="Enter your username" autocomplete="username"/>
+    </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <div style="position:relative;">
+        <input type="password" id="password" placeholder="Enter your password"
+               autocomplete="current-password" style="padding-right:44px;"/>
+        <button type="button" onclick="togglePwd('password','eyeIcon1')"
+                style="position:absolute;right:12px;top:50%;transform:translateY(-50%);
+                       background:none;border:none;cursor:pointer;font-size:1.1rem;
+                       color:var(--muted);padding:0;" id="eyeIcon1">👁️</button>
+      </div>
+    </div>
+
+    <details style="margin-bottom:18px;background:#f8fafc;border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;">
+      <summary style="font-size:0.84rem;font-weight:600;color:var(--muted);user-select:none;cursor:pointer;">
+        🔬 Risk Engine Demo — Simulate a different IP location
+      </summary>
+      <div style="margin-top:12px;">
+        <label>Simulated IP address</label>
+        <input type="text" id="debugIp" placeholder="e.g. 41.182.0.1 (Windhoek) or 8.8.8.8 (USA)"/>
+        <div class="hint" style="margin-top:8px;line-height:1.9;">
+          <strong>Namibia:</strong>
+          <code style="background:#eef2ff;padding:1px 6px;border-radius:4px;">41.182.0.1</code> Windhoek &nbsp;·&nbsp;
+          <code style="background:#eef2ff;padding:1px 6px;border-radius:4px;">41.182.0.2</code> Swakopmund &nbsp;·&nbsp;
+          <code style="background:#eef2ff;padding:1px 6px;border-radius:4px;">41.182.0.4</code> Oshakati<br/>
+          <strong>Other:</strong>
+          <code style="background:#eef2ff;padding:1px 6px;border-radius:4px;">8.8.8.8</code> USA &nbsp;·&nbsp;
+          <code style="background:#eef2ff;padding:1px 6px;border-radius:4px;">196.216.2.1</code> South Africa &nbsp;·&nbsp;
+          <code style="background:#eef2ff;padding:1px 6px;border-radius:4px;">203.0.113.5</code> Japan
+        </div>
+      </div>
+    </details>
+
+    <button class="btn btn-primary btn-block btn-lg" id="loginBtn" onclick="doLogin()">
+      Sign In →
+    </button>
+
+    <div id="msg"></div>
+
+    <div class="divider">or</div>
+    <p class="text-center" style="font-size:0.9rem;">
+      Don't have an account? <a href="/register.html" class="link">Create one</a>
+    </p>
+    <p class="text-center" style="font-size:0.85rem;margin-top:8px;">
+      <a href="/" style="color:var(--muted);text-decoration:none;font-size:0.85rem;">← Back to home</a>
+    </p>
+
+  </div>
+</div>
+
+<script>
+function togglePwd(inputId, btnId) {
+  const input = document.getElementById(inputId);
+  const btn   = document.getElementById(btnId);
+  input.type  = input.type === "password" ? "text" : "password";
+  btn.textContent = input.type === "password" ? "👁️" : "🙈";
+}
+</script>
+<script src="/js/login.js"></script>
+</body>
+</html>

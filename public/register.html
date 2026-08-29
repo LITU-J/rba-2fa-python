@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Create Account — RBA-2FA</title>
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body>
+<div class="page-center">
+  <div class="card card-sm">
+
+    <div class="auth-header">
+      <div class="logo-icon">🔐</div>
+      <h1>Create your account</h1>
+      <p>Join the RBA-2FA adaptive security system</p>
+    </div>
+
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="username" placeholder="Choose a username" autocomplete="username"/>
+    </div>
+
+    <div class="form-group">
+      <label>Email address</label>
+      <input type="email" id="email" placeholder="you@example.com" autocomplete="email"/>
+      <div class="hint">📧 OTP verification codes will be sent here</div>
+    </div>
+
+    <div class="form-group">
+      <label>Phone number <span style="font-weight:400;text-transform:none;">(optional)</span></label>
+      <input type="tel" id="phone" placeholder="+264 81 234 5678"/>
+      <div class="hint">📱 Required for SMS OTP on high-risk logins</div>
+    </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <div style="position:relative;">
+        <input type="password" id="password" placeholder="Minimum 8 characters"
+               autocomplete="new-password" style="padding-right:44px;"/>
+        <button type="button" onclick="togglePwd('password','eyeIcon')"
+                style="position:absolute;right:12px;top:50%;transform:translateY(-50%);
+                       background:none;border:none;cursor:pointer;font-size:1.1rem;
+                       color:var(--muted);padding:0;" id="eyeIcon">👁️</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Confirm password</label>
+      <div style="position:relative;">
+        <input type="password" id="confirmPwd" placeholder="Repeat your password"
+               autocomplete="new-password" style="padding-right:44px;"/>
+        <button type="button" onclick="togglePwd('confirmPwd','eyeIcon2')"
+                style="position:absolute;right:12px;top:50%;transform:translateY(-50%);
+                       background:none;border:none;cursor:pointer;font-size:1.1rem;
+                       color:var(--muted);padding:0;" id="eyeIcon2">👁️</button>
+      </div>
+    </div>
+
+    <!-- Password strength bar -->
+    <div style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <span class="hint">Password strength</span>
+        <span class="hint" id="strengthLabel">—</span>
+      </div>
+      <div class="risk-bar">
+        <div id="strengthBar" class="risk-bar-fill low" style="width:0%;transition:width 0.3s;"></div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block btn-lg" onclick="doRegister()">
+      Create Account →
+    </button>
+
+    <div id="msg"></div>
+
+    <div class="divider">or</div>
+    <p class="text-center" style="font-size:0.9rem;">
+      Already have an account? <a href="/login.html" class="link">Sign in</a>
+    </p>
+    <p class="text-center" style="font-size:0.85rem;margin-top:8px;">
+      <a href="/" style="color:var(--muted);text-decoration:none;font-size:0.85rem;">← Back to home</a>
+    </p>
+
+  </div>
+</div>
+
+<script>
+function togglePwd(inputId, btnId) {
+  const input = document.getElementById(inputId);
+  const btn   = document.getElementById(btnId);
+  input.type  = input.type === "password" ? "text" : "password";
+  btn.textContent = input.type === "password" ? "👁️" : "🙈";
+}
+
+document.getElementById("password").addEventListener("input", function () {
+  const v   = this.value;
+  const bar = document.getElementById("strengthBar");
+  const lbl = document.getElementById("strengthLabel");
+  let score = 0;
+  if (v.length >= 8)            score++;
+  if (v.length >= 12)           score++;
+  if (/[A-Z]/.test(v))         score++;
+  if (/[0-9]/.test(v))         score++;
+  if (/[^A-Za-z0-9]/.test(v)) score++;
+  const levels = [
+    { pct:"0%",   cls:"low",      text:"—" },
+    { pct:"25%",  cls:"critical", text:"Weak" },
+    { pct:"50%",  cls:"high",     text:"Fair" },
+    { pct:"75%",  cls:"medium",   text:"Good" },
+    { pct:"100%", cls:"low",      text:"Strong ✅" },
+  ];
+  const l = levels[score] || levels[0];
+  bar.style.width = l.pct;
+  bar.className   = `risk-bar-fill ${l.cls}`;
+  lbl.textContent = l.text;
+});
+</script>
+<script src="/js/register.js"></script>
+</body>
+</html>

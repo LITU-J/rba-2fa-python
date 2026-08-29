@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evaluation Dashboard — RBA-2FA</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .metric-card  { background:var(--card); border-radius:14px; padding:24px; box-shadow:var(--shadow); border:1px solid var(--border); text-align:center; }
+    .metric-value { font-size:2.4rem; font-weight:900; line-height:1; margin-bottom:4px; }
+    .metric-label { font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); }
+    .metric-sub   { font-size:0.8rem; color:var(--muted); margin-top:6px; }
+    .metric-grid  { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:28px; }
+    .chart-bar-row   { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+    .chart-bar-label { width:200px; font-size:0.83rem; color:var(--text); flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .chart-bar-track { flex:1; height:20px; background:#f1f5f9; border-radius:6px; overflow:hidden; }
+    .chart-bar-fill  { height:100%; border-radius:6px; background:linear-gradient(90deg,var(--primary),var(--primary-light)); transition:width 0.6s ease; }
+    .chart-bar-count { font-size:0.82rem; font-weight:700; color:var(--muted); width:32px; text-align:right; }
+    .section-card { background:var(--card); border-radius:14px; padding:24px; box-shadow:var(--shadow); border:1px solid var(--border); margin-bottom:24px; }
+    .info-box { background:#eff6ff; border:1px solid #93c5fd; border-radius:10px; padding:14px 18px; font-size:0.86rem; color:#1d4ed8; margin-bottom:20px; line-height:1.7; }
+    .sus-pill { display:inline-flex; align-items:center; gap:8px; padding:6px 16px; border-radius:20px; font-size:0.85rem; font-weight:700; }
+    .pill-Excellent { background:#dcfce7; color:#15803d; }
+    .pill-Good      { background:#dbeafe; color:#1d4ed8; }
+    .pill-OK        { background:#fef9c3; color:#854d0e; }
+    .pill-Poor      { background:#ffedd5; color:#9a3412; }
+    .pill-Awful     { background:#fee2e2; color:#991b1b; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="/dashboard.html" class="nav-brand"><span>🔐</span> RBA-2FA System</a>
+  <div class="nav-actions">
+    <a href="/dashboard.html" class="btn btn-outline" style="font-size:0.85rem;">← Dashboard</a>
+    <a href="/sus.html" class="btn btn-secondary" style="font-size:0.85rem;">📝 SUS Survey</a>
+  </div>
+</nav>
+
+<div style="max-width:1000px; margin:0 auto; padding:32px 24px;">
+
+  <div style="margin-bottom:24px;">
+    <h1 style="margin-bottom:6px;">📊 Evaluation Dashboard</h1>
+    <p>Security metrics computed from <code>login_logs</code> — answering Research Objective 3.</p>
+  </div>
+
+  <div class="info-box">
+    <strong>Setup:</strong> Run <code>python simulate_attacks.py</code> in your terminal first to populate attack data.
+    Then refresh this page to see all computed metrics.
+  </div>
+
+  <!-- Core Metrics -->
+  <div class="section-card">
+    <h3 style="margin-bottom:16px;">Core Security Metrics</h3>
+    <div class="metric-grid">
+      <div class="metric-card">
+        <div class="metric-value" id="metFAR" style="color:#dc2626;">—</div>
+        <div class="metric-label">FAR</div>
+        <div class="metric-sub">False Acceptance Rate</div>
+        <div class="metric-sub" style="font-size:0.75rem;margin-top:4px;">Attacks accepted / Total attacks</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="metFRR" style="color:#d97706;">—</div>
+        <div class="metric-label">FRR</div>
+        <div class="metric-sub">False Rejection Rate</div>
+        <div class="metric-sub" style="font-size:0.75rem;margin-top:4px;">Legit blocked / Total legit</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="metTPR" style="color:#16a34a;">—</div>
+        <div class="metric-label">TPR</div>
+        <div class="metric-sub">True Positive Rate</div>
+        <div class="metric-sub" style="font-size:0.75rem;margin-top:4px;">Attacks detected / Total attacks</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="metEER" style="color:#2f5df0;">—</div>
+        <div class="metric-label">EER</div>
+        <div class="metric-sub">Equal Error Rate</div>
+        <div class="metric-sub" style="font-size:0.75rem;margin-top:4px;">Approx. (FAR + FRR) / 2</div>
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px;">
+      <div style="background:#f8faff;border-radius:10px;padding:14px;text-align:center;border:1px solid #e2e8f0;">
+        <div style="font-size:1.6rem;font-weight:800;color:var(--primary);" id="totAttacks">—</div>
+        <div style="font-size:0.78rem;color:var(--muted);font-weight:600;text-transform:uppercase;">Total Attacks</div>
+      </div>
+      <div style="background:#f8faff;border-radius:10px;padding:14px;text-align:center;border:1px solid #e2e8f0;">
+        <div style="font-size:1.6rem;font-weight:800;color:var(--primary);" id="totLegit">—</div>
+        <div style="font-size:0.78rem;color:var(--muted);font-weight:600;text-transform:uppercase;">Legitimate Logins</div>
+      </div>
+      <div style="background:#fef2f2;border-radius:10px;padding:14px;text-align:center;border:1px solid #fca5a5;">
+        <div style="font-size:1.6rem;font-weight:800;color:#dc2626;" id="totFA">—</div>
+        <div style="font-size:0.78rem;color:#dc2626;font-weight:600;text-transform:uppercase;">False Acceptances</div>
+      </div>
+      <div style="background:#f0fdf4;border-radius:10px;padding:14px;text-align:center;border:1px solid #86efac;">
+        <div style="font-size:1.6rem;font-weight:800;color:#16a34a;" id="totTP">—</div>
+        <div style="font-size:0.78rem;color:#16a34a;font-weight:600;text-transform:uppercase;">True Positives</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attack breakdown -->
+  <div class="section-card">
+    <h3 style="margin-bottom:16px;">Attack-Type Detection Breakdown</h3>
+    <div class="table-wrap" style="margin-top:0;">
+      <table>
+        <thead>
+          <tr>
+            <th>Attack Type</th><th>Total</th><th>Blocked (CRITICAL)</th>
+            <th>Escalated (MED/HIGH)</th><th>Accepted (LOW)</th><th>Detection Rate</th>
+          </tr>
+        </thead>
+        <tbody id="attackTable">
+          <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted);">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Charts row -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
+    <div class="section-card" style="margin-bottom:0;">
+      <h3 style="margin-bottom:16px;">Risk Tier Distribution</h3>
+      <div id="tierChart"></div>
+    </div>
+    <div class="section-card" style="margin-bottom:0;">
+      <h3 style="margin-bottom:16px;">Risk Indicator Frequency</h3>
+      <p style="font-size:0.83rem;margin-bottom:14px;">Which indicators triggered most often.</p>
+      <div id="indicatorChart"></div>
+    </div>
+  </div>
+
+  <!-- SUS summary -->
+  <div class="section-card">
+    <h3 style="margin-bottom:6px;">System Usability Scale (SUS) Results</h3>
+    <p style="font-size:0.85rem;margin-bottom:16px;">
+      A score ≥ 68 indicates good usability (Bangor et al., 2008).
+      Collect responses at the <a href="/sus.html" class="link">SUS Survey page</a>.
+    </p>
+    <div id="susPanel">
+      <p style="color:var(--muted);font-size:0.9rem;">No SUS responses yet. Share the <a href="/sus.html" class="link">survey</a> with participants.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const TIER_COLORS = { LOW:"#22c55e", MEDIUM:"#eab308", HIGH:"#f97316", CRITICAL:"#ef4444" };
+
+function barChart(id, data, maxVal, colorFn) {
+  const el = document.getElementById(id);
+  if (!data || Object.keys(data).length === 0) {
+    el.innerHTML = `<p style="color:var(--muted);font-size:0.88rem;">No data — run python simulate_attacks.py first.</p>`;
+    return;
+  }
+  el.innerHTML = Object.entries(data).map(([label, count]) => {
+    const w = maxVal ? Math.round(count / maxVal * 100) : 0;
+    const c = colorFn ? colorFn(label) : "var(--primary)";
+    return `<div class="chart-bar-row">
+      <div class="chart-bar-label" title="${label}">${label}</div>
+      <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${w}%;background:${c};"></div></div>
+      <div class="chart-bar-count">${count}</div>
+    </div>`;
+  }).join("");
+}
+
+async function load() {
+  const res  = await fetch("/api/evaluation/metrics");
+  if (!res.ok) return;
+  const d    = await res.json();
+
+  document.getElementById("metFAR").textContent = d.rates.FAR + "%";
+  document.getElementById("metFRR").textContent = d.rates.FRR + "%";
+  document.getElementById("metTPR").textContent = d.rates.TPR + "%";
+  document.getElementById("metEER").textContent = d.rates.EER + "%";
+  document.getElementById("totAttacks").textContent = d.totals.attacks;
+  document.getElementById("totLegit").textContent   = d.totals.legitimate;
+  document.getElementById("totFA").textContent      = d.totals.false_acceptances;
+  document.getElementById("totTP").textContent      = d.totals.true_positives;
+
+  const tbody = document.getElementById("attackTable");
+  const ab    = d.attack_breakdown;
+  if (!Object.keys(ab).length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted);">No attack data — run python simulate_attacks.py</td></tr>`;
+  } else {
+    tbody.innerHTML = Object.entries(ab).map(([type, v]) => {
+      const rate  = v.total ? Math.round((v.blocked + v.escalated) / v.total * 100) : 0;
+      const label = type.replace(/_/g," ").replace(/\b\w/g, c => c.toUpperCase());
+      const col   = rate >= 80 ? "low" : rate >= 50 ? "medium" : "critical";
+      return `<tr>
+        <td style="font-weight:600;">${label}</td>
+        <td>${v.total}</td>
+        <td><span class="badge badge-CRITICAL">${v.blocked}</span></td>
+        <td><span class="badge badge-HIGH">${v.escalated}</span></td>
+        <td>${v.accepted > 0 ? `<span class="badge badge-failed">${v.accepted}</span>` : `<span style="color:var(--success)">0</span>`}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="risk-bar" style="width:80px;"><div class="risk-bar-fill ${col}" style="width:${rate}%;"></div></div>
+            <strong>${rate}%</strong>
+          </div>
+        </td>
+      </tr>`;
+    }).join("");
+  }
+
+  const tierMax = Math.max(...Object.values(d.tier_distribution), 1);
+  barChart("tierChart", d.tier_distribution, tierMax, t => TIER_COLORS[t] || "#2f5df0");
+
+  const top = Object.fromEntries(Object.entries(d.indicator_frequency).slice(0, 8));
+  barChart("indicatorChart", top, Math.max(...Object.values(top), 1), null);
+
+  const sus = d.sus_summary;
+  if (sus.count > 0) {
+    const grade = sus.average >= 85 ? "Excellent" : sus.average >= 72 ? "Good" : sus.average >= 52 ? "OK" : sus.average >= 38 ? "Poor" : "Awful";
+    document.getElementById("susPanel").innerHTML = `
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:14px;">
+        <div style="text-align:center;">
+          <div style="font-size:3rem;font-weight:900;color:var(--primary);">${sus.average}</div>
+          <div style="font-size:0.78rem;color:var(--muted);font-weight:700;text-transform:uppercase;">Average SUS Score</div>
+        </div>
+        <div>
+          <span class="sus-pill pill-${grade}">${grade}</span>
+          <div style="font-size:0.84rem;color:var(--muted);margin-top:8px;">
+            ${sus.count} participant response${sus.count > 1 ? "s" : ""} &nbsp;·&nbsp; Range: ${sus.min} – ${sus.max}
+          </div>
+        </div>
+      </div>
+      <p style="font-size:0.83rem;color:var(--muted);">
+        A SUS score ≥ 68 is considered good usability. ≥ 72 = "Good", ≥ 85 = "Excellent" (Bangor et al., 2008).
+        <a href="/sus.html" class="link">View individual responses →</a>
+      </p>`;
+  }
+}
+
+load();
+</script>
+</body>
+</html>

@@ -7,17 +7,39 @@ async function doRegister() {
   const msg        = document.getElementById("msg");
   msg.innerHTML    = "";
 
+  const SPECIAL = "!@#$%^&*()_+-=[]{}|;':\",./<>?";
+
+  // Client-side validation
   if (!username || !email || !password) {
-    showMsg("error", "Please fill in username, email and password."); return;
-  }
-  if (password.length < 8) {
-    showMsg("error", "Password must be at least 8 characters."); return;
-  }
-  if (password !== confirmPwd) {
-    showMsg("error", "Passwords do not match. Please try again."); return;
+    showMsg("error", "Please fill in username, email and password.");
+    return;
   }
   if (!/\S+@\S+\.\S+/.test(email)) {
-    showMsg("error", "Please enter a valid email address."); return;
+    showMsg("error", "Please enter a valid email address.");
+    return;
+  }
+  if (password.length < 8) {
+    showMsg("error", "Password must be at least 8 characters.");
+    return;
+  }
+  if (!/[A-Z]/.test(password)) {
+    showMsg("error",
+      "Password must contain at least one uppercase letter.");
+    return;
+  }
+  if (!/[0-9]/.test(password)) {
+    showMsg("error", "Password must contain at least one number.");
+    return;
+  }
+  if (!password.split("").some(c => SPECIAL.includes(c))) {
+    showMsg("error",
+      "Password must contain at least one special character " +
+      "e.g. !@#$%^&*");
+    return;
+  }
+  if (password !== confirmPwd) {
+    showMsg("error", "Passwords do not match. Please try again.");
+    return;
   }
 
   const btn = document.querySelector("button.btn-primary");
@@ -33,10 +55,12 @@ async function doRegister() {
     const data = await res.json();
 
     if (!res.ok) {
-      showMsg("error", data.error || "Registration failed"); return;
+      showMsg("error", data.error || "Registration failed");
+      return;
     }
 
-    showMsg("success", "✅ Account created! Redirecting to your dashboard…");
+    showMsg("success",
+      "✅ Account created successfully! Redirecting…");
     setTimeout(() => location.href = "/dashboard.html", 1000);
 
   } catch (e) {
@@ -49,7 +73,9 @@ async function doRegister() {
 
 function showMsg(type, text) {
   document.getElementById("msg").innerHTML =
-    `<div class="alert alert-${type}" style="margin-top:14px;">${text}</div>`;
+    `<div class="alert alert-${type}" style="margin-top:14px;">
+       ${text}
+     </div>`;
 }
 
 document.addEventListener("keydown", e => {

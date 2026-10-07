@@ -5,9 +5,205 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Dashboard — RBA-2FA</title>
   <link rel="stylesheet" href="/css/style.css"/>
+  <style>
+    /* ---- Page background ---- */
+    body { background: #f0f4ff; }
+
+    /* ---- Navbar ---- */
+    .navbar {
+      background: linear-gradient(135deg, #1a3c8f 0%, #2f5df0 100%);
+      border-bottom: none;
+      box-shadow: 0 2px 16px rgba(26,60,143,0.25);
+    }
+    .nav-brand { color: #fff !important; }
+    .nav-brand span { font-size: 1.4rem; }
+    .nav-user { color: rgba(255,255,255,0.85) !important; font-weight: 600; }
+    .navbar .btn-outline {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border-color: rgba(255,255,255,0.3);
+    }
+    .navbar .btn-outline:hover { background: rgba(255,255,255,0.25); }
+    .navbar .btn-secondary {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      border-color: rgba(255,255,255,0.3);
+    }
+    .navbar .btn-secondary:hover { background: rgba(255,255,255,0.3); }
+
+    /* ---- Sidebar ---- */
+    .dash-sidebar {
+      background: #1a2744;
+      border-right: none;
+      padding: 20px 12px;
+      box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+    }
+
+    /* Sidebar section label */
+    .sidebar-section-label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.35);
+      padding: 0 10px;
+      margin: 18px 0 8px;
+    }
+    .sidebar-section-label:first-child { margin-top: 4px; }
+
+    /* Sidebar divider */
+    .sidebar-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+      margin: 14px 0;
+    }
+
+    /* Sidebar items */
+    .sidebar-item {
+      color: rgba(255,255,255,0.65) !important;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 3px;
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+    .sidebar-item:hover {
+      background: rgba(255,255,255,0.1) !important;
+      color: #fff !important;
+    }
+    .sidebar-item.active {
+      background: linear-gradient(135deg, #2f5df0, #1a3c8f) !important;
+      color: #fff !important;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(47,93,240,0.4);
+    }
+    .sidebar-item span { font-size: 1rem; }
+
+    /* Collapsible group */
+    .sidebar-group { margin-bottom: 4px; }
+    .sidebar-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      color: rgba(255,255,255,0.65);
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: background 0.15s, color 0.15s;
+      user-select: none;
+    }
+    .sidebar-group-header:hover {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+    .sidebar-group-header .left {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-group-header .arrow {
+      font-size: 0.7rem;
+      transition: transform 0.25s ease;
+      opacity: 0.6;
+    }
+    .sidebar-group-header.open .arrow { transform: rotate(90deg); }
+    .sidebar-group-items {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.3s ease;
+      padding-left: 8px;
+    }
+    .sidebar-group-items.open { max-height: 300px; }
+
+    /* User card at bottom of sidebar */
+    .sidebar-user {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sidebar-user .avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2f5df0, #60a5fa);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 800; color: #fff;
+      flex-shrink: 0;
+    }
+    .sidebar-user .info .name {
+      font-size: 0.88rem; font-weight: 700; color: #fff;
+    }
+    .sidebar-user .info .role {
+      font-size: 0.72rem; color: rgba(255,255,255,0.45);
+    }
+
+    /* ---- Main content ---- */
+    .dash-main { background: #f0f4ff; padding: 28px; }
+    .dash-layout {
+      min-height: calc(100vh - 64px);
+      display: grid;
+      grid-template-columns: 220px 1fr;
+    }
+    .dash-sidebar {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Stat cards ---- */
+    .stat-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 2px 12px rgba(26,60,143,0.08);
+      border: 1px solid rgba(47,93,240,0.08);
+    }
+    .stat-card .stat-value { color: #1a3c8f; font-size: 1.9rem; }
+
+    /* ---- Location card ---- */
+    .location-card {
+      background: linear-gradient(135deg, #1a2744 0%, #1a3c8f 60%, #2f5df0 100%);
+      border-radius: 16px;
+    }
+
+    /* ---- Section card ---- */
+    .section-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(26,60,143,0.08);
+      border: 1px solid rgba(47,93,240,0.08);
+      margin-bottom: 20px;
+    }
+
+    /* ---- Page header ---- */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .page-header h2 { color: #1a2744; }
+    .page-header p  { color: var(--muted); margin-top: 4px; font-size: 0.9rem; }
+
+    /* Table inside white card */
+    .table-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(26,60,143,0.08);
+      border: 1px solid rgba(47,93,240,0.08);
+      overflow: hidden;
+    }
+  </style>
 </head>
 <body>
 
+<!-- ===== Navbar ===== -->
 <nav class="navbar">
   <a href="/" class="nav-brand"><span>🔐</span> RBA-2FA System</a>
   <div class="nav-actions">
@@ -19,35 +215,83 @@
 
 <div class="dash-layout">
 
+  <!-- ===== Sidebar ===== -->
   <aside class="dash-sidebar">
-    <div style="padding:0 8px 16px;margin-bottom:12px;border-bottom:1px solid var(--border);">
-      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Navigation</div>
+
+    <!-- Main navigation -->
+    <div class="sidebar-section-label">Main</div>
+
+    <button class="sidebar-item active" onclick="showSection('overview')">
+      <span>🏠</span> Overview
+    </button>
+
+    <!-- Collapsible Login group -->
+    <div class="sidebar-group">
+      <div class="sidebar-group-header" onclick="toggleGroup('loginGroup', this)">
+        <div class="left"><span>📋</span> Login Activity</div>
+        <span class="arrow">▶</span>
+      </div>
+      <div class="sidebar-group-items" id="loginGroup">
+        <button class="sidebar-item" onclick="showSection('history')" style="font-size:0.84rem;">
+          <span>📄</span> Login History
+        </button>
+        <button class="sidebar-item" onclick="showSection('devices')" style="font-size:0.84rem;">
+          <span>💻</span> Known Devices
+        </button>
+      </div>
     </div>
-    <button class="sidebar-item active" onclick="showSection('overview')"><span>🏠</span> Overview</button>
-    <button class="sidebar-item" onclick="showSection('history')"><span>📋</span> Login History</button>
-    <button class="sidebar-item" onclick="showSection('devices')"><span>💻</span> Known Devices</button>
-    <button class="sidebar-item" onclick="showSection('totp')"><span>🔑</span> Authenticator App</button>
-    <div style="padding:0 8px;margin:16px 0 10px;border-top:1px solid var(--border);padding-top:16px;">
-      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Research Evaluation</div>
+
+    <button class="sidebar-item" onclick="showSection('totp')">
+      <span>🔑</span> Authenticator App
+    </button>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- Collapsible Research group -->
+    <div class="sidebar-section-label">Research Evaluation</div>
+
+    <div class="sidebar-group">
+      <div class="sidebar-group-header" onclick="toggleGroup('researchGroup', this)">
+        <div class="left"><span>📊</span> Evaluation</div>
+        <span class="arrow">▶</span>
+      </div>
+      <div class="sidebar-group-items" id="researchGroup">
+        <a href="/evaluation.html" class="sidebar-item" style="text-decoration:none;font-size:0.84rem;">
+          <span>📈</span> Metrics Dashboard
+        </a>
+        <a href="/sus.html" class="sidebar-item" style="text-decoration:none;font-size:0.84rem;">
+          <span>📝</span> SUS Questionnaire
+        </a>
+      </div>
     </div>
-    <a href="/evaluation.html" class="sidebar-item" style="text-decoration:none;"><span>📊</span> Evaluation Metrics</a>
-    <a href="/sus.html"        class="sidebar-item" style="text-decoration:none;"><span>📝</span> SUS Questionnaire</a>
-    <div style="padding:0 8px;margin:16px 0 10px;border-top:1px solid var(--border);padding-top:16px;">
-      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);">Account</div>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- User card at bottom -->
+    <div class="sidebar-user">
+      <div class="avatar" id="sidebarAvatar">?</div>
+      <div class="info">
+        <div class="name" id="sidebarName">Loading…</div>
+        <div class="role">Authenticated User</div>
+      </div>
     </div>
-    <a href="/settings.html" class="sidebar-item" style="text-decoration:none;"><span>⚙️</span> Settings</a>
+
   </aside>
 
+  <!-- ===== Main content ===== -->
   <main class="dash-main">
 
-    <!-- OVERVIEW -->
+    <!-- ========== OVERVIEW ========== -->
     <section id="sec-overview">
-      <div style="margin-bottom:24px;">
-        <h2>Welcome back, <span id="welcomeName" style="color:var(--primary-light);"></span> 👋</h2>
-        <p style="margin-top:4px;">Here is your security overview and recent activity.</p>
+      <div class="page-header">
+        <div>
+          <h2>Welcome back, <span id="welcomeName" style="color:#2f5df0;"></span> 👋</h2>
+          <p>Here is your security overview and recent activity.</p>
+        </div>
+        <div style="font-size:0.82rem;color:var(--muted);" id="lastSeen"></div>
       </div>
 
-      <div class="stat-grid" style="margin-bottom:24px;">
+      <div class="stat-grid" style="margin-bottom:20px;">
         <div class="stat-card">
           <div class="stat-value" id="statScore">—</div>
           <div class="stat-label">Last Risk Score</div>
@@ -66,7 +310,7 @@
         </div>
       </div>
 
-      <div class="location-card" style="margin-bottom:24px;">
+      <div class="location-card" style="margin-bottom:20px;">
         <div class="location-icon">📍</div>
         <div class="location-info">
           <div class="label">Last Login Location</div>
@@ -75,8 +319,12 @@
         </div>
       </div>
 
-      <div class="section-title">Recent login attempts</div>
-      <div style="background:var(--card);border-radius:12px;box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;">
+      <div class="table-card">
+        <div style="padding:18px 20px 0; display:flex; align-items:center; justify-content:space-between;">
+          <div class="section-title" style="margin-bottom:0;">Recent login attempts</div>
+          <button class="btn btn-secondary" onclick="showSection('history')"
+                  style="font-size:0.8rem;padding:6px 14px;">View all →</button>
+        </div>
         <div class="table-wrap" style="margin-top:0;">
           <table>
             <thead>
@@ -93,18 +341,16 @@
       </div>
     </section>
 
-    <!-- LOGIN HISTORY -->
+    <!-- ========== LOGIN HISTORY ========== -->
     <section id="sec-history" style="display:none;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+      <div class="page-header">
         <div>
           <h2>Login History</h2>
-          <p style="margin-top:4px;">Your 50 most recent login attempts with full risk analysis.</p>
+          <p>Your 50 most recent login attempts with full risk analysis.</p>
         </div>
-        <button class="btn btn-secondary" onclick="exportCSV()" style="flex-shrink:0;">
-          📥 Export CSV
-        </button>
+        <button class="btn btn-secondary" onclick="exportCSV()">📥 Export CSV</button>
       </div>
-      <div style="background:var(--card);border-radius:12px;box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;">
+      <div class="table-card">
         <div class="table-wrap" style="margin-top:0;">
           <table>
             <thead>
@@ -121,16 +367,20 @@
       </div>
     </section>
 
-    <!-- KNOWN DEVICES -->
+    <!-- ========== KNOWN DEVICES ========== -->
     <section id="sec-devices" style="display:none;">
-      <div style="margin-bottom:20px;">
-        <h2>Known Devices</h2>
-        <p style="margin-top:4px;">Devices that have previously completed a successful login on your account.</p>
+      <div class="page-header">
+        <div>
+          <h2>Known Devices</h2>
+          <p>Devices that have previously completed a successful login on your account.</p>
+        </div>
       </div>
-      <div style="background:var(--card);border-radius:12px;box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;">
+      <div class="table-card">
         <div class="table-wrap" style="margin-top:0;">
           <table>
-            <thead><tr><th>Device Fingerprint</th><th>First Seen</th><th>Last Seen</th></tr></thead>
+            <thead>
+              <tr><th>Device Fingerprint</th><th>First Seen</th><th>Last Seen</th></tr>
+            </thead>
             <tbody id="devicesBody">
               <tr><td colspan="3" style="text-align:center;padding:24px;color:var(--muted);">Loading…</td></tr>
             </tbody>
@@ -139,35 +389,51 @@
       </div>
     </section>
 
-    <!-- TOTP -->
+    <!-- ========== TOTP ========== -->
     <section id="sec-totp" style="display:none;">
-      <div style="margin-bottom:20px;">
-        <h2>Authenticator App (TOTP)</h2>
-        <p style="margin-top:4px;">Set up Google Authenticator, Authy, or Microsoft Authenticator for 6-digit codes on Medium and High-risk logins.</p>
-      </div>
-      <div id="totpStatusBox" class="alert" style="margin-bottom:20px;"></div>
-      <button class="btn btn-secondary" id="setupTotpBtn" onclick="setupTotp()">
-        📱 Set up authenticator app
-      </button>
-      <div id="qrArea" class="qr-box" style="display:none;max-width:340px;margin-top:20px;">
-        <img id="qrImg" width="200" height="200" alt="QR Code" style="margin-bottom:16px;"/>
-        <p style="font-size:0.88rem;color:var(--muted);margin-bottom:16px;">
-          Scan this QR code with your authenticator app, then enter the 6-digit code below to confirm.
-        </p>
-        <div class="form-group">
-          <label>Confirmation code</label>
-          <input type="number" id="totpConfirmCode" class="otp-input" placeholder="000000"/>
+      <div class="page-header">
+        <div>
+          <h2>Authenticator App (TOTP)</h2>
+          <p>Set up Google Authenticator, Authy, or Microsoft Authenticator.</p>
         </div>
-        <button class="btn btn-primary btn-block" style="margin-top:12px;" onclick="confirmTotp()">
-          ✅ Confirm &amp; Enable
-        </button>
       </div>
-      <div id="totpMsg"></div>
+
+      <div class="section-card">
+        <div id="totpStatusBox" class="alert" style="margin-bottom:20px;"></div>
+        <button class="btn btn-secondary" id="setupTotpBtn" onclick="setupTotp()">
+          📱 Set up authenticator app
+        </button>
+        <div id="qrArea" class="qr-box" style="display:none;max-width:340px;margin-top:20px;">
+          <img id="qrImg" width="200" height="200" alt="QR Code"
+               style="margin-bottom:16px;display:block;margin-left:auto;margin-right:auto;"/>
+          <p style="font-size:0.88rem;color:var(--muted);margin-bottom:16px;text-align:center;">
+            Scan this QR code with your authenticator app, then enter
+            the 6-digit code below to confirm enrolment.
+          </p>
+          <div class="form-group">
+            <label>Confirmation code</label>
+            <input type="number" id="totpConfirmCode" class="otp-input" placeholder="000000"/>
+          </div>
+          <button class="btn btn-primary btn-block" style="margin-top:12px;" onclick="confirmTotp()">
+            ✅ Confirm &amp; Enable
+          </button>
+        </div>
+        <div id="totpMsg"></div>
+      </div>
     </section>
 
   </main>
 </div>
 
 <script src="/js/dashboard.js"></script>
+<script>
+// Collapsible sidebar groups
+function toggleGroup(groupId, header) {
+  const items  = document.getElementById(groupId);
+  const isOpen = items.classList.contains("open");
+  items.classList.toggle("open", !isOpen);
+  header.classList.toggle("open", !isOpen);
+}
+</script>
 </body>
 </html>

@@ -18,57 +18,114 @@
 
     <div class="form-group">
       <label>Username</label>
-      <input type="text" id="username" placeholder="Choose a username" autocomplete="username"/>
+      <input type="text" id="username"
+             placeholder="Choose a username"
+             autocomplete="username"/>
     </div>
 
     <div class="form-group">
       <label>Email address</label>
-      <input type="email" id="email" placeholder="you@example.com" autocomplete="email"/>
-      <div class="hint">📧 OTP verification codes will be sent here</div>
+      <input type="email" id="email"
+             placeholder="you@example.com"
+             autocomplete="email"/>
+      <div class="hint">
+        📧 OTP verification codes will be sent to this email
+      </div>
     </div>
 
     <div class="form-group">
-      <label>Phone number <span style="font-weight:400;text-transform:none;">(optional)</span></label>
-      <input type="tel" id="phone" placeholder="+264 81 234 5678"/>
-      <div class="hint">📱 Required for SMS OTP on high-risk logins</div>
+      <label>
+        Phone number
+        <span style="font-weight:400;text-transform:none;">
+          (optional)
+        </span>
+      </label>
+      <input type="tel" id="phone"
+             placeholder="+264 81 234 5678"/>
+      <div class="hint">
+        📱 Required for SMS OTP on high-risk logins
+      </div>
     </div>
 
     <div class="form-group">
       <label>Password</label>
       <div style="position:relative;">
-        <input type="password" id="password" placeholder="Minimum 8 characters"
-               autocomplete="new-password" style="padding-right:44px;"/>
-        <button type="button" onclick="togglePwd('password','eyeIcon')"
-                style="position:absolute;right:12px;top:50%;transform:translateY(-50%);
-                       background:none;border:none;cursor:pointer;font-size:1.1rem;
-                       color:var(--muted);padding:0;" id="eyeIcon">👁️</button>
+        <input type="password" id="password"
+               placeholder="Create a strong password"
+               autocomplete="new-password"
+               style="padding-right:44px;"/>
+        <button type="button"
+                onclick="togglePwd('password','eyeIcon')"
+                id="eyeIcon"
+                style="position:absolute;right:12px;top:50%;
+                       transform:translateY(-50%);background:none;
+                       border:none;cursor:pointer;font-size:1.1rem;
+                       color:var(--muted);padding:0;">👁️</button>
+      </div>
+    </div>
+
+    <!-- Password strength bar -->
+    <div style="margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;
+                  margin-bottom:6px;">
+        <span class="hint">Password strength</span>
+        <span class="hint" id="strengthLabel">—</span>
+      </div>
+      <div class="risk-bar">
+        <div id="strengthBar" class="risk-bar-fill low"
+             style="width:0%;transition:width 0.3s;"></div>
+      </div>
+    </div>
+
+    <!-- Password requirements hints -->
+    <div id="passwordHints"
+         style="display:none;margin-bottom:18px;padding:12px 14px;
+                background:#f8faff;border:1px solid #c7d5fd;
+                border-radius:10px;">
+      <div style="font-size:0.78rem;font-weight:700;
+                  color:var(--muted);text-transform:uppercase;
+                  letter-spacing:0.05em;margin-bottom:8px;">
+        Password Requirements
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <span id="hintLength"
+              style="font-size:0.82rem;">
+          ❌ At least 8 characters
+        </span>
+        <span id="hintUpper"
+              style="font-size:0.82rem;">
+          ❌ At least one uppercase letter (A-Z)
+        </span>
+        <span id="hintNumber"
+              style="font-size:0.82rem;">
+          ❌ At least one number (0-9)
+        </span>
+        <span id="hintSpecial"
+              style="font-size:0.82rem;">
+          ❌ At least one special character (!@#$%^&*)
+        </span>
       </div>
     </div>
 
     <div class="form-group">
       <label>Confirm password</label>
       <div style="position:relative;">
-        <input type="password" id="confirmPwd" placeholder="Repeat your password"
-               autocomplete="new-password" style="padding-right:44px;"/>
-        <button type="button" onclick="togglePwd('confirmPwd','eyeIcon2')"
-                style="position:absolute;right:12px;top:50%;transform:translateY(-50%);
-                       background:none;border:none;cursor:pointer;font-size:1.1rem;
-                       color:var(--muted);padding:0;" id="eyeIcon2">👁️</button>
+        <input type="password" id="confirmPwd"
+               placeholder="Repeat your password"
+               autocomplete="new-password"
+               style="padding-right:44px;"/>
+        <button type="button"
+                onclick="togglePwd('confirmPwd','eyeIcon2')"
+                id="eyeIcon2"
+                style="position:absolute;right:12px;top:50%;
+                       transform:translateY(-50%);background:none;
+                       border:none;cursor:pointer;font-size:1.1rem;
+                       color:var(--muted);padding:0;">👁️</button>
       </div>
     </div>
 
-    <!-- Password strength bar -->
-    <div style="margin-bottom:20px;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-        <span class="hint">Password strength</span>
-        <span class="hint" id="strengthLabel">—</span>
-      </div>
-      <div class="risk-bar">
-        <div id="strengthBar" class="risk-bar-fill low" style="width:0%;transition:width 0.3s;"></div>
-      </div>
-    </div>
-
-    <button class="btn btn-primary btn-block btn-lg" onclick="doRegister()">
+    <button class="btn btn-primary btn-block btn-lg"
+            onclick="doRegister()">
       Create Account →
     </button>
 
@@ -76,10 +133,15 @@
 
     <div class="divider">or</div>
     <p class="text-center" style="font-size:0.9rem;">
-      Already have an account? <a href="/login.html" class="link">Sign in</a>
+      Already have an account?
+      <a href="/login.html" class="link">Sign in</a>
     </p>
     <p class="text-center" style="font-size:0.85rem;margin-top:8px;">
-      <a href="/" style="color:var(--muted);text-decoration:none;font-size:0.85rem;">← Back to home</a>
+      <a href="/"
+         style="color:var(--muted);text-decoration:none;
+                font-size:0.85rem;">
+        ← Back to home
+      </a>
     </p>
 
   </div>
@@ -93,29 +155,65 @@ function togglePwd(inputId, btnId) {
   btn.textContent = input.type === "password" ? "👁️" : "🙈";
 }
 
-document.getElementById("password").addEventListener("input", function () {
-  const v   = this.value;
-  const bar = document.getElementById("strengthBar");
-  const lbl = document.getElementById("strengthLabel");
-  let score = 0;
-  if (v.length >= 8)            score++;
-  if (v.length >= 12)           score++;
-  if (/[A-Z]/.test(v))         score++;
-  if (/[0-9]/.test(v))         score++;
-  if (/[^A-Za-z0-9]/.test(v)) score++;
+document.getElementById("password").addEventListener("input",
+function () {
+  const v       = this.value;
+  const bar     = document.getElementById("strengthBar");
+  const lbl     = document.getElementById("strengthLabel");
+  const hints   = document.getElementById("passwordHints");
+  const SPECIAL = "!@#$%^&*()_+-=[]{}|;':\",./<>?";
+
+  const checks = {
+    length:  v.length >= 8,
+    upper:   /[A-Z]/.test(v),
+    number:  /[0-9]/.test(v),
+    special: v.split("").some(c => SPECIAL.includes(c)),
+    long:    v.length >= 12,
+  };
+
+  const score = Object.values(checks).filter(Boolean).length;
+
   const levels = [
-    { pct:"0%",   cls:"low",      text:"—" },
-    { pct:"25%",  cls:"critical", text:"Weak" },
-    { pct:"50%",  cls:"high",     text:"Fair" },
-    { pct:"75%",  cls:"medium",   text:"Good" },
+    { pct:"0%",   cls:"critical", text:"—" },
+    { pct:"20%",  cls:"critical", text:"Very Weak" },
+    { pct:"40%",  cls:"high",     text:"Weak" },
+    { pct:"60%",  cls:"medium",   text:"Fair" },
+    { pct:"80%",  cls:"medium",   text:"Good" },
     { pct:"100%", cls:"low",      text:"Strong ✅" },
   ];
-  const l = levels[score] || levels[0];
-  bar.style.width = l.pct;
-  bar.className   = `risk-bar-fill ${l.cls}`;
-  lbl.textContent = l.text;
+
+  const lvl = levels[score] || levels[0];
+  bar.style.width = lvl.pct;
+  bar.className   = `risk-bar-fill ${lvl.cls}`;
+  lbl.textContent = lvl.text;
+
+  if (v.length > 0) {
+    hints.style.display = "block";
+
+    const hintLength  = document.getElementById("hintLength");
+    const hintUpper   = document.getElementById("hintUpper");
+    const hintNumber  = document.getElementById("hintNumber");
+    const hintSpecial = document.getElementById("hintSpecial");
+
+    hintLength.textContent =
+      (checks.length  ? "✅" : "❌") + " At least 8 characters";
+    hintUpper.textContent  =
+      (checks.upper   ? "✅" : "❌") + " At least one uppercase letter (A-Z)";
+    hintNumber.textContent =
+      (checks.number  ? "✅" : "❌") + " At least one number (0-9)";
+    hintSpecial.textContent =
+      (checks.special ? "✅" : "❌") + " At least one special character (!@#$%^&*)";
+
+    hintLength.style.color  = checks.length  ? "#16a34a" : "#dc2626";
+    hintUpper.style.color   = checks.upper   ? "#16a34a" : "#dc2626";
+    hintNumber.style.color  = checks.number  ? "#16a34a" : "#dc2626";
+    hintSpecial.style.color = checks.special ? "#16a34a" : "#dc2626";
+  } else {
+    hints.style.display = "none";
+  }
 });
 </script>
+
 <script src="/js/register.js"></script>
 </body>
 </html>

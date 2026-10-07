@@ -39,4 +39,4 @@ if __name__ == "__main__":
     print(f"\nRisk-Based 2FA prototype running at http://localhost:{config.PORT}")
     if config.ALLOW_DEBUG_IP:
         print("ALLOW_DEBUG_IP is on — use Simulate IP on the login page.\n")
-    app.run(host="0.0.0.0", port=config.PORT, debug=True)
+        app.run(host="0.0.0.0", port=config.PORT, debug=True)

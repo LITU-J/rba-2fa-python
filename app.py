@@ -4,6 +4,7 @@ Run: python app.py
 Then open http://localhost:3000
 """
 
+import os
 from flask import Flask
 import config
 from db import init_db
@@ -31,12 +32,14 @@ def index():
 @app.get("/api/health")
 def health_check():
     return {"status": "ok"}
+
+
 @app.errorhandler(404)
 def not_found(e):
     return app.send_static_file("404.html"), 404
 
+
 if __name__ == "__main__":
-    print(f"\nRisk-Based 2FA prototype running at http://localhost:{config.PORT}")
-    if config.ALLOW_DEBUG_IP:
-        print("ALLOW_DEBUG_IP is on — use Simulate IP on the login page.\n")
-        app.run(host="0.0.0.0", port=config.PORT, debug=True)
+    port = int(os.environ.get("PORT", 3000))
+    print(f"\n  Risk-Based 2FA running at http://localhost:{port}\n")
+    app.run(host="0.0.0.0", port=port, debug=False)

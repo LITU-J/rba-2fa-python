@@ -32,10 +32,9 @@ RISK_WEIGHTS = {
 RISK_TIERS = {
     "LOW":      {"max_score": 29,  "requires": ["password"]},
     "MEDIUM":   {"max_score": 59,  "requires": ["password", "otp_any"]},
-    "HIGH":     {"max_score": 84,  "requires": ["password", "totp", "sms_otp"]},
+    "HIGH":     {"max_score": 84,  "requires": ["password", "totp", "email_otp"]},
     "CRITICAL": {"max_score": 100, "requires": ["blocked"]},
 }
-
 FREQUENCY_WINDOW_MINUTES      = 10
 FREQUENCY_MAX_ATTEMPTS        = 5
 CONSECUTIVE_FAILURE_THRESHOLD = 3

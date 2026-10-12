@@ -1,0 +1,8 @@
+flask
+python-dotenv
+bcrypt
+pyotp
+qrcode[pil]
+requests
+twilio
+gunicorn

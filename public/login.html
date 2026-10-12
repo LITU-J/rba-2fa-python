@@ -5,80 +5,387 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Sign In — RBA-2FA</title>
   <link rel="stylesheet" href="/css/style.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg,
+        #0f172a 0%, #1e3a8a 50%, #1a1a2e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image:
+        radial-gradient(circle at 20% 20%,
+          rgba(99,102,241,0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%,
+          rgba(59,130,246,0.15) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%,
+          rgba(139,92,246,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .login-wrapper {
+      width: 100%;
+      max-width: 480px;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-right {
+      background: #ffffff;
+      padding: 48px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .login-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      justify-content: center;
+    }
+
+    .login-brand-icon {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    .login-brand-name {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .login-brand-sub {
+      font-size: 0.7rem;
+      color: #64748b;
+    }
+
+    .login-right h1 {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .subtitle {
+      font-size: 0.88rem;
+      color: #64748b;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #374151;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+
+    .input-wrap {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      padding: 13px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      color: #0f172a;
+      background: #f8fafc;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+
+    .input-wrap input:focus {
+      border-color: #4f46e5;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(79,70,229,0.08);
+    }
+
+    .input-wrap input::placeholder { color: #94a3b8; }
+
+    .eye-btn {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #94a3b8;
+      padding: 0;
+      transition: color 0.2s;
+    }
+
+    .eye-btn:hover { color: #4f46e5; }
+
+    .sim-toggle {
+      width: 100%;
+      background: #f1f5f9;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-size: 0.82rem;
+      color: #64748b;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color 0.2s;
+    }
+
+    .sim-toggle:hover { border-color: #4f46e5; color: #4f46e5; }
+
+    .sim-panel {
+      display: none;
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .sim-panel.open { display: block; }
+
+    .sim-panel input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      background: #fff;
+      margin-bottom: 10px;
+      outline: none;
+      color: #0f172a;
+    }
+
+    .sim-panel input:focus { border-color: #4f46e5; }
+
+    .ip-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .ip-chip {
+      background: #ede9fe;
+      color: #5b21b6;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .ip-chip:hover { background: #ddd6fe; }
+
+    .signin-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      margin-top: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 16px rgba(79,70,229,0.4);
+    }
+
+    .signin-btn:hover   { opacity: 0.92; transform: translateY(-1px); }
+    .signin-btn:active  { transform: translateY(0); }
+    .signin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .divider {
+      text-align: center;
+      font-size: 0.82rem;
+      color: #94a3b8;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 43%;
+      height: 1px;
+      background: #e2e8f0;
+    }
+
+    .divider::before { left: 0; }
+    .divider::after  { right: 0; }
+
+    .bottom-links {
+      text-align: center;
+      font-size: 0.86rem;
+      color: #64748b;
+    }
+
+    .bottom-links a {
+      color: #4f46e5;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .bottom-links a:hover { text-decoration: underline; }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 10px;
+      text-decoration: none;
+    }
+
+    .back-link:hover { color: #64748b; }
+
+    #msg { margin-top: 4px; }
+
+    .alert-error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1.5px solid #fca5a5;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    .alert-success {
+      background: #f0fdf4;
+      color: #166534;
+      border: 1.5px solid #86efac;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 </head>
 <body>
-<div class="page-center">
-  <div class="card card-sm">
 
-    <div class="auth-header">
-      <div class="logo-icon">🛡️</div>
-      <h1>Welcome back</h1>
-      <p>Sign in to your secured account</p>
+<div class="login-wrapper">
+  <div class="login-right">
+
+    <!-- Brand -->
+    <div class="login-brand">
+      <div class="login-brand-icon">🛡️</div>
+      <div>
+        <div class="login-brand-name">RBA-2FA System</div>
+        <div class="login-brand-sub">Adaptive Authentication</div>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Username</label>
+    <h1>Welcome back</h1>
+    <p class="subtitle">Sign in to your secured account</p>
+
+    <label class="field-label">Username</label>
+    <div class="input-wrap">
       <input type="text" id="username"
              placeholder="Enter your username"
              autocomplete="username"/>
     </div>
 
-    <div class="form-group">
-      <label>Password</label>
-      <div style="position:relative;">
-        <input type="password" id="password"
-               placeholder="Enter your password"
-               autocomplete="current-password"
-               style="padding-right:44px;"/>
-        <button type="button"
-                onclick="togglePwd()"
-                id="eyeIcon"
-                style="position:absolute;right:12px;top:50%;
-                       transform:translateY(-50%);background:none;
-                       border:none;cursor:pointer;font-size:1.1rem;
-                       color:var(--muted);padding:0;">👁️</button>
+    <label class="field-label">Password</label>
+    <div class="input-wrap">
+      <input type="password" id="password"
+             placeholder="Enter your password"
+             autocomplete="current-password"
+             style="padding-right:44px;"/>
+      <button class="eye-btn" onclick="togglePwd()"
+              id="eyeIcon">👁️</button>
+    </div>
+
+    <button class="sim-toggle" onclick="toggleSim()">
+      🔬 Risk Engine Demo — Simulate a different IP location
+    </button>
+
+    <div class="sim-panel" id="simPanel">
+      <input type="text" id="debugIp"
+             placeholder="e.g. 41.182.0.1 (Windhoek)"/>
+      <div class="ip-chips">
+        <button class="ip-chip"
+                onclick="setIp('41.182.0.1')">
+          Windhoek
+        </button>
+        <button class="ip-chip"
+                onclick="setIp('41.182.0.2')">
+          Swakopmund
+        </button>
+        <button class="ip-chip"
+                onclick="setIp('41.182.0.4')">
+          Oshakati
+        </button>
+        <button class="ip-chip"
+                onclick="setIp('196.216.2.1')">
+          South Africa
+        </button>
+        <button class="ip-chip"
+                onclick="setIp('203.0.113.5')">
+          Japan
+        </button>
+        <button class="ip-chip"
+                onclick="setIp('8.8.8.8')">
+          USA
+        </button>
       </div>
     </div>
 
-    <details style="margin-bottom:18px;background:#f8fafc;
-                    border:1.5px solid var(--border);
-                    border-radius:10px;padding:12px 16px;">
-      <summary style="font-size:0.84rem;font-weight:600;
-                      color:var(--muted);user-select:none;
-                      cursor:pointer;">
-        🔬 Risk Engine Demo — Simulate a different IP location
-      </summary>
-      <div style="margin-top:12px;">
-        <label>Simulated IP address</label>
-        <input type="text" id="debugIp"
-               placeholder="e.g. 41.182.0.1 (Windhoek)"/>
-        <div class="hint" style="margin-top:8px;line-height:1.9;">
-          <strong>Namibia:</strong>
-          <code style="background:#eef2ff;padding:1px 6px;
-                       border-radius:4px;">41.182.0.1</code>
-          Windhoek &nbsp;·&nbsp;
-          <code style="background:#eef2ff;padding:1px 6px;
-                       border-radius:4px;">41.182.0.2</code>
-          Swakopmund &nbsp;·&nbsp;
-          <code style="background:#eef2ff;padding:1px 6px;
-                       border-radius:4px;">41.182.0.4</code>
-          Oshakati<br/>
-          <strong>Other:</strong>
-          <code style="background:#eef2ff;padding:1px 6px;
-                       border-radius:4px;">196.216.2.1</code>
-          South Africa &nbsp;·&nbsp;
-          <code style="background:#eef2ff;padding:1px 6px;
-                       border-radius:4px;">203.0.113.5</code>
-          Japan &nbsp;·&nbsp;
-          <code style="background:#eef2ff;padding:1px 6px;
-                       border-radius:4px;">8.8.8.8</code>
-          USA
-        </div>
-      </div>
-    </details>
-
-    <button class="btn btn-primary btn-block btn-lg"
-            id="loginBtn"
+    <button class="signin-btn" id="loginBtn"
             onclick="doLogin()">
       Sign In →
     </button>
@@ -87,16 +394,11 @@
 
     <div class="divider">or</div>
 
-    <p class="text-center" style="font-size:0.9rem;">
+    <div class="bottom-links">
       Don't have an account?
-      <a href="/register.html" class="link">Create one</a>
-    </p>
-    <p class="text-center" style="font-size:0.85rem;margin-top:8px;">
-      <a href="/"
-         style="color:var(--muted);text-decoration:none;">
-        ← Back to home
-      </a>
-    </p>
+      <a href="/register.html">Create one</a>
+    </div>
+    <a href="/" class="back-link">← Back to home</a>
 
   </div>
 </div>
@@ -107,6 +409,15 @@ function togglePwd() {
   const btn   = document.getElementById("eyeIcon");
   input.type  = input.type === "password" ? "text" : "password";
   btn.textContent = input.type === "password" ? "👁️" : "🙈";
+}
+
+function toggleSim() {
+  document.getElementById("simPanel").classList.toggle("open");
+}
+
+function setIp(ip) {
+  document.getElementById("debugIp").value = ip;
+  document.getElementById("simPanel").classList.add("open");
 }
 </script>
 <script src="/js/login.js"></script>

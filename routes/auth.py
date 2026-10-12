@@ -4,6 +4,7 @@ routes/auth.py
 Registration, login, OTP verification, TOTP setup, logout.
 Includes time-based account lockout — 15 minutes after 5 failures.
 Password must contain uppercase, number and special character.
+HIGH risk requires: Password + TOTP (or SMS OTP) + Email OTP
 """
 
 import json
@@ -19,7 +20,7 @@ import services.otp_service as otp
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
-LOCKOUT_MINUTES  = 15
+LOCKOUT_MINUTES  = 2
 LOCKOUT_ATTEMPTS = 5
 SPECIAL_CHARS    = "!@#$%^&*()_+-=[]{}|;':\",./<>?"
 
@@ -38,10 +39,6 @@ def require_auth(fn):
 # ------------------------------------------------------------------
 
 def _validate_password(password):
-    """
-    Returns (True, None) if valid.
-    Returns (False, error_message) if invalid.
-    """
     if len(password) < 8:
         return False, "Password must be at least 8 characters"
     if not any(c.isupper() for c in password):
@@ -58,11 +55,6 @@ def _validate_password(password):
 # ------------------------------------------------------------------
 
 def _check_lockout(db, user_id):
-    """
-    Checks if account is currently locked.
-    Lock lasts 15 minutes from the time of the 5th consecutive failure.
-    After 15 minutes the account unlocks automatically.
-    """
     recent = db.execute(
         "SELECT outcome, timestamp FROM login_logs "
         "WHERE user_id=? ORDER BY timestamp DESC LIMIT ?",
@@ -80,7 +72,6 @@ def _check_lockout(db, user_id):
     if not all_failed:
         return {"locked": False}
 
-    # Get timestamp of most recent failure
     latest_str  = recent[0]["timestamp"]
     latest_fail = datetime.strptime(
         latest_str, "%Y-%m-%d %H:%M:%S"
@@ -90,7 +81,6 @@ def _check_lockout(db, user_id):
     now         = datetime.now(timezone.utc)
 
     if now >= unlock_time:
-        # Lockout period has passed — auto unlocked
         return {"locked": False}
 
     remaining_secs    = int((unlock_time - now).total_seconds())
@@ -215,7 +205,6 @@ def login():
              score=0, tier="LOW",
              reasons=[], required_factors=[])
 
-        # Count consecutive failures after logging this one
         recent = db.execute(
             "SELECT outcome FROM login_logs WHERE user_id=? "
             "ORDER BY timestamp DESC LIMIT ?",
@@ -289,6 +278,7 @@ def login():
 
 # ------------------------------------------------------------------
 # OTP Challenge
+# KEY CHANGE: HIGH risk = Password + TOTP (or SMS OTP) + Email OTP
 # ------------------------------------------------------------------
 
 def _start_challenge(db, user, ip, geo, dhash, score, tier, reasons):
@@ -297,17 +287,32 @@ def _start_challenge(db, user, ip, geo, dhash, score, tier, reasons):
         if f != "password"
     ]
 
-    if "totp" in required and not user["totp_enabled"]:
-        required = [
-            "email_otp" if f == "totp" else f
-            for f in required
-        ]
+    # HIGH risk — requires TOTP or SMS OTP + Email OTP
+    if tier == "HIGH":
+        if user["totp_enabled"]:
+            # User has TOTP set up — require TOTP + Email OTP
+            required = ["totp", "email_otp"]
+        elif user["phone"]:
+            # No TOTP but has phone — require SMS OTP + Email OTP
+            required = ["sms_otp", "email_otp"]
+        else:
+            # No TOTP and no phone — require Email OTP only
+            required = ["email_otp"]
+
+    # MEDIUM risk — require TOTP or Email OTP (either one is fine)
+    elif tier == "MEDIUM":
+        if user["totp_enabled"]:
+            required = ["totp"]
+        else:
+            required = ["email_otp"]
 
     email_hash = email_exp = sms_hash = sms_exp = None
 
-    if "otp_any" in required or "email_otp" in required:
+    # Send Email OTP if required
+    if "email_otp" in required:
         _, email_hash, email_exp = otp.send_email_otp(user["email"])
 
+    # Send SMS OTP if required
     if "sms_otp" in required:
         _, sms_hash, sms_exp = otp.send_sms_otp(user["phone"])
 
@@ -324,10 +329,10 @@ def _start_challenge(db, user, ip, geo, dhash, score, tier, reasons):
         token, user["id"],
         json.dumps(required), json.dumps([]),
         email_hash, email_exp,
-        sms_hash, sms_exp,
+        sms_hash,   sms_exp,
         ip,
         geo["country"], geo["region"], geo["city"],
-        geo["lat"], geo["lon"],
+        geo["lat"],     geo["lon"],
         geo.get("isp"), geo.get("timezone"),
         dhash, score, tier, json.dumps(reasons)
     ))

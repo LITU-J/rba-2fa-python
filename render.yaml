@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: rba-2fa
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: SECRET_KEY
+        value: rba2fa-litu-joseph-201705632-unam-2026
+      - key: PORT
+        value: 10000
+      - key: ALLOW_DEBUG_IP
+        value: "true"
+      - key: USE_REAL_GEOLOCATION
+        value: "false"
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_USER
+        value: litujoseph1@gmail.com
+      - key: SMTP_PASS
+        value: sjpe xtcm msxn jqeu
+      - key: SMTP_FROM
+        value: litujoseph1@gmail.com
+      - key: TWILIO_ACCOUNT_SID
+        value: ACf9aaf45264f8a0918e2e75c0619c2f35
+      - key: TWILIO_AUTH_TOKEN
+        value: your_new_token_here
+      - key: TWILIO_FROM_NUMBER
+        value: "+14472712040"

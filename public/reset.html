@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Reset Password — RBA-2FA</title>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <style>
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg,
+        #0f172a 0%, #1e3a8a 50%, #1a1a2e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 48px 44px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+    }
+    h1 { font-size:1.5rem; font-weight:800; color:#0f172a; margin-bottom:6px; }
+    p  { font-size:0.88rem; color:#64748b; margin-bottom:28px; }
+    label {
+      display:block; font-size:0.78rem; font-weight:700;
+      color:#374151; text-transform:uppercase;
+      letter-spacing:0.06em; margin-bottom:8px;
+    }
+    input {
+      width:100%; padding:13px 16px;
+      border:2px solid #e2e8f0; border-radius:12px;
+      font-size:0.95rem; color:#0f172a;
+      background:#f8fafc; outline:none;
+      margin-bottom:16px;
+    }
+    input:focus { border-color:#4f46e5; background:#fff; }
+    button {
+      width:100%; padding:14px;
+      background:linear-gradient(135deg,#4f46e5,#7c3aed);
+      color:#fff; border:none; border-radius:12px;
+      font-size:1rem; font-weight:700; cursor:pointer;
+      margin-bottom:16px;
+    }
+    #msg { margin-top:8px; }
+    .back {
+      display:block; text-align:center;
+      font-size:0.85rem; color:#94a3b8;
+      text-decoration:none; margin-top:10px;
+    }
+    .alert-error {
+      background:#fef2f2; color:#991b1b;
+      border:1.5px solid #fca5a5;
+      border-radius:10px; padding:12px 16px;
+      font-size:0.86rem; margin-top:8px;
+    }
+    .alert-success {
+      background:#f0fdf4; color:#166534;
+      border:1.5px solid #86efac;
+      border-radius:10px; padding:12px 16px;
+      font-size:0.86rem; margin-top:8px;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+
+  <!-- Step 1 — Request reset -->
+  <div id="step1">
+    <h1>Reset Password</h1>
+    <p>Enter your email address and we will send you a reset code.</p>
+
+    <label>Email Address</label>
+    <input type="email" id="resetEmail"
+           placeholder="you@example.com"/>
+
+    <button onclick="requestReset()">Send Reset Code</button>
+    <div id="msg1"></div>
+    <a href="/login.html" class="back">← Back to login</a>
+  </div>
+
+  <!-- Step 2 — Enter code and new password -->
+  <div id="step2" style="display:none;">
+    <h1>Enter Reset Code</h1>
+    <p>Check your email for the 6-digit reset code.</p>
+
+    <label>Reset Code</label>
+    <input type="number" id="resetCode"
+           placeholder="000000"/>
+
+    <label>New Password</label>
+    <input type="password" id="newPassword"
+           placeholder="Min 8 chars, uppercase, number, special"/>
+
+    <label>Confirm New Password</label>
+    <input type="password" id="confirmNewPassword"
+           placeholder="Repeat new password"/>
+
+    <button onclick="confirmReset()">Reset Password</button>
+    <div id="msg2"></div>
+  </div>
+
+</div>
+
+<script>
+async function requestReset() {
+  const email = document.getElementById("resetEmail").value.trim();
+  const msg   = document.getElementById("msg1");
+
+  if (!email) {
+    msg.innerHTML = "<div class='alert-error'>Please enter your email.</div>";
+    return;
+  }
+
+  const res  = await fetch("/api/auth/reset-password", {
+    method:  "POST",
+    headers: { "Content-Type": "application/json" },
+    body:    JSON.stringify({ email }),
+  });
+  const data = await res.json();
+
+  msg.innerHTML =
+    "<div class='alert-success'>" +
+    "✅ Reset code sent — check your email inbox." +
+    "</div>";
+
+  setTimeout(() => {
+    document.getElementById("step1").style.display = "none";
+    document.getElementById("step2").style.display = "block";
+  }, 1500);
+}
+
+async function confirmReset() {
+  const email    = document.getElementById("resetEmail").value.trim();
+  const code     = document.getElementById("resetCode").value.trim();
+  const newPwd   = document.getElementById("newPassword").value;
+  const confirm  = document.getElementById("confirmNewPassword").value;
+  const msg      = document.getElementById("msg2");
+
+  if (newPwd !== confirm) {
+    msg.innerHTML =
+      "<div class='alert-error'>Passwords do not match.</div>";
+    return;
+  }
+
+  const res  = await fetch("/api/auth/reset-password/confirm", {
+    method:  "POST",
+    headers: { "Content-Type": "application/json" },
+    body:    JSON.stringify({
+      email,
+      code,
+      new_password: newPwd
+    }),
+  });
+  const data = await res.json();
+
+  if (!res.ok) {
+    msg.innerHTML =
+      "<div class='alert-error'>❌ " + data.error + "</div>";
+    return;
+  }
+
+  msg.innerHTML =
+    "<div class='alert-success'>" +
+    "✅ Password reset successfully! Redirecting to login..." +
+    "</div>";
+
+  setTimeout(() => location.href = "/login.html", 2000);
+}
+</script>
+</body>
+</html>

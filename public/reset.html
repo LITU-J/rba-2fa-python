@@ -6,170 +6,417 @@
   <title>Reset Password — RBA-2FA</title>
   <link rel="stylesheet" href="/css/style.css"/>
   <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
     body {
-      min-height: 100vh;
-      background: linear-gradient(135deg,
-        #0f172a 0%, #1e3a8a 50%, #1a1a2e 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      min-height:100vh;
+      background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 50%,#1a1a2e 100%);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Segoe UI',sans-serif; padding:20px;
     }
     .card {
-      background: #fff;
-      border-radius: 24px;
-      padding: 48px 44px;
-      width: 100%;
-      max-width: 440px;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+      background:#fff; border-radius:24px; padding:48px 44px;
+      width:100%; max-width:460px;
+      box-shadow:0 32px 80px rgba(0,0,0,0.5);
     }
-    h1 { font-size:1.5rem; font-weight:800; color:#0f172a; margin-bottom:6px; }
-    p  { font-size:0.88rem; color:#64748b; margin-bottom:28px; }
-    label {
+    .brand {
+      display:flex; align-items:center; gap:10px;
+      justify-content:center; margin-bottom:28px;
+    }
+    .brand-icon {
+      width:42px; height:42px;
+      background:linear-gradient(135deg,#4f46e5,#7c3aed);
+      border-radius:12px; display:flex; align-items:center;
+      justify-content:center; font-size:1.3rem;
+    }
+    .brand-name { font-size:1.1rem; font-weight:800; color:#0f172a; }
+    .brand-sub  { font-size:0.7rem; color:#64748b; }
+    h1 {
+      font-size:1.5rem; font-weight:800; color:#0f172a;
+      margin-bottom:6px; text-align:center;
+    }
+    .subtitle {
+      font-size:0.88rem; color:#64748b;
+      margin-bottom:28px; text-align:center; line-height:1.5;
+    }
+    .field-label {
       display:block; font-size:0.78rem; font-weight:700;
       color:#374151; text-transform:uppercase;
       letter-spacing:0.06em; margin-bottom:8px;
     }
-    input {
+    .input-wrap { position:relative; margin-bottom:18px; }
+    .input-wrap input {
       width:100%; padding:13px 16px;
       border:2px solid #e2e8f0; border-radius:12px;
       font-size:0.95rem; color:#0f172a;
       background:#f8fafc; outline:none;
-      margin-bottom:16px;
+      transition:border-color 0.2s,box-shadow 0.2s;
     }
-    input:focus { border-color:#4f46e5; background:#fff; }
-    button {
+    .input-wrap input:focus {
+      border-color:#4f46e5; background:#fff;
+      box-shadow:0 0 0 4px rgba(79,70,229,0.08);
+    }
+    .input-wrap input::placeholder { color:#94a3b8; }
+    .btn-primary {
       width:100%; padding:14px;
       background:linear-gradient(135deg,#4f46e5,#7c3aed);
       color:#fff; border:none; border-radius:12px;
       font-size:1rem; font-weight:700; cursor:pointer;
+      transition:opacity 0.2s,transform 0.1s;
       margin-bottom:16px;
+      box-shadow:0 4px 16px rgba(79,70,229,0.4);
     }
-    #msg { margin-top:8px; }
-    .back {
+    .btn-primary:hover   { opacity:0.92; transform:translateY(-1px); }
+    .btn-primary:active  { transform:translateY(0); }
+    .btn-primary:disabled { opacity:0.6; cursor:not-allowed; }
+    .back-link {
       display:block; text-align:center;
       font-size:0.85rem; color:#94a3b8;
-      text-decoration:none; margin-top:10px;
+      text-decoration:none; margin-top:8px;
     }
+    .back-link:hover { color:#64748b; }
     .alert-error {
       background:#fef2f2; color:#991b1b;
-      border:1.5px solid #fca5a5;
-      border-radius:10px; padding:12px 16px;
-      font-size:0.86rem; margin-top:8px;
+      border:1.5px solid #fca5a5; border-radius:10px;
+      padding:12px 16px; font-size:0.86rem;
+      font-weight:600; margin-top:12px;
     }
     .alert-success {
       background:#f0fdf4; color:#166534;
-      border:1.5px solid #86efac;
-      border-radius:10px; padding:12px 16px;
-      font-size:0.86rem; margin-top:8px;
+      border:1.5px solid #86efac; border-radius:10px;
+      padding:12px 16px; font-size:0.86rem;
+      font-weight:600; margin-top:12px;
     }
+    .step-indicator {
+      display:flex; align-items:center; justify-content:center;
+      gap:8px; margin-bottom:24px;
+    }
+    .step-dot {
+      width:10px; height:10px; border-radius:50%;
+      background:#e2e8f0; transition:background 0.3s;
+    }
+    .step-dot.active  { background:#4f46e5; }
+    .step-dot.done    { background:#16a34a; }
+    .spinner {
+      display:inline-block; width:16px; height:16px;
+      border:2px solid rgba(255,255,255,0.3);
+      border-top-color:#fff; border-radius:50%;
+      animation:spin 0.7s linear infinite;
+      vertical-align:middle; margin-right:8px;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .hint-box {
+      background:#f0f4ff; border:1px solid #c7d5fd;
+      border-radius:10px; padding:12px 16px;
+      font-size:0.82rem; color:#374151;
+      margin-bottom:16px; line-height:1.8;
+    }
+    .eye-btn {
+      position:absolute; right:14px; top:50%;
+      transform:translateY(-50%); background:none;
+      border:none; cursor:pointer; font-size:1rem;
+      color:#94a3b8; padding:0;
+    }
+    .eye-btn:hover { color:#4f46e5; }
   </style>
 </head>
 <body>
 <div class="card">
 
-  <!-- Step 1 — Request reset -->
-  <div id="step1">
-    <h1>Reset Password</h1>
-    <p>Enter your email address and we will send you a reset code.</p>
-
-    <label>Email Address</label>
-    <input type="email" id="resetEmail"
-           placeholder="you@example.com"/>
-
-    <button onclick="requestReset()">Send Reset Code</button>
-    <div id="msg1"></div>
-    <a href="/login.html" class="back">← Back to login</a>
+  <!-- Brand -->
+  <div class="brand">
+    <div class="brand-icon">🛡️</div>
+    <div>
+      <div class="brand-name">RBA-2FA System</div>
+      <div class="brand-sub">Password Recovery</div>
+    </div>
   </div>
 
-  <!-- Step 2 — Enter code and new password -->
+  <!-- Step indicators -->
+  <div class="step-indicator">
+    <div class="step-dot active" id="dot1"></div>
+    <div style="width:40px;height:2px;background:#e2e8f0;" id="line1"></div>
+    <div class="step-dot" id="dot2"></div>
+    <div style="width:40px;height:2px;background:#e2e8f0;" id="line2"></div>
+    <div class="step-dot" id="dot3"></div>
+  </div>
+
+  <!-- STEP 1 — Enter email -->
+  <div id="step1">
+    <h1>Forgot Password?</h1>
+    <p class="subtitle">
+      Enter your registered email address and we will
+      send you a 6-digit reset code.
+    </p>
+
+    <label class="field-label">Email Address</label>
+    <div class="input-wrap">
+      <input type="email" id="resetEmail"
+             placeholder="you@example.com"
+             autocomplete="email"/>
+    </div>
+
+    <button class="btn-primary" id="sendBtn"
+            onclick="sendCode()">
+      Send Reset Code →
+    </button>
+    <div id="msg1"></div>
+    <a href="/login.html" class="back-link">← Back to login</a>
+  </div>
+
+  <!-- STEP 2 — Enter code -->
   <div id="step2" style="display:none;">
     <h1>Enter Reset Code</h1>
-    <p>Check your email for the 6-digit reset code.</p>
+    <p class="subtitle">
+      Check your email inbox for a 6-digit code.
+      It expires in 15 minutes.
+    </p>
 
-    <label>Reset Code</label>
-    <input type="number" id="resetCode"
-           placeholder="000000"/>
+    <div class="hint-box">
+      📧 A reset code was sent to
+      <strong id="emailSentTo"></strong>
+      — check your inbox and spam folder.
+    </div>
 
-    <label>New Password</label>
-    <input type="password" id="newPassword"
-           placeholder="Min 8 chars, uppercase, number, special"/>
+    <label class="field-label">6-Digit Reset Code</label>
+    <div class="input-wrap">
+      <input type="number" id="resetCode"
+             placeholder="000000" maxlength="6"/>
+    </div>
 
-    <label>Confirm New Password</label>
-    <input type="password" id="confirmNewPassword"
-           placeholder="Repeat new password"/>
-
-    <button onclick="confirmReset()">Reset Password</button>
+    <button class="btn-primary" id="verifyBtn"
+            onclick="verifyCode()">
+      Verify Code →
+    </button>
     <div id="msg2"></div>
+    <a href="#" class="back-link"
+       onclick="goBack(1)">← Back</a>
+  </div>
+
+  <!-- STEP 3 — New password -->
+  <div id="step3" style="display:none;">
+    <h1>Set New Password</h1>
+    <p class="subtitle">
+      Create a strong new password for your account.
+    </p>
+
+    <div class="hint-box">
+      ✅ Password must contain:<br/>
+      • At least 8 characters<br/>
+      • One uppercase letter (A-Z)<br/>
+      • One number (0-9)<br/>
+      • One special character (!@#$%^&*)
+    </div>
+
+    <label class="field-label">New Password</label>
+    <div class="input-wrap">
+      <input type="password" id="newPassword"
+             placeholder="Create a strong password"
+             style="padding-right:44px;"
+             autocomplete="new-password"/>
+      <button class="eye-btn" onclick="togglePwd('newPassword','eye1')"
+              id="eye1">👁️</button>
+    </div>
+
+    <label class="field-label">Confirm New Password</label>
+    <div class="input-wrap">
+      <input type="password" id="confirmPassword"
+             placeholder="Repeat your new password"
+             style="padding-right:44px;"
+             autocomplete="new-password"/>
+      <button class="eye-btn"
+              onclick="togglePwd('confirmPassword','eye2')"
+              id="eye2">👁️</button>
+    </div>
+
+    <button class="btn-primary" id="resetBtn"
+            onclick="resetPassword()">
+      Reset Password →
+    </button>
+    <div id="msg3"></div>
   </div>
 
 </div>
 
 <script>
-async function requestReset() {
+let userEmail = "";
+
+function togglePwd(inputId, btnId) {
+  const input = document.getElementById(inputId);
+  const btn   = document.getElementById(btnId);
+  input.type  = input.type === "password" ? "text" : "password";
+  btn.textContent = input.type === "password" ? "👁️" : "🙈";
+}
+
+function goBack(toStep) {
+  document.getElementById("step1").style.display =
+    toStep === 1 ? "block" : "none";
+  document.getElementById("step2").style.display =
+    toStep === 2 ? "block" : "none";
+  document.getElementById("step3").style.display =
+    toStep === 3 ? "block" : "none";
+  updateDots(toStep);
+}
+
+function updateDots(step) {
+  [1,2,3].forEach(i => {
+    const dot = document.getElementById(`dot${i}`);
+    dot.className = "step-dot" +
+      (i < step ? " done" : i === step ? " active" : "");
+  });
+}
+
+async function sendCode() {
   const email = document.getElementById("resetEmail").value.trim();
   const msg   = document.getElementById("msg1");
+  const btn   = document.getElementById("sendBtn");
 
   if (!email) {
-    msg.innerHTML = "<div class='alert-error'>Please enter your email.</div>";
+    msg.innerHTML =
+      "<div class='alert-error'>Please enter your email address.</div>";
     return;
   }
 
-  const res  = await fetch("/api/auth/reset-password", {
-    method:  "POST",
-    headers: { "Content-Type": "application/json" },
-    body:    JSON.stringify({ email }),
-  });
-  const data = await res.json();
+  btn.innerHTML = "<span class='spinner'></span> Sending…";
+  btn.disabled  = true;
 
-  msg.innerHTML =
-    "<div class='alert-success'>" +
-    "✅ Reset code sent — check your email inbox." +
-    "</div>";
+  try {
+    const res  = await fetch("/api/auth/reset-password", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ email }),
+    });
+    const data = await res.json();
 
-  setTimeout(() => {
-    document.getElementById("step1").style.display = "none";
-    document.getElementById("step2").style.display = "block";
-  }, 1500);
+    if (!res.ok) {
+      msg.innerHTML =
+        "<div class='alert-error'>❌ " + data.error + "</div>";
+      return;
+    }
+
+    userEmail = email;
+    msg.innerHTML =
+      "<div class='alert-success'>✅ Reset code sent — check your inbox!</div>";
+
+    setTimeout(() => {
+      document.getElementById("step1").style.display = "none";
+      document.getElementById("step2").style.display = "block";
+      document.getElementById("emailSentTo").textContent = email;
+      updateDots(2);
+    }, 1200);
+
+  } catch(e) {
+    msg.innerHTML =
+      "<div class='alert-error'>Network error. Please try again.</div>";
+  } finally {
+    btn.innerHTML = "Send Reset Code →";
+    btn.disabled  = false;
+  }
 }
 
-async function confirmReset() {
-  const email    = document.getElementById("resetEmail").value.trim();
-  const code     = document.getElementById("resetCode").value.trim();
-  const newPwd   = document.getElementById("newPassword").value;
-  const confirm  = document.getElementById("confirmNewPassword").value;
-  const msg      = document.getElementById("msg2");
+async function verifyCode() {
+  const code = document.getElementById("resetCode").value.trim();
+  const msg  = document.getElementById("msg2");
+  const btn  = document.getElementById("verifyBtn");
 
-  if (newPwd !== confirm) {
+  if (!code || code.length !== 6) {
+    msg.innerHTML =
+      "<div class='alert-error'>Please enter the 6-digit code.</div>";
+    return;
+  }
+
+  btn.innerHTML = "<span class='spinner'></span> Verifying…";
+  btn.disabled  = true;
+
+  try {
+    const res  = await fetch("/api/auth/reset-password/verify", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ email: userEmail, code }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      msg.innerHTML =
+        "<div class='alert-error'>❌ " + data.error + "</div>";
+      return;
+    }
+
+    msg.innerHTML =
+      "<div class='alert-success'>✅ Code verified!</div>";
+
+    setTimeout(() => {
+      document.getElementById("step2").style.display = "none";
+      document.getElementById("step3").style.display = "block";
+      updateDots(3);
+    }, 900);
+
+  } catch(e) {
+    msg.innerHTML =
+      "<div class='alert-error'>Network error. Please try again.</div>";
+  } finally {
+    btn.innerHTML = "Verify Code →";
+    btn.disabled  = false;
+  }
+}
+
+async function resetPassword() {
+  const newPwd = document.getElementById("newPassword").value;
+  const conPwd = document.getElementById("confirmPassword").value;
+  const msg    = document.getElementById("msg3");
+  const btn    = document.getElementById("resetBtn");
+
+  if (newPwd !== conPwd) {
     msg.innerHTML =
       "<div class='alert-error'>Passwords do not match.</div>";
     return;
   }
 
-  const res  = await fetch("/api/auth/reset-password/confirm", {
-    method:  "POST",
-    headers: { "Content-Type": "application/json" },
-    body:    JSON.stringify({
-      email,
-      code,
-      new_password: newPwd
-    }),
-  });
-  const data = await res.json();
+  btn.innerHTML = "<span class='spinner'></span> Resetting…";
+  btn.disabled  = true;
 
-  if (!res.ok) {
+  try {
+    const code = document.getElementById("resetCode").value.trim();
+    const res  = await fetch("/api/auth/reset-password/confirm", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({
+        email:        userEmail,
+        code:         code,
+        new_password: newPwd
+      }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      msg.innerHTML =
+        "<div class='alert-error'>❌ " + data.error + "</div>";
+      return;
+    }
+
     msg.innerHTML =
-      "<div class='alert-error'>❌ " + data.error + "</div>";
-    return;
+      "<div class='alert-success'>" +
+      "✅ Password reset successfully! Redirecting to login…" +
+      "</div>";
+
+    setTimeout(() => location.href = "/login.html", 2000);
+
+  } catch(e) {
+    msg.innerHTML =
+      "<div class='alert-error'>Network error. Please try again.</div>";
+  } finally {
+    btn.innerHTML = "Reset Password →";
+    btn.disabled  = false;
   }
-
-  msg.innerHTML =
-    "<div class='alert-success'>" +
-    "✅ Password reset successfully! Redirecting to login..." +
-    "</div>";
-
-  setTimeout(() => location.href = "/login.html", 2000);
 }
+
+document.addEventListener("keydown", e => {
+  if (e.key !== "Enter") return;
+  const s1 = document.getElementById("step1").style.display;
+  const s2 = document.getElementById("step2").style.display;
+  if (s1 !== "none") sendCode();
+  else if (s2 !== "none") verifyCode();
+  else resetPassword();
+});
 </script>
 </body>
 </html>

@@ -2,25 +2,28 @@
 routes/auth.py
 ===============
 Registration, login, OTP verification, TOTP setup, logout.
-Includes time-based account lockout — 15 minutes after 5 failures.
-Password must contain uppercase, number and special character.
-HIGH risk requires: Password + TOTP (or SMS OTP) + Email OTP
+Password reset with email verification.
+Time-based account lockout — 15 minutes after 5 failures.
 """
 
 import json
 import uuid
 import bcrypt
+import smtplib
 from datetime import datetime, timedelta, timezone
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from flask import Blueprint, jsonify, request, session
 from db import get_db
 from services.geo_service import resolve_client_ip, lookup_geo
 from services.device_service import compute_device_hash
 from services.risk_engine import assess_risk, required_factors_for_tier
 import services.otp_service as otp
+import config
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
-LOCKOUT_MINUTES  = 2
+LOCKOUT_MINUTES  = 15
 LOCKOUT_ATTEMPTS = 5
 SPECIAL_CHARS    = "!@#$%^&*()_+-=[]{}|;':\",./<>?"
 
@@ -95,6 +98,110 @@ def _check_lockout(db, user_id):
 
 
 # ------------------------------------------------------------------
+# Email helper — uses Mailgun or Gmail SMTP
+# ------------------------------------------------------------------
+
+def _send_reset_email(to, code):
+    html = f"""
+    <html>
+    <body style="font-family:Arial,sans-serif;padding:0;margin:0;
+                 background:#f4f6fb;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+    <tr><td align="center" style="padding:40px 0;">
+    <table width="520"
+           style="background:#fff;border-radius:16px;
+                  box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+      <tr><td style="background:linear-gradient(135deg,#1a3c8f,#2f5df0);
+                     padding:32px 40px;
+                     border-radius:16px 16px 0 0;
+                     text-align:center;">
+        <h1 style="margin:0;color:#fff;font-size:22px;">
+          🔐 RBA-2FA System
+        </h1>
+        <p style="margin:6px 0 0;color:rgba(255,255,255,0.8);
+                  font-size:14px;">
+          Password Reset Request
+        </p>
+      </td></tr>
+      <tr><td style="padding:40px;">
+        <p style="color:#374151;font-size:15px;">Hello,</p>
+        <p style="color:#6b7386;font-size:14px;line-height:1.6;">
+          You requested a password reset for your RBA-2FA account.
+          Use the code below to reset your password.
+        </p>
+        <div style="text-align:center;margin:28px 0;">
+          <span style="display:inline-block;
+                       background:#f0f4ff;
+                       border:2px solid #2f5df0;
+                       border-radius:12px;
+                       padding:18px 40px;
+                       font-size:38px;
+                       font-weight:800;
+                       letter-spacing:10px;
+                       color:#1a3c8f;">
+            {code}
+          </span>
+        </div>
+        <p style="color:#6b7386;font-size:13px;text-align:center;">
+          ⏱ Expires in <strong>15 minutes</strong>
+        </p>
+        <div style="background:#fff8e1;border:1px solid #ffd54f;
+                    border-radius:10px;padding:14px 18px;margin-top:20px;">
+          <p style="margin:0;color:#856404;font-size:13px;">
+            🔒 Never share this code with anyone.
+          </p>
+        </div>
+        <hr style="border:none;border-top:1px solid #eef0f5;margin:28px 0;">
+        <p style="color:#9aa3b5;font-size:12px;text-align:center;">
+          If you did not request this — ignore this email.
+        </p>
+      </td></tr>
+      <tr><td style="background:#f8f9fc;padding:20px;
+                     border-radius:0 0 16px 16px;text-align:center;">
+        <p style="margin:0;color:#c0c5d0;font-size:11px;">
+          RBA-2FA System — UNAM Research Prototype 2026
+        </p>
+      </td></tr>
+    </table></td></tr></table>
+    </body></html>"""
+
+    plain = (
+        f"Your RBA-2FA password reset code is: {code}\n"
+        f"Expires in 15 minutes. Do not share this code."
+    )
+
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = "RBA-2FA Password Reset Code"
+    msg["From"]    = config.SMTP_FROM
+    msg["To"]      = to
+    msg.attach(MIMEText(plain, "plain"))
+    msg.attach(MIMEText(html,  "html"))
+
+    # Try port 587 STARTTLS first
+    try:
+        with smtplib.SMTP(config.SMTP_HOST, int(config.SMTP_PORT)) as s:
+            s.ehlo()
+            s.starttls()
+            s.login(config.SMTP_USER, config.SMTP_PASS)
+            s.sendmail(config.SMTP_FROM, to, msg.as_string())
+            print(f"[RESET EMAIL] Sent to {to}")
+            return
+    except Exception as e:
+        print(f"[SMTP 587 failed] {e} — trying SSL 465")
+
+    # Try port 465 SSL
+    try:
+        with smtplib.SMTP_SSL(config.SMTP_HOST, 465) as s:
+            s.login(config.SMTP_USER, config.SMTP_PASS)
+            s.sendmail(config.SMTP_FROM, to, msg.as_string())
+            print(f"[RESET EMAIL via SSL] Sent to {to}")
+            return
+    except Exception as e:
+        print(f"[SMTP 465 failed] {e}")
+        raise
+
+
+# ------------------------------------------------------------------
 # Register
 # ------------------------------------------------------------------
 
@@ -161,7 +268,7 @@ def login():
     geo   = lookup_geo(ip)
     dhash = compute_device_hash()
 
-    # ---- Check lockout BEFORE password verification ----
+    # Check lockout BEFORE password verification
     if user:
         lockout = _check_lockout(db, user["id"])
         if lockout["locked"]:
@@ -190,13 +297,13 @@ def login():
                 ],
             }), 403
 
-    # ---- Wrong username ----
+    # Wrong username
     if user is None:
         _log(db, None, username, ip, geo, dhash,
              outcome="failed_password")
         return jsonify({"error": "Invalid credentials"}), 401
 
-    # ---- Wrong password ----
+    # Wrong password
     if not bcrypt.checkpw(
         password.encode(), user["password_hash"].encode()
     ):
@@ -240,7 +347,7 @@ def login():
                 f"account is locked for {LOCKOUT_MINUTES} minutes.",
         }), 401
 
-    # ---- Password correct — run risk engine ----
+    # Password correct — run risk engine
     risk    = assess_risk(user["id"], dhash, geo)
     score   = risk["score"]
     tier    = risk["tier"]
@@ -278,7 +385,6 @@ def login():
 
 # ------------------------------------------------------------------
 # OTP Challenge
-# KEY CHANGE: HIGH risk = Password + TOTP (or SMS OTP) + Email OTP
 # ------------------------------------------------------------------
 
 def _start_challenge(db, user, ip, geo, dhash, score, tier, reasons):
@@ -290,16 +396,13 @@ def _start_challenge(db, user, ip, geo, dhash, score, tier, reasons):
     # HIGH risk — requires TOTP or SMS OTP + Email OTP
     if tier == "HIGH":
         if user["totp_enabled"]:
-            # User has TOTP set up — require TOTP + Email OTP
             required = ["totp", "email_otp"]
         elif user["phone"]:
-            # No TOTP but has phone — require SMS OTP + Email OTP
             required = ["sms_otp", "email_otp"]
         else:
-            # No TOTP and no phone — require Email OTP only
             required = ["email_otp"]
 
-    # MEDIUM risk — require TOTP or Email OTP (either one is fine)
+    # MEDIUM risk — require TOTP or Email OTP
     elif tier == "MEDIUM":
         if user["totp_enabled"]:
             required = ["totp"]
@@ -308,11 +411,9 @@ def _start_challenge(db, user, ip, geo, dhash, score, tier, reasons):
 
     email_hash = email_exp = sms_hash = sms_exp = None
 
-    # Send Email OTP if required
     if "email_otp" in required:
         _, email_hash, email_exp = otp.send_email_otp(user["email"])
 
-    # Send SMS OTP if required
     if "sms_otp" in required:
         _, sms_hash, sms_exp = otp.send_sms_otp(user["phone"])
 
@@ -550,6 +651,7 @@ def totp_confirm():
     db.commit()
     return jsonify({"message": "TOTP enabled"})
 
+
 # ------------------------------------------------------------------
 # Password Reset — Step 1: Send code to email
 # ------------------------------------------------------------------
@@ -567,7 +669,6 @@ def reset_password_request():
         "SELECT * FROM users WHERE email=?", (email,)
     ).fetchone()
 
-    # Always return success to prevent email enumeration
     if not user:
         return jsonify({
             "message": "If this email exists a reset code has been sent"
@@ -580,83 +681,16 @@ def reset_password_request():
         datetime.now(timezone.utc) + timedelta(minutes=15)
     ).strftime("%Y-%m-%d %H:%M:%S")
 
-    # Store code in database — reuse totp_secret field temporarily
+    # Store code
     db.execute(
         "UPDATE users SET totp_secret=? WHERE id=?",
         (f"RESET:{code}:{expires}", user["id"])
     )
     db.commit()
 
-    # Send reset email
+    # Send email
     try:
-        import smtplib
-        from email.mime.text import MIMEText
-        from email.mime.multipart import MIMEMultipart
-
-        msg_obj = MIMEMultipart("alternative")
-        msg_obj["Subject"] = "RBA-2FA Password Reset Code"
-        msg_obj["From"]    = config.SMTP_FROM
-        msg_obj["To"]      = email
-
-        html = f"""
-        <html>
-        <body style="font-family:Arial,sans-serif;padding:20px;
-                     background:#f8fafc;">
-          <div style="max-width:480px;margin:0 auto;
-                      background:#fff;border-radius:16px;
-                      padding:32px;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
-            <div style="text-align:center;margin-bottom:24px;">
-              <div style="width:56px;height:56px;
-                          background:linear-gradient(135deg,#4f46e5,#7c3aed);
-                          border-radius:16px;display:inline-flex;
-                          align-items:center;justify-content:center;
-                          font-size:1.8rem;">🛡️</div>
-              <h2 style="color:#1a2744;margin-top:12px;">
-                Password Reset Request
-              </h2>
-            </div>
-            <p style="color:#374151;line-height:1.6;">
-              You requested a password reset for your RBA-2FA account.
-              Use the code below to reset your password.
-            </p>
-            <div style="background:#f0f4ff;border:2px solid #c7d5fd;
-                        border-radius:12px;padding:24px;
-                        text-align:center;margin:24px 0;">
-              <div style="font-size:0.82rem;color:#64748b;
-                          margin-bottom:8px;font-weight:600;">
-                YOUR RESET CODE
-              </div>
-              <div style="font-size:2.8rem;font-weight:900;
-                          letter-spacing:0.3em;color:#1a3c8f;">
-                {code}
-              </div>
-              <div style="font-size:0.82rem;color:#64748b;margin-top:8px;">
-                ⏱ Expires in 15 minutes
-              </div>
-            </div>
-            <p style="color:#64748b;font-size:0.88rem;line-height:1.6;">
-              If you did not request a password reset you can safely
-              ignore this email. Your password will not be changed.
-            </p>
-            <div style="border-top:1px solid #e2e8f0;
-                        margin-top:24px;padding-top:16px;
-                        text-align:center;font-size:0.78rem;color:#94a3b8;">
-              RBA-2FA System — UNAM Research Prototype
-            </div>
-          </div>
-        </body>
-        </html>"""
-
-        msg_obj.attach(MIMEText(html, "html"))
-
-        with smtplib.SMTP(config.SMTP_HOST, config.SMTP_PORT) as s:
-            s.ehlo()
-            s.starttls()
-            s.login(config.SMTP_USER, config.SMTP_PASS)
-            s.sendmail(config.SMTP_FROM, email, msg_obj.as_string())
-
-        print(f"[RESET EMAIL] Code sent to {email}")
-
+        _send_reset_email(email, code)
     except Exception as e:
         print(f"[RESET EMAIL ERROR] {e}")
         print(f"[RESET CODE CONSOLE] Code for {email}: {code}")
@@ -689,16 +723,23 @@ def reset_password_verify():
         return jsonify({"error": "Invalid or expired reset code"}), 400
 
     try:
-        _, stored_code, expires = user["totp_secret"].split(":")
+        parts       = user["totp_secret"].split(":")
+        stored_code = parts[1]
+        expires     = parts[2]
+
         expiry_time = datetime.strptime(
             expires, "%Y-%m-%d %H:%M:%S"
         ).replace(tzinfo=timezone.utc)
 
         if datetime.now(timezone.utc) > expiry_time:
-            return jsonify({"error": "Reset code has expired — please request a new one"}), 400
+            return jsonify({
+                "error": "Reset code has expired — please request a new one"
+            }), 400
 
         if stored_code != code:
-            return jsonify({"error": "Invalid reset code — please check and try again"}), 400
+            return jsonify({
+                "error": "Invalid reset code — please check and try again"
+            }), 400
 
     except Exception:
         return jsonify({"error": "Invalid or expired reset code"}), 400
@@ -734,7 +775,10 @@ def reset_password_confirm():
         return jsonify({"error": "Invalid or expired reset code"}), 400
 
     try:
-        _, stored_code, expires = user["totp_secret"].split(":")
+        parts       = user["totp_secret"].split(":")
+        stored_code = parts[1]
+        expires     = parts[2]
+
         expiry_time = datetime.strptime(
             expires, "%Y-%m-%d %H:%M:%S"
         ).replace(tzinfo=timezone.utc)
@@ -745,14 +789,11 @@ def reset_password_confirm():
             }), 400
 
         if stored_code != code:
-            return jsonify({
-                "error": "Invalid reset code"
-            }), 400
+            return jsonify({"error": "Invalid reset code"}), 400
 
     except Exception:
         return jsonify({"error": "Invalid or expired reset code"}), 400
 
-    # Update password and clear reset code
     new_hash = bcrypt.hashpw(
         new_pwd.encode(), bcrypt.gensalt(rounds=12)
     ).decode()
@@ -765,6 +806,8 @@ def reset_password_confirm():
 
     print(f"[RESET SUCCESS] Password reset for {email}")
     return jsonify({"message": "Password reset successfully"}), 200
+
+
 # ------------------------------------------------------------------
 # Helpers
 # ------------------------------------------------------------------

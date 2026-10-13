@@ -1,0 +1,23 @@
+# Environment variables — contains passwords and API keys
+.env
+
+# Database — contains user data
+data/
+data/app.sqlite
+*.sqlite
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+venv/
+env/
+
+# VS Code
+.vscode/
+
+# Windows
+Thumbs.db
+desktop.ini

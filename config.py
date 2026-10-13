@@ -13,7 +13,13 @@ SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", 587))
 SMTP_USER = os.environ.get("SMTP_USER", "")
 SMTP_PASS = os.environ.get("SMTP_PASS", "")
-SMTP_FROM = os.environ.get("SMTP_FROM", SMTP_USER)
+SMTP_FROM = os.environ.get("SMTP_FROM", "")
+
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+
+MAILGUN_API_KEY = os.environ.get("MAILGUN_API_KEY", "")
+MAILGUN_DOMAIN  = os.environ.get("MAILGUN_DOMAIN", "")
+MAILGUN_FROM    = os.environ.get("MAILGUN_FROM", "")
 
 TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID", "")
 TWILIO_AUTH_TOKEN  = os.environ.get("TWILIO_AUTH_TOKEN", "")
@@ -35,6 +41,7 @@ RISK_TIERS = {
     "HIGH":     {"max_score": 84,  "requires": ["password", "totp", "email_otp"]},
     "CRITICAL": {"max_score": 100, "requires": ["blocked"]},
 }
+
 FREQUENCY_WINDOW_MINUTES      = 10
 FREQUENCY_MAX_ATTEMPTS        = 5
 CONSECUTIVE_FAILURE_THRESHOLD = 3

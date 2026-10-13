@@ -723,9 +723,12 @@ def reset_password_verify():
         return jsonify({"error": "Invalid or expired reset code"}), 400
 
     try:
-        parts       = user["totp_secret"].split(":")
+        # Split only on first two colons to handle timestamp with colons
+        raw     = user["totp_secret"]
+        parts   = raw.split(":")
         stored_code = parts[1]
-        expires     = parts[2]
+        # Rejoin remaining parts as timestamp
+        expires = ":".join(parts[2:])
 
         expiry_time = datetime.strptime(
             expires, "%Y-%m-%d %H:%M:%S"
@@ -741,7 +744,8 @@ def reset_password_verify():
                 "error": "Invalid reset code — please check and try again"
             }), 400
 
-    except Exception:
+    except Exception as e:
+        print(f"[RESET VERIFY ERROR] {e}")
         return jsonify({"error": "Invalid or expired reset code"}), 400
 
     return jsonify({"message": "Code verified"}), 200
@@ -777,7 +781,7 @@ def reset_password_confirm():
     try:
         parts       = user["totp_secret"].split(":")
         stored_code = parts[1]
-        expires     = parts[2]
+        expires     = ":".join(parts[2:])
 
         expiry_time = datetime.strptime(
             expires, "%Y-%m-%d %H:%M:%S"

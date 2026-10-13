@@ -82,9 +82,12 @@
     .calc-table th {
       padding: 8px 12px; background: #f1f5f9;
       text-align: left; font-size: 0.75rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--muted);
     }
-    .calc-table td { padding: 9px 12px; border-bottom: 1px solid #f1f5f9; }
+    .calc-table td {
+      padding: 9px 12px; border-bottom: 1px solid #f1f5f9;
+    }
     .calc-table tr:last-child td { border-bottom: none; }
     .score-poor   { color: #dc2626; font-weight: 700; }
     .score-medium { color: #d97706; font-weight: 700; }
@@ -114,31 +117,8 @@
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
-    .formula-step .step-text  { color: var(--text); }
-    .formula-step .step-value { font-weight: 800; color: var(--primary); margin-left: auto; }
-    .past-row {
-      background: #f8faff; border: 1px solid var(--border);
-      border-radius: 12px; padding: 14px 18px; margin-bottom: 12px;
-    }
-    .past-top {
-      display: flex; align-items: center;
-      justify-content: space-between; margin-bottom: 6px;
-    }
-    .past-score { font-size: 1.3rem; font-weight: 900; }
-    .past-suggestion {
-      font-size: 0.84rem; color: var(--muted);
-      background: #fff; border: 1px solid #e8edf5;
-      border-radius: 8px; padding: 8px 12px;
-      margin-top: 8px; font-style: italic; line-height: 1.5;
-    }
-    .pill-Excellent { background: #dcfce7; color: #15803d; }
-    .pill-Good      { background: #dbeafe; color: #1d4ed8; }
-    .pill-Fair      { background: #fef9c3; color: #854d0e; }
-    .pill-Poor      { background: #fee2e2; color: #991b1b; }
-    .sus-pill {
-      display: inline-flex; align-items: center;
-      padding: 4px 12px; border-radius: 20px;
-      font-size: 0.78rem; font-weight: 700;
+    .formula-step .step-value {
+      font-weight: 800; color: var(--primary); margin-left: auto;
     }
     .suggestions-box {
       background: var(--card); border: 1.5px solid var(--border);
@@ -164,29 +144,19 @@
       background: linear-gradient(90deg,var(--primary),var(--primary-light));
       border-radius: 4px; transition: width 0.3s ease;
     }
-    .response-card {
-      background: #fff; border: 1.5px solid #e2e8f0;
-      border-radius: 14px; padding: 18px 20px; margin-bottom: 14px;
-      box-shadow: 0 2px 8px rgba(26,60,143,0.05);
-    }
-    .suggestion-box {
-      background: #f0f4ff; border-left: 4px solid #4f46e5;
-      border-radius: 0 8px 8px 0; padding: 10px 14px; margin-top: 10px;
-    }
-    .suggestion-label {
-      font-size: 0.72rem; font-weight: 700; color: #4f46e5;
-      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;
-    }
-    .suggestion-text { font-size: 0.86rem; color: #374151; line-height: 1.6; }
   </style>
 </head>
 <body>
 
 <nav class="navbar">
-  <a href="/dashboard.html" class="nav-brand"><span>🔐</span> RBA-2FA System</a>
+  <a href="/dashboard.html" class="nav-brand">
+    <span>🔐</span> RBA-2FA System
+  </a>
   <div class="nav-actions">
-    <a href="/evaluation.html" class="btn btn-secondary" style="font-size:0.85rem;">📊 Metrics</a>
-    <a href="/dashboard.html"  class="btn btn-outline"   style="font-size:0.85rem;">← Dashboard</a>
+    <a href="/evaluation.html" class="btn btn-secondary"
+       style="font-size:0.85rem;">📊 Metrics</a>
+    <a href="/dashboard.html" class="btn btn-outline"
+       style="font-size:0.85rem;">← Dashboard</a>
   </div>
 </nav>
 
@@ -197,59 +167,82 @@
 
     <div style="margin-bottom:24px;">
       <h1 style="margin-bottom:8px;">📝 Usability Questionnaire</h1>
-      <p>Rate your experience using the RBA-2FA login system. Answer all 10 questions honestly — your feedback improves the system.</p>
+      <p>Rate your experience using the RBA-2FA login system.
+         Answer all 10 questions honestly — your feedback
+         improves the system.</p>
     </div>
 
-    <div class="form-group" style="max-width:300px;margin-bottom:20px;">
-      <label>Your name <span style="font-weight:400;text-transform:none;">(optional)</span></label>
-      <input type="text" id="participant" placeholder="e.g. Participant 1"/>
+    <div class="form-group"
+         style="max-width:300px;margin-bottom:20px;">
+      <label>Your name
+        <span style="font-weight:400;text-transform:none;">
+          (optional)
+        </span>
+      </label>
+      <input type="text" id="participant"
+             placeholder="e.g. Participant 1"/>
     </div>
 
     <div style="background:#f0fdf4;border:1.5px solid #86efac;
-                border-radius:12px;padding:16px 20px;margin-bottom:24px;">
-      <div style="font-weight:700;margin-bottom:10px;color:#15803d;font-size:0.9rem;">
+                border-radius:12px;padding:16px 20px;
+                margin-bottom:24px;">
+      <div style="font-weight:700;margin-bottom:10px;
+                  color:#15803d;font-size:0.9rem;">
         ⭐ Rating Guide — Higher number always means better
       </div>
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;text-align:center;">
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);
+                  gap:8px;text-align:center;">
         <div style="background:#fef2f2;border-radius:8px;padding:10px 6px;">
           <div style="font-size:1.4rem;font-weight:900;color:#dc2626;">1</div>
-          <div style="font-size:0.72rem;color:#dc2626;font-weight:700;margin-top:3px;">Very Poor</div>
+          <div style="font-size:0.72rem;color:#dc2626;font-weight:700;
+                      margin-top:3px;">Very Poor</div>
         </div>
         <div style="background:#fff7ed;border-radius:8px;padding:10px 6px;">
           <div style="font-size:1.4rem;font-weight:900;color:#ea580c;">2</div>
-          <div style="font-size:0.72rem;color:#ea580c;font-weight:700;margin-top:3px;">Poor</div>
+          <div style="font-size:0.72rem;color:#ea580c;font-weight:700;
+                      margin-top:3px;">Poor</div>
         </div>
         <div style="background:#fffbeb;border-radius:8px;padding:10px 6px;">
           <div style="font-size:1.4rem;font-weight:900;color:#d97706;">3</div>
-          <div style="font-size:0.72rem;color:#d97706;font-weight:700;margin-top:3px;">Medium</div>
+          <div style="font-size:0.72rem;color:#d97706;font-weight:700;
+                      margin-top:3px;">Medium</div>
         </div>
         <div style="background:#f0fdf4;border-radius:8px;padding:10px 6px;">
           <div style="font-size:1.4rem;font-weight:900;color:#16a34a;">4</div>
-          <div style="font-size:0.72rem;color:#16a34a;font-weight:700;margin-top:3px;">Good</div>
+          <div style="font-size:0.72rem;color:#16a34a;font-weight:700;
+                      margin-top:3px;">Good</div>
         </div>
         <div style="background:#dcfce7;border-radius:8px;padding:10px 6px;">
           <div style="font-size:1.4rem;font-weight:900;color:#15803d;">5</div>
-          <div style="font-size:0.72rem;color:#15803d;font-weight:700;margin-top:3px;">Excellent</div>
+          <div style="font-size:0.72rem;color:#15803d;font-weight:700;
+                      margin-top:3px;">Excellent</div>
         </div>
       </div>
     </div>
 
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-      <span style="font-size:0.82rem;color:var(--muted);font-weight:600;">Questions answered</span>
-      <span style="font-size:0.82rem;font-weight:700;color:var(--primary);" id="progressText">0 / 10</span>
+    <div style="display:flex;align-items:center;
+                justify-content:space-between;margin-bottom:8px;">
+      <span style="font-size:0.82rem;color:var(--muted);font-weight:600;">
+        Questions answered
+      </span>
+      <span style="font-size:0.82rem;font-weight:700;color:var(--primary);"
+            id="progressText">0 / 10</span>
     </div>
     <div class="progress-bar-wrap">
-      <div class="progress-bar-fill" id="progressBar" style="width:0%;"></div>
+      <div class="progress-bar-fill" id="progressBar"
+           style="width:0%;"></div>
     </div>
 
     <div id="questionsArea"></div>
 
     <div class="suggestions-box">
       <div style="font-size:0.82rem;font-weight:700;color:var(--muted);
-                  text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">
+                  text-transform:uppercase;letter-spacing:0.06em;
+                  margin-bottom:6px;">
         💬 Suggestions &amp; Comments
       </div>
-      <h3 style="font-size:0.95rem;font-weight:600;color:var(--text);margin-bottom:8px;">
+      <h3 style="font-size:0.95rem;font-weight:600;color:var(--text);
+                 margin-bottom:8px;">
         What would you improve about the RBA-2FA system?
       </h3>
       <p style="font-size:0.84rem;color:var(--muted);margin-bottom:12px;">
@@ -266,16 +259,21 @@
     </button>
     <div id="msg"></div>
 
-   
+  </div><!-- end formSection -->
+
   <!-- ===== RESULT SECTION ===== -->
   <div id="resultSection" style="display:none;">
 
     <div class="result-card" id="resultCard">
-      <div style="font-size:0.85rem;opacity:0.8;margin-bottom:6px;" id="resultName"></div>
+      <div style="font-size:0.85rem;opacity:0.8;margin-bottom:6px;"
+           id="resultName"></div>
       <div class="big-score" id="resultScore"></div>
-      <div style="font-size:1rem;opacity:0.75;margin-top:2px;">out of 100</div>
+      <div style="font-size:1rem;opacity:0.75;margin-top:2px;">
+        out of 100
+      </div>
       <div class="grade-text" id="resultGrade"></div>
-      <div style="font-size:0.88rem;opacity:0.75;margin-top:8px;" id="resultMsg"></div>
+      <div style="font-size:0.88rem;opacity:0.75;margin-top:8px;"
+           id="resultMsg"></div>
     </div>
 
     <div style="margin-bottom:20px;">
@@ -283,46 +281,52 @@
       <div class="formula-box">
         <div class="formula-step">
           <div class="step-num">1</div>
-          <div class="step-text">Each question rated from 1 (Very Poor) to 5 (Excellent)</div>
+          <div>Each question rated from 1 (Very Poor) to 5 (Excellent)</div>
         </div>
         <div class="formula-step">
           <div class="step-num">2</div>
-          <div class="step-text" id="formulaStep2"></div>
+          <div id="formulaStep2"></div>
         </div>
         <div class="formula-step">
           <div class="step-num">3</div>
-          <div class="step-text" id="formulaStep3"></div>
+          <div id="formulaStep3"></div>
         </div>
         <div class="formula-step">
           <div class="step-num">4</div>
-          <div class="step-text" id="formulaStep4"></div>
+          <div id="formulaStep4"></div>
           <div class="step-value" id="formulaFinal"></div>
         </div>
       </div>
     </div>
 
     <div style="margin-bottom:24px;">
-      <h3 style="margin-bottom:12px;">📋 Question-by-question breakdown</h3>
+      <h3 style="margin-bottom:12px;">
+        📋 Question-by-question breakdown
+      </h3>
       <div style="background:var(--card);border-radius:12px;
                   box-shadow:var(--shadow);border:1px solid var(--border);
                   overflow:hidden;">
         <table class="calc-table">
           <thead>
             <tr>
-              <th>#</th><th>Question</th>
-              <th>Your Rating</th><th>Level</th>
+              <th>#</th>
+              <th>Question</th>
+              <th>Your Rating</th>
+              <th>Level</th>
             </tr>
           </thead>
           <tbody id="breakdownBody"></tbody>
           <tfoot>
             <tr style="background:#f8faff;">
-              <td colspan="2" style="padding:10px 12px;font-weight:700;">
+              <td colspan="2"
+                  style="padding:10px 12px;font-weight:700;">
                 Total raw score
               </td>
               <td style="padding:10px 12px;font-weight:900;
                          color:var(--primary);font-size:1.1rem;"
                   id="rawScoreCell"></td>
-              <td style="padding:10px 12px;font-size:0.78rem;color:var(--muted);">
+              <td style="padding:10px 12px;font-size:0.78rem;
+                         color:var(--muted);">
                 out of 50
               </td>
             </tr>
@@ -333,24 +337,38 @@
 
     <div style="background:#f8faff;border:1px solid var(--border);
                 border-radius:12px;padding:18px 22px;margin-bottom:24px;">
-      <h3 style="margin-bottom:14px;font-size:0.95rem;">📊 Score scale reference</h3>
+      <h3 style="margin-bottom:14px;font-size:0.95rem;">
+        📊 Score scale reference
+      </h3>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);
                   gap:10px;text-align:center;">
         <div style="background:#fee2e2;border-radius:10px;padding:12px 8px;">
-          <div style="font-size:1.1rem;font-weight:900;color:#991b1b;">0 – 39</div>
-          <div style="font-size:0.75rem;color:#991b1b;font-weight:700;margin-top:4px;">Poor</div>
+          <div style="font-size:1.1rem;font-weight:900;color:#991b1b;">
+            0 – 39
+          </div>
+          <div style="font-size:0.75rem;color:#991b1b;font-weight:700;
+                      margin-top:4px;">Poor</div>
         </div>
         <div style="background:#fef9c3;border-radius:10px;padding:12px 8px;">
-          <div style="font-size:1.1rem;font-weight:900;color:#854d0e;">40 – 59</div>
-          <div style="font-size:0.75rem;color:#854d0e;font-weight:700;margin-top:4px;">Fair</div>
+          <div style="font-size:1.1rem;font-weight:900;color:#854d0e;">
+            40 – 59
+          </div>
+          <div style="font-size:0.75rem;color:#854d0e;font-weight:700;
+                      margin-top:4px;">Fair</div>
         </div>
         <div style="background:#dbeafe;border-radius:10px;padding:12px 8px;">
-          <div style="font-size:1.1rem;font-weight:900;color:#1d4ed8;">60 – 79</div>
-          <div style="font-size:0.75rem;color:#1d4ed8;font-weight:700;margin-top:4px;">Good</div>
+          <div style="font-size:1.1rem;font-weight:900;color:#1d4ed8;">
+            60 – 79
+          </div>
+          <div style="font-size:0.75rem;color:#1d4ed8;font-weight:700;
+                      margin-top:4px;">Good</div>
         </div>
         <div style="background:#dcfce7;border-radius:10px;padding:12px 8px;">
-          <div style="font-size:1.1rem;font-weight:900;color:#15803d;">80 – 100</div>
-          <div style="font-size:0.75rem;color:#15803d;font-weight:700;margin-top:4px;">Excellent</div>
+          <div style="font-size:1.1rem;font-weight:900;color:#15803d;">
+            80 – 100
+          </div>
+          <div style="font-size:0.75rem;color:#15803d;font-weight:700;
+                      margin-top:4px;">Excellent</div>
         </div>
       </div>
     </div>
@@ -359,19 +377,9 @@
       <button class="btn btn-secondary" onclick="resetForm()">
         📝 Submit another response
       </button>
-      <a href="/evaluation.html" class="btn btn-primary">
-        📊 View all results →
+      <a href="/dashboard.html" class="btn btn-primary">
+        ← Back to Dashboard
       </a>
-    </div>
-
-    <div>
-      <h3 style="margin-bottom:6px;">All Responses</h3>
-      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:16px;">
-        All responses collected from participants.
-      </p>
-      <div id="pastResponses">
-        <p style="color:var(--muted);">Loading…</p>
-      </div>
     </div>
 
   </div><!-- end resultSection -->
@@ -392,32 +400,34 @@ const QUESTIONS = [
   "Overall, I am satisfied with the security and usability of this system.",
 ];
 
-let answeredCount = 0;
-
 function renderQuestions() {
-  document.getElementById("questionsArea").innerHTML = QUESTIONS.map((q, i) => `
-    <div class="sus-q" id="card${i}">
-      <div class="q-num">Question ${i + 1} of ${QUESTIONS.length}</div>
-      <div class="q-text">${q}</div>
-      <div class="scale-wrap">
-        <div class="scale-options">
-          ${[1,2,3,4,5].map(v => `
-            <div class="scale-option" data-val="${v}">
-              <input type="radio" name="q${i}" id="q${i}v${v}"
-                     value="${v}" onchange="onAnswer(${i})"/>
-              <label for="q${i}v${v}" class="btn-scale">${v}</label>
-            </div>`).join("")}
+  document.getElementById("questionsArea").innerHTML =
+    QUESTIONS.map((q, i) => `
+      <div class="sus-q" id="card${i}">
+        <div class="q-num">Question ${i + 1} of ${QUESTIONS.length}</div>
+        <div class="q-text">${q}</div>
+        <div class="scale-wrap">
+          <div class="scale-options">
+            ${[1,2,3,4,5].map(v => `
+              <div class="scale-option" data-val="${v}">
+                <input type="radio" name="q${i}"
+                       id="q${i}v${v}" value="${v}"
+                       onchange="onAnswer(${i})"/>
+                <label for="q${i}v${v}" class="btn-scale">
+                  ${v}
+                </label>
+              </div>`).join("")}
+          </div>
+          <div class="scale-labels">
+            <span>1 = Very Poor</span>
+            <span>3 = Medium</span>
+            <span>5 = Excellent</span>
+          </div>
+          <div class="q-rating-hint" id="hint${i}">
+            Select a number above — 1 is worst, 5 is best
+          </div>
         </div>
-        <div class="scale-labels">
-          <span>1 = Very Poor</span>
-          <span>3 = Medium</span>
-          <span>5 = Excellent</span>
-        </div>
-        <div class="q-rating-hint" id="hint${i}">
-          Select a number above — 1 is worst, 5 is best
-        </div>
-      </div>
-    </div>`).join("");
+      </div>`).join("");
 }
 
 function onAnswer(i) {
@@ -429,8 +439,8 @@ function onAnswer(i) {
   card.classList.add("answered");
   const labels = ["","Very Poor","Poor","Medium","Good","Excellent"];
   const colors = ["","#dc2626","#ea580c","#d97706","#16a34a","#15803d"];
-  hint.textContent   = `You selected: ${val} — ${labels[val]}`;
-  hint.style.color   = colors[val];
+  hint.textContent      = `You selected: ${val} — ${labels[val]}`;
+  hint.style.color      = colors[val];
   hint.style.fontStyle  = "normal";
   hint.style.fontWeight = "600";
   updateProgress();
@@ -441,7 +451,6 @@ function updateProgress() {
   for (let i = 0; i < 10; i++) {
     if (document.querySelector(`input[name="q${i}"]:checked`)) count++;
   }
-  answeredCount = count;
   document.getElementById("progressText").textContent = `${count} / 10`;
   document.getElementById("progressBar").style.width  =
     (count / 10 * 100) + "%";
@@ -468,8 +477,9 @@ async function submitForm() {
     (document.getElementById("participant").value || "").trim();
   const suggestions =
     (document.getElementById("suggestions").value || "").trim();
+
   const btn = document.getElementById("submitBtn");
-  btn.innerHTML = '<span class="spinner"></span> Calculating…';
+  btn.innerHTML = '<span class="spinner"></span> Submitting…';
   btn.disabled  = true;
 
   try {
@@ -479,6 +489,7 @@ async function submitForm() {
       body:    JSON.stringify({ participant, answers, suggestions }),
     });
     const data = await res.json();
+
     if (!res.ok) {
       document.getElementById("msg").innerHTML =
         `<div class="alert alert-error" style="margin-top:14px;">
@@ -487,6 +498,7 @@ async function submitForm() {
       return;
     }
     showResult(data, answers, participant || "Anonymous");
+
   } catch(e) {
     document.getElementById("msg").innerHTML =
       `<div class="alert alert-error" style="margin-top:14px;">
@@ -508,8 +520,10 @@ function showResult(data, answers, participant) {
   const raw   = data.raw_score;
 
   const gradeClass = {
-    Excellent:"excellent", Good:"good", Fair:"fair", Poor:"poor"
+    Excellent:"excellent", Good:"good",
+    Fair:"fair", Poor:"poor"
   }[grade] || "fair";
+
   const gradeMsg = {
     Excellent: "Outstanding! The system achieved excellent usability.",
     Good:      "Good usability — users found the system easy and secure.",
@@ -537,12 +551,14 @@ function showResult(data, answers, participant) {
     "Ease of use","Completing login","OTP step clarity",
     "Account security confidence","Clear instructions",
     "Risk feedback clarity","OTP time acceptable",
-    "Would use regularly","System response speed","Overall satisfaction",
+    "Would use regularly","System response speed",
+    "Overall satisfaction",
   ];
 
   const tbody = document.getElementById("breakdownBody");
   tbody.innerHTML = answers.map((a, i) => {
-    const lc = a <= 2 ? "score-poor" : a === 3 ? "score-medium" : "score-good";
+    const lc = a <= 2 ? "score-poor" :
+               a === 3 ? "score-medium" : "score-good";
     const lt = a <= 2 ? (a===1?"Very Poor":"Poor") :
                a === 3 ? "Medium" : (a===4?"Good":"Excellent");
     const st = "★".repeat(a) + "☆".repeat(5 - a);
@@ -561,22 +577,24 @@ function showResult(data, answers, participant) {
   }).join("");
 
   document.getElementById("rawScoreCell").textContent = raw;
-  loadPast();
 }
 
 function resetForm() {
-  document.querySelectorAll("input[type=radio]").forEach(r => r.checked=false);
-  document.getElementById("participant").value            = "";
-  document.getElementById("suggestions").value           = "";
-  document.getElementById("msg").innerHTML               = "";
-  document.getElementById("formSection").style.display   = "block";
-  document.getElementById("resultSection").style.display = "none";
+  document.querySelectorAll("input[type=radio]").forEach(
+    r => r.checked = false
+  );
+  document.getElementById("participant").value          = "";
+  document.getElementById("suggestions").value          = "";
+  document.getElementById("msg").innerHTML              = "";
+  document.getElementById("formSection").style.display  = "block";
+  document.getElementById("resultSection").style.display= "none";
   for (let i = 0; i < 10; i++) {
     const card = document.getElementById(`card${i}`);
     if (card) card.classList.remove("answered");
     const hint = document.getElementById(`hint${i}`);
     if (hint) {
-      hint.textContent      = "Select a number above — 1 is worst, 5 is best";
+      hint.textContent      =
+        "Select a number above — 1 is worst, 5 is best";
       hint.style.color      = "";
       hint.style.fontWeight = "";
       hint.style.fontStyle  = "italic";
@@ -584,169 +602,6 @@ function resetForm() {
   }
   updateProgress();
   window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-function buildResponseCards(responses) {
-  return responses.map(r => `
-    <div class="response-card">
-      <div style="display:flex;align-items:center;
-                  justify-content:space-between;margin-bottom:12px;">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:38px;height:38px;border-radius:50%;
-                      background:linear-gradient(135deg,#4f46e5,#7c3aed);
-                      display:flex;align-items:center;justify-content:center;
-                      color:#fff;font-weight:800;font-size:1rem;">
-            ${(r.participant||"A").charAt(0).toUpperCase()}
-          </div>
-          <div>
-            <div style="font-weight:700;color:#1a2744;font-size:0.92rem;">
-              ${r.participant || "Anonymous"}
-            </div>
-            <div style="font-size:0.75rem;color:var(--muted);">
-              ${r.submitted_at || ""}
-            </div>
-          </div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:1.6rem;font-weight:900;
-                      color:${r.total_score>=80?"#15803d":
-                              r.total_score>=60?"#1d4ed8":
-                              r.total_score>=40?"#854d0e":"#991b1b"};">
-            ${r.total_score}
-          </div>
-          <span style="font-size:0.74rem;font-weight:700;
-                       padding:2px 10px;border-radius:20px;
-                       background:${r.grade==="Excellent"?"#dcfce7":
-                                   r.grade==="Good"?"#dbeafe":
-                                   r.grade==="Fair"?"#fef9c3":"#fee2e2"};
-                       color:${r.grade==="Excellent"?"#166534":
-                               r.grade==="Good"?"#1d4ed8":
-                               r.grade==="Fair"?"#854d0e":"#991b1b"};">
-            ${r.grade}
-          </span>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:repeat(10,1fr);
-                  gap:4px;margin-bottom:10px;">
-        ${r.answers.map((a,i) => `
-          <div style="background:#f8fafc;border:1px solid #e2e8f0;
-                      border-radius:6px;padding:6px 2px;text-align:center;">
-            <div style="font-size:0.6rem;color:var(--muted);margin-bottom:2px;">
-              Q${i+1}
-            </div>
-            <div style="font-size:0.95rem;font-weight:800;
-                        color:${a>=4?"#16a34a":a===3?"#d97706":"#dc2626"};">
-              ${a}
-            </div>
-          </div>`).join("")}
-      </div>
-
-      <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;">
-        Raw: ${r.raw_score}/50 → (${r.raw_score} ÷ 50) × 100 = ${r.total_score}
-      </div>
-
-      ${r.suggestions ? `
-        <div class="suggestion-box">
-          <div class="suggestion-label">💬 Suggestion</div>
-          <div class="suggestion-text">${r.suggestions}</div>
-        </div>` : `
-        <div style="font-size:0.8rem;color:var(--muted);
-                    font-style:italic;margin-top:6px;">
-          No suggestions provided
-        </div>`}
-    </div>`).join("");
-}
-
-async function loadAllResponses() {
-  const res  = await fetch("/api/sus/results");
-  const data = await res.json();
-  const el   = document.getElementById("allResponsesSection");
-  if (!el) return;
-
-  if (!data.responses || !data.responses.length) {
-    el.innerHTML =
-      "<p style='color:var(--muted);text-align:center;padding:24px;'>" +
-      "No responses yet — be the first to submit!</p>";
-    return;
-  }
-
-  const s        = data.summary;
-  const avgColor = s.average>=80?"#15803d":
-                   s.average>=60?"#1d4ed8":
-                   s.average>=40?"#854d0e":"#991b1b";
-  const avgGrade = s.average>=80?"Excellent":
-                   s.average>=60?"Good":
-                   s.average>=40?"Fair":"Poor";
-
-  el.innerHTML = `
-    <div style="background:#f0fdf4;border:1px solid #86efac;
-                border-radius:12px;padding:16px 20px;margin-bottom:16px;">
-      <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
-        <div>
-          <div style="font-size:0.75rem;color:var(--muted);font-weight:700;
-                      text-transform:uppercase;margin-bottom:2px;">
-            Average Score
-          </div>
-          <div style="font-size:2.4rem;font-weight:900;
-                      color:${avgColor};line-height:1;">
-            ${s.average}
-          </div>
-          <div style="font-size:0.78rem;color:${avgColor};font-weight:700;">
-            ${avgGrade}
-          </div>
-        </div>
-        <div style="font-size:0.86rem;color:var(--muted);line-height:2;">
-          <div>📊 <strong>${s.count}</strong> response${s.count>1?"s":""} collected</div>
-          <div>📈 Range: <strong>${s.min}</strong> – <strong>${s.max}</strong></div>
-          <div>✅ Industry threshold: ≥ 68 = Good usability</div>
-        </div>
-      </div>
-    </div>
-    ${buildResponseCards(data.responses)}`;
-}
-
-async function loadPast() {
-  const res  = await fetch("/api/sus/results");
-  const data = await res.json();
-  const el   = document.getElementById("pastResponses");
-  if (!data.responses.length) {
-    el.innerHTML =
-      "<p style='color:var(--muted);'>No responses yet.</p>";
-    return;
-  }
-  const s        = data.summary;
-  const avgColor = s.average>=80?"#15803d":
-                   s.average>=60?"#1d4ed8":
-                   s.average>=40?"#854d0e":"#991b1b";
-  const avgGrade = s.average>=80?"Excellent":
-                   s.average>=60?"Good":
-                   s.average>=40?"Fair":"Poor";
-
-  el.innerHTML = `
-    <div style="background:#f0fdf4;border:1px solid #86efac;
-                border-radius:12px;padding:16px 20px;margin-bottom:16px;">
-      <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
-        <div>
-          <div style="font-size:0.75rem;color:var(--muted);font-weight:700;
-                      text-transform:uppercase;margin-bottom:2px;">
-            Average Score
-          </div>
-          <div style="font-size:2.4rem;font-weight:900;
-                      color:${avgColor};line-height:1;">
-            ${s.average}
-          </div>
-          <div style="font-size:0.78rem;color:${avgColor};font-weight:700;">
-            ${avgGrade}
-          </div>
-        </div>
-        <div style="font-size:0.86rem;color:var(--muted);line-height:2;">
-          <div>📊 <strong>${s.count}</strong> response${s.count>1?"s":""}</div>
-          <div>📈 Range: <strong>${s.min}</strong> – <strong>${s.max}</strong></div>
-        </div>
-      </div>
-    </div>
-    ${buildResponseCards(data.responses)}`;
 }
 
 renderQuestions();

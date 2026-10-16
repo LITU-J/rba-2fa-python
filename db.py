@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash   TEXT NOT NULL,
     totp_secret     TEXT,
     totp_enabled    INTEGER DEFAULT 0,
+    failed_attempts INTEGER DEFAULT 0,
+    locked_until    TEXT,
     created_at      TEXT DEFAULT (datetime('now'))
 );
 
@@ -26,6 +28,7 @@ CREATE TABLE IF NOT EXISTS known_devices (
     device_hash  TEXT NOT NULL,
     first_seen   TEXT DEFAULT (datetime('now')),
     last_seen    TEXT DEFAULT (datetime('now')),
+    login_count  INTEGER DEFAULT 1,
     UNIQUE(user_id, device_hash)
 );
 
@@ -47,6 +50,7 @@ CREATE TABLE IF NOT EXISTS login_logs (
     risk_tier             TEXT,
     risk_reasons          TEXT,
     required_factors      TEXT,
+    auth_method           TEXT,
     outcome               TEXT,
     simulated_attack_type TEXT
 );
@@ -78,6 +82,40 @@ CREATE TABLE IF NOT EXISTS sus_responses (
     total_score     REAL NOT NULL,
     suggestions     TEXT,
     submitted_at    TEXT DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS active_sessions (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_uuid TEXT UNIQUE NOT NULL,
+    user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    ip           TEXT,
+    country      TEXT,
+    city         TEXT,
+    isp          TEXT,
+    device_hash  TEXT,
+    user_agent   TEXT,
+    created_at   TEXT DEFAULT (datetime('now')),
+    last_active  TEXT DEFAULT (datetime('now')),
+    is_active    INTEGER DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS totp_backup_codes (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    code_hash  TEXT NOT NULL,
+    used       INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS security_alerts (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    token      TEXT UNIQUE NOT NULL,
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    ip         TEXT,
+    country    TEXT,
+    city       TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    resolved   INTEGER DEFAULT 0
 );
 """
 

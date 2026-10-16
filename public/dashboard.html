@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Dashboard — RBA-2FA</title>
   <link rel="stylesheet" href="/css/style.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -55,7 +56,7 @@
       padding: 11px 14px !important; margin-bottom: 4px !important;
       font-size: 0.88rem !important; font-weight: 500 !important;
       transition: all 0.2s ease !important; border: 1px solid transparent !important;
-      background: transparent !important;
+      background: transparent !important; width: 100% !important; text-align: left !important; cursor: pointer !important;
     }
     .sidebar-item:hover {
       background: rgba(255,255,255,0.08) !important; color: #fff !important;
@@ -81,7 +82,7 @@
     .sidebar-group-header .arrow { font-size: 0.7rem !important; transition: transform 0.25s ease !important; opacity: 0.5 !important; }
     .sidebar-group-header.open .arrow { transform: rotate(90deg) !important; }
     .sidebar-group-items { overflow: hidden !important; max-height: 0 !important; transition: max-height 0.3s ease !important; padding-left: 8px !important; }
-    .sidebar-group-items.open { max-height: 300px !important; }
+    .sidebar-group-items.open { max-height: 400px !important; }
     .sidebar-user {
       background: rgba(255,255,255,0.05) !important;
       border: 1px solid rgba(255,255,255,0.08) !important;
@@ -133,7 +134,7 @@
     .stat-card:nth-child(2) { background: linear-gradient(135deg, #0c1a2e 0%, #0e3a5c 100%) !important; }
     .stat-card:nth-child(3) { background: linear-gradient(135deg, #0a2318 0%, #064e3b 100%) !important; }
     .stat-card:nth-child(4) { background: linear-gradient(135deg, #1c1000 0%, #451a03 100%) !important; }
-    .stat-card .stat-icon { font-size: 1.6rem !important; display: block !important; margin-bottom: 14px !important; filter: drop-shadow(0 0 8px currentColor) !important; }
+    .stat-card .stat-icon { font-size: 1.6rem !important; display: block !important; margin-bottom: 14px !important; }
     .stat-card .stat-value { font-size: 2rem !important; font-weight: 900 !important; line-height: 1 !important; margin-bottom: 6px !important; display: block !important; }
     .stat-card:nth-child(1) .stat-value { color: #c4b5fd !important; }
     .stat-card:nth-child(2) .stat-value { color: #67e8f9 !important; }
@@ -153,12 +154,11 @@
       background: radial-gradient(circle at 80% 50%, rgba(255,255,255,0.08) 0%, transparent 60%) !important;
       pointer-events: none !important;
     }
-    .location-icon { font-size: 2.2rem !important; flex-shrink: 0 !important; filter: drop-shadow(0 0 10px rgba(196,181,253,0.6)) !important; }
+    .location-icon { font-size: 2.2rem !important; flex-shrink: 0 !important; }
     .location-info .label { font-size: 0.7rem !important; text-transform: uppercase !important; letter-spacing: 0.12em !important; color: rgba(255,255,255,0.5) !important; font-weight: 700 !important; margin-bottom: 4px !important; }
     .location-info .value { font-size: 1.3rem !important; font-weight: 800 !important; color: #fff !important; margin-bottom: 4px !important; }
     .location-info .sub { font-size: 0.8rem !important; color: rgba(255,255,255,0.55) !important; }
-
-    /* ── Session Context Card ── */
+    /* Session Context Card */
     .session-ctx-card {
       background: rgba(255,255,255,0.05) !important;
       backdrop-filter: blur(20px) !important;
@@ -194,7 +194,6 @@
       border-top: 1px solid rgba(255,255,255,0.06) !important;
       padding-top: 12px !important;
     }
-
     .table-card, .section-card {
       background: rgba(255,255,255,0.04) !important; backdrop-filter: blur(20px) !important;
       border-radius: 18px !important; border: 1px solid rgba(255,255,255,0.08) !important;
@@ -216,23 +215,6 @@
       border: 1px solid rgba(139,92,246,0.3) !important; border-radius: 10px !important;
     }
     .dash-main .btn-secondary:hover { background: rgba(139,92,246,0.35) !important; color: #fff !important; }
-    #inactivityWarning {
-      display: none !important; position: fixed !important; bottom: 28px !important; right: 28px !important; z-index: 9999 !important;
-      background: linear-gradient(135deg, #1e1040, #2d1b69) !important; color: #fff !important;
-      border: 1px solid rgba(139,92,246,0.4) !important; border-radius: 16px !important;
-      padding: 18px 22px !important; font-size: 0.9rem !important;
-      box-shadow: 0 16px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(139,92,246,0.15) !important;
-      max-width: 320px !important;
-    }
-    #inactivityWarning[style*="block"] { display: block !important; }
-    #inactivityWarning strong { color: #fbbf24 !important; }
-    #inactivityWarning .warn-btn {
-      margin-top: 12px !important; padding: 10px 18px !important;
-      background: linear-gradient(135deg, #8b5cf6, #4f46e5) !important;
-      border: none !important; border-radius: 10px !important; color: #fff !important;
-      font-weight: 700 !important; font-size: 0.85rem !important; cursor: pointer !important;
-      width: 100% !important; box-shadow: 0 4px 16px rgba(139,92,246,0.4) !important;
-    }
     .section-card .alert { border-radius: 12px !important; }
     .section-card .alert-success { background: rgba(16,185,129,0.12) !important; border: 1px solid rgba(16,185,129,0.3) !important; color: #6ee7b7 !important; }
     .section-card .alert-warning { background: rgba(245,158,11,0.12) !important; border: 1px solid rgba(245,158,11,0.3) !important; color: #fcd34d !important; }
@@ -240,6 +222,87 @@
     .section-card input { background: rgba(255,255,255,0.06) !important; border: 1px solid rgba(255,255,255,0.12) !important; color: #fff !important; border-radius: 10px !important; }
     .section-card h2 { color: #fff !important; }
     .section-card p { color: rgba(255,255,255,0.5) !important; }
+    /* Inactivity Warning */
+    #inactivityWarning {
+      display: none; position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+      background: linear-gradient(135deg, #1e1040, #2d1b69);
+      color: #fff; border: 1px solid rgba(139,92,246,0.4); border-radius: 16px;
+      padding: 18px 22px; font-size: 0.9rem;
+      box-shadow: 0 16px 50px rgba(0,0,0,0.5);
+      max-width: 320px; flex-direction: column;
+    }
+    #inactivityWarning strong { color: #fbbf24; }
+    #inactivityWarning .warn-btn {
+      margin-top: 12px; padding: 10px 18px;
+      background: linear-gradient(135deg, #8b5cf6, #4f46e5);
+      border: none; border-radius: 10px; color: #fff;
+      font-weight: 700; font-size: 0.85rem; cursor: pointer;
+      width: 100%; box-shadow: 0 4px 16px rgba(139,92,246,0.4);
+    }
+    /* Badges */
+    .badge { padding: 3px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
+    .badge-low      { background: rgba(34,197,94,0.15);  color: #4ade80; }
+    .badge-medium   { background: rgba(234,179,8,0.15);  color: #fde047; }
+    .badge-high     { background: rgba(249,115,22,0.15); color: #fb923c; }
+    .badge-critical { background: rgba(239,68,68,0.15);  color: #f87171; }
+    .badge-success  { background: rgba(34,197,94,0.15);  color: #4ade80; }
+    .badge-fail     { background: rgba(239,68,68,0.15);  color: #f87171; }
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: rgba(30,16,64,0.95); border: 1px solid rgba(139,92,246,0.4);
+      color: #fff; padding: 12px 24px; border-radius: 12px; font-size: 0.9rem;
+      z-index: 99999; transition: transform 0.3s; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast-success { border-color: rgba(34,197,94,0.4); }
+    .toast-error   { border-color: rgba(239,68,68,0.4); }
+    /* Sessions */
+    .session-card {
+      background: rgba(139,92,246,0.08);
+      border: 1px solid rgba(139,92,246,0.2);
+      border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 0.75rem;
+      display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    }
+    .session-card.current { border-color: rgba(139,92,246,0.5); }
+    .session-device { color: #e2d9f3; font-weight: 500; }
+    .session-meta { color: #a78bfa; font-size: 0.82rem; margin-top: 0.25rem; }
+    .badge-current { background: rgba(139,92,246,0.3); color:#c4b5fd; padding:0.3rem 0.7rem; border-radius:999px; font-size:0.8rem; }
+    /* Revoke button */
+    .btn-revoke {
+      background: rgba(239,68,68,0.15); color:#fca5a5;
+      border:1px solid rgba(239,68,68,0.3); padding:0.35rem 0.9rem;
+      border-radius:8px; cursor:pointer; font-size:0.85rem; transition:all 0.2s;
+    }
+    .btn-revoke:hover { background: rgba(239,68,68,0.3); }
+    /* Backup codes */
+    .backup-codes-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:0.5rem; margin:0.75rem 0; }
+    .backup-code { background:rgba(139,92,246,0.12); border:1px solid rgba(139,92,246,0.25); border-radius:8px; padding:0.5rem 0.75rem; font-family:monospace; color:#c4b5fd; font-size:0.95rem; text-align:center; display:block; }
+    .backup-codes-note { color:#f97316; font-size:0.85rem; margin-top:0.5rem; }
+    /* Admin stat boxes */
+    .admin-stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+    .admin-stat-box { background:rgba(255,255,255,0.05); border-radius:12px; padding:1rem; text-align:center; border:1px solid rgba(255,255,255,0.08); }
+    .admin-stat-val { font-size:2rem; font-weight:800; color:#c4b5fd; display:block; }
+    .admin-stat-lbl { font-size:0.72rem; color:#a78bfa; margin-top:0.25rem; text-transform:uppercase; letter-spacing:0.05em; }
+    .admin-tier-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.5rem; }
+    .tier-box { background:rgba(255,255,255,0.04); border-radius:10px; padding:0.75rem; text-align:center; }
+    .tier-box.low .tier-val    { color:#22c55e; } .tier-box.medium .tier-val { color:#eab308; }
+    .tier-box.high .tier-val   { color:#f97316; } .tier-box.critical .tier-val { color:#ef4444; }
+    .tier-val { font-size:1.6rem; font-weight:800; }
+    .tier-lbl { font-size:0.7rem; color:#a78bfa; text-transform:uppercase; }
+    /* Pagination */
+    #history-pagination { display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:1rem; padding:0 16px 16px; }
+    .page-btn { background:rgba(139,92,246,0.1); border:1px solid rgba(139,92,246,0.25); color:#a78bfa; padding:0.3rem 0.7rem; border-radius:6px; cursor:pointer; }
+    .page-btn.active { background:rgba(139,92,246,0.4); color:#fff; }
+    /* Empty / error state */
+    .empty-state, .error-state { color:#a78bfa; text-align:center; padding:2rem; }
+    /* Chart card */
+    .chart-card {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px; padding: 22px 26px; margin-bottom: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .chart-card h3 { color:#c4b5fd; margin-bottom:1rem; font-size:0.9rem; text-transform:uppercase; letter-spacing:0.1em; }
   </style>
 </head>
 <body>
@@ -249,25 +312,30 @@
   <div class="nav-actions">
     <span class="nav-user" id="navUser"></span>
     <a href="/settings.html" class="btn btn-secondary" style="font-size:0.85rem;">⚙️ Settings</a>
-    <button class="btn btn-outline" onclick="doLogout()">Sign Out</button>
+    <button class="btn btn-outline" id="btn-logout">Sign Out</button>
   </div>
 </nav>
 
 <div class="dash-layout">
   <aside class="dash-sidebar">
     <div class="sidebar-section-label">Main</div>
-    <button class="sidebar-item active" onclick="showSection('overview')"><span>🏠</span> Overview</button>
+    <button class="sidebar-item nav-item active" data-section="overview"><span>🏠</span> Overview</button>
+
     <div class="sidebar-group">
       <div class="sidebar-group-header" onclick="toggleGroup('loginGroup', this)">
         <div class="left"><span>📋</span> Login Activity</div>
         <span class="arrow">▶</span>
       </div>
       <div class="sidebar-group-items" id="loginGroup">
-        <button class="sidebar-item" onclick="showSection('history')" style="font-size:0.84rem;"><span>📄</span> Login History</button>
-        <button class="sidebar-item" onclick="showSection('devices')" style="font-size:0.84rem;"><span>💻</span> Known Devices</button>
+        <button class="sidebar-item nav-item" data-section="history" style="font-size:0.84rem;"><span>📄</span> Login History</button>
+        <button class="sidebar-item nav-item" data-section="devices" style="font-size:0.84rem;"><span>💻</span> Known Devices</button>
+        <button class="sidebar-item nav-item" data-section="sessions" style="font-size:0.84rem;"><span>🖥️</span> Active Sessions</button>
       </div>
     </div>
-    <button class="sidebar-item" onclick="showSection('totp')"><span>🔑</span> Authenticator App</button>
+
+    <button class="sidebar-item nav-item" data-section="totp"><span>🔑</span> Authenticator App</button>
+    <button class="sidebar-item nav-item" data-section="admin"><span>🛡️</span> Admin Panel</button>
+
     <div class="sidebar-divider"></div>
     <div class="sidebar-section-label">Research Evaluation</div>
     <div class="sidebar-group">
@@ -280,6 +348,7 @@
         <a href="/sus.html" class="sidebar-item" style="text-decoration:none;font-size:0.84rem;"><span>⭐</span> App Rating &amp; Feedback Survey</a>
       </div>
     </div>
+
     <div class="sidebar-divider"></div>
     <div class="sidebar-user">
       <div class="avatar" id="sidebarAvatar">?</div>
@@ -288,11 +357,13 @@
         <div class="role">Authenticated User</div>
       </div>
     </div>
-    <button class="sidebar-logout-btn" onclick="doLogout()">🚪 Sign Out</button>
+    <button class="sidebar-logout-btn" id="btn-logout-sidebar">🚪 Sign Out</button>
   </aside>
 
   <main class="dash-main">
-    <section id="sec-overview">
+
+    <!-- ── OVERVIEW ── -->
+    <section id="sec-overview" class="dash-section">
       <div class="page-header">
         <div>
           <h2>Welcome back, <span id="welcomeName" style="background:linear-gradient(135deg,#a78bfa,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;"></span> 👋</h2>
@@ -333,27 +404,28 @@
         </div>
       </div>
 
+      <!-- Session Context Card -->
       <div class="session-ctx-card">
         <div class="ctx-header">🌐 Current Session — Real-Time Detection</div>
         <div class="session-ctx-grid">
           <div class="ctx-item ctx-ip">
             <div class="ctx-label">IP Address</div>
-            <div class="ctx-value" id="ctxIP">Detecting…</div>
+            <div class="ctx-value" id="sess-ip">Detecting…</div>
           </div>
           <div class="ctx-item">
             <div class="ctx-label">Country</div>
-            <div class="ctx-value" id="ctxCountry">Detecting…</div>
+            <div class="ctx-value" id="sess-country">Detecting…</div>
           </div>
           <div class="ctx-item">
             <div class="ctx-label">City</div>
-            <div class="ctx-value" id="ctxCity">Detecting…</div>
+            <div class="ctx-value" id="sess-city">Detecting…</div>
           </div>
           <div class="ctx-item">
             <div class="ctx-label">ISP / Network</div>
-            <div class="ctx-value" id="ctxISP">Detecting…</div>
+            <div class="ctx-value" id="sess-isp">Detecting…</div>
           </div>
           <div class="ctx-item ctx-time">
-            <div class="ctx-label">🕒 Date &amp; Time (Server)</div>
+            <div class="ctx-label">🕒 Date &amp; Time (Local)</div>
             <div class="ctx-value" id="ctxTime">—</div>
           </div>
         </div>
@@ -362,128 +434,186 @@
         </div>
       </div>
 
+      <!-- Risk Trend Chart -->
+      <div class="chart-card">
+        <h3>📈 Risk Score Trend — Last 30 Logins</h3>
+        <canvas id="risk-trend-chart" height="80"></canvas>
+      </div>
+
+      <!-- Recent Activity -->
       <div class="table-card">
         <div style="padding:18px 20px 0;display:flex;align-items:center;justify-content:space-between;">
           <div class="section-title" style="margin-bottom:0;">Recent login attempts</div>
           <button class="btn btn-secondary" onclick="showSection('history')" style="font-size:0.8rem;padding:6px 14px;">View all →</button>
         </div>
         <div class="table-wrap" style="margin-top:0;">
-          <table>
-            <thead><tr><th>Time</th><th>Location</th><th>Risk Tier</th><th>Auth Method</th><th>Outcome</th></tr></thead>
-            <tbody id="recentBody"><tr><td colspan="5" style="text-align:center;padding:24px;color:rgba(255,255,255,0.3);">Loading…</td></tr></tbody>
+          <table id="tbl-recent">
+            <thead><tr><th>Time</th><th>Outcome</th><th>Auth Method</th><th>Location</th><th>Risk Tier</th></tr></thead>
+            <tbody><tr><td colspan="5" style="text-align:center;padding:24px;color:rgba(255,255,255,0.3);">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <section id="sec-history" style="display:none;">
+    <!-- ── HISTORY ── -->
+    <section id="sec-history" class="dash-section" style="display:none;">
       <div class="page-header">
-        <div><h2>Login History</h2><p>Your 50 most recent login attempts with full risk analysis.</p></div>
-        <button class="btn btn-secondary" onclick="exportCSV()">📥 Export CSV</button>
+        <div><h2>Login History</h2><p>Your most recent login attempts with full risk analysis.</p></div>
+        <button class="btn btn-secondary" id="btn-export-csv">📥 Export CSV</button>
       </div>
       <div class="table-card">
         <div class="table-wrap" style="margin-top:0;">
-          <table>
-            <thead><tr><th>Timestamp</th><th>IP Address</th><th>Location</th><th>ISP</th><th>Risk Score</th><th>Tier</th><th>Auth Method</th><th>Outcome</th></tr></thead>
-            <tbody id="historyBody"><tr><td colspan="8" style="text-align:center;padding:24px;color:rgba(255,255,255,0.3);">Loading…</td></tr></tbody>
+          <table id="tbl-history">
+            <thead><tr><th>Timestamp</th><th>Outcome</th><th>Auth Method</th><th>IP Address</th><th>Location</th><th>ISP</th><th>Tier</th><th>Score</th></tr></thead>
+            <tbody><tr><td colspan="8" style="text-align:center;padding:24px;color:rgba(255,255,255,0.3);">Loading…</td></tr></tbody>
           </table>
         </div>
+        <div id="history-pagination"></div>
       </div>
     </section>
 
-    <section id="sec-devices" style="display:none;">
+    <!-- ── DEVICES ── -->
+    <section id="sec-devices" class="dash-section" style="display:none;">
       <div class="page-header">
         <div><h2>Known Devices</h2><p>Devices that have previously completed a successful login on your account.</p></div>
       </div>
       <div class="table-card">
         <div class="table-wrap" style="margin-top:0;">
-          <table>
-            <thead><tr><th>Device Fingerprint</th><th>First Seen</th><th>Last Seen</th></tr></thead>
-            <tbody id="devicesBody"><tr><td colspan="3" style="text-align:center;padding:24px;color:rgba(255,255,255,0.3);">Loading…</td></tr></tbody>
+          <table id="tbl-devices">
+            <thead><tr><th>Device</th><th>First Seen</th><th>Last Seen</th><th>Logins</th><th>Action</th></tr></thead>
+            <tbody><tr><td colspan="5" style="text-align:center;padding:24px;color:rgba(255,255,255,0.3);">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <section id="sec-totp" style="display:none;">
+    <!-- ── ACTIVE SESSIONS ── -->
+    <section id="sec-sessions" class="dash-section" style="display:none;">
+      <div class="page-header">
+        <div><h2>Active Sessions</h2><p>All currently active login sessions on your account.</p></div>
+        <button class="btn btn-secondary" onclick="loadSessions()">🔄 Refresh</button>
+      </div>
+      <div class="section-card" style="padding:24px;">
+        <div id="sessions-list">
+          <p class="empty-state">Loading sessions…</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TOTP ── -->
+    <section id="sec-totp" class="dash-section" style="display:none;">
       <div class="page-header">
         <div><h2>Authenticator App (TOTP)</h2><p>Set up Google Authenticator, Authy, or Microsoft Authenticator.</p></div>
       </div>
       <div class="section-card" style="padding:24px;">
         <div id="totpStatusBox" class="alert" style="margin-bottom:20px;"></div>
-        <button class="btn btn-secondary" id="setupTotpBtn" onclick="setupTotp()">📱 Set up authenticator app</button>
-        <div id="qrArea" class="qr-box" style="display:none;max-width:340px;margin-top:20px;">
-          <img id="qrImg" width="200" height="200" alt="QR Code" style="margin-bottom:16px;display:block;margin-left:auto;margin-right:auto;border-radius:12px;"/>
-          <p style="font-size:0.88rem;color:rgba(255,255,255,0.5);margin-bottom:16px;text-align:center;">Scan this QR code with your authenticator app, then enter the 6-digit code below to confirm enrolment.</p>
+        <button class="btn btn-secondary" id="btn-setup-totp">📱 Set up authenticator app</button>
+
+        <div id="totp-setup-section" style="display:none;max-width:340px;margin-top:20px;">
+          <img id="totp-qr" width="200" height="200" alt="QR Code" style="margin-bottom:16px;display:block;margin-left:auto;margin-right:auto;border-radius:12px;"/>
+          <p style="font-size:0.88rem;color:rgba(255,255,255,0.5);margin-bottom:4px;text-align:center;">Manual key:</p>
+          <p id="totp-secret" style="font-family:monospace;color:#c4b5fd;text-align:center;font-size:0.9rem;margin-bottom:16px;word-break:break-all;"></p>
+          <p style="font-size:0.88rem;color:rgba(255,255,255,0.5);margin-bottom:16px;text-align:center;">Scan the QR code, then enter the 6-digit code below to confirm.</p>
           <div class="form-group">
             <label>Confirmation code</label>
-            <input type="number" id="totpConfirmCode" class="otp-input" placeholder="000000"/>
+            <input type="number" id="totp-confirm-code" class="otp-input" placeholder="000000" style="width:100%;padding:12px;font-size:1.1rem;text-align:center;"/>
           </div>
-          <button class="btn btn-primary btn-block" style="margin-top:12px;" onclick="confirmTotp()">✅ Confirm &amp; Enable</button>
+          <button class="btn btn-primary btn-block" id="btn-confirm-totp" style="margin-top:12px;">✅ Confirm &amp; Enable</button>
         </div>
+
+        <!-- Backup Codes -->
+        <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.08);">
+          <h3 style="color:#c4b5fd;margin-bottom:0.5rem;font-size:1rem;">🗝️ Backup Codes</h3>
+          <p id="backup-codes-count" style="color:#a78bfa;margin-bottom:1rem;font-size:0.88rem;"></p>
+          <button class="btn btn-secondary" id="btn-generate-backup-codes">Generate New Backup Codes</button>
+          <div id="backup-codes-display" style="display:none;margin-top:1rem;"></div>
+        </div>
+
         <div id="totpMsg"></div>
       </div>
     </section>
+
+    <!-- ── ADMIN ── -->
+    <section id="sec-admin" class="dash-section" style="display:none;">
+      <div class="page-header">
+        <div><h2>Admin Panel</h2><p>System-wide statistics and user management.</p></div>
+        <button class="btn btn-secondary" onclick="loadAdmin()">🔄 Refresh</button>
+      </div>
+
+      <div class="section-card" style="padding:24px;margin-bottom:20px;">
+        <h3 style="color:#c4b5fd;margin-bottom:1rem;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.1em;">System Statistics</h3>
+        <div class="admin-stat-grid">
+          <div class="admin-stat-box"><span class="admin-stat-val" id="admin-total-users">—</span><div class="admin-stat-lbl">Total Users</div></div>
+          <div class="admin-stat-box"><span class="admin-stat-val" id="admin-total-logins">—</span><div class="admin-stat-lbl">Total Logins</div></div>
+          <div class="admin-stat-box"><span class="admin-stat-val" id="admin-totp-users">—</span><div class="admin-stat-lbl">TOTP Enabled</div></div>
+          <div class="admin-stat-box"><span class="admin-stat-val" id="admin-locked-users">—</span><div class="admin-stat-lbl">Locked Accounts</div></div>
+        </div>
+        <h3 style="color:#c4b5fd;margin-bottom:1rem;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.1em;">Risk Tier Breakdown (All Logins)</h3>
+        <div class="admin-tier-grid">
+          <div class="tier-box low"><div class="tier-val" id="admin-tier-low">—</div><div class="tier-lbl">LOW</div></div>
+          <div class="tier-box medium"><div class="tier-val" id="admin-tier-medium">—</div><div class="tier-lbl">MEDIUM</div></div>
+          <div class="tier-box high"><div class="tier-val" id="admin-tier-high">—</div><div class="tier-lbl">HIGH</div></div>
+          <div class="tier-box critical"><div class="tier-val" id="admin-tier-critical">—</div><div class="tier-lbl">CRITICAL</div></div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div style="padding:18px 20px 0;">
+          <div class="section-title">All Users</div>
+        </div>
+        <div class="table-wrap" style="margin-top:0;">
+          <table id="tbl-admin-users">
+            <thead><tr><th>ID</th><th>Username</th><th>Email</th><th>2FA</th><th>Failed Attempts</th><th>Created</th><th>Logins</th></tr></thead>
+            <tbody><tr><td colspan="7" style="text-align:center;padding:24px;color:rgba(255,255,255,0.3);">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
   </main>
 </div>
 
-<div id="inactivityWarning">
+<!-- Inactivity Warning -->
+<div id="inactivityWarning" style="display:none;">
   <strong>⚠️ Session Timeout Warning</strong><br/>
-  You have been inactive for 4 minutes. You will be automatically signed out in <span id="inactivityCountdown">1:00</span>.
-  <button class="warn-btn" onclick="resetInactivityTimer()">Stay signed in</button>
+  You have been inactive for 4 minutes. You will be automatically signed out in <span id="inactivity-countdown">1:00</span>.
+  <button class="warn-btn" id="btn-stay-logged-in">Stay signed in</button>
 </div>
 
 <script src="/js/dashboard.js"></script>
+
 <script>
 function toggleGroup(groupId, header) {
   const items = document.getElementById(groupId);
-  const isOpen = items.classList.contains("open");
-  items.classList.toggle("open", !isOpen);
-  header.classList.toggle("open", !isOpen);
+  const isOpen = items.classList.contains('open');
+  items.classList.toggle('open', !isOpen);
+  header.classList.toggle('open', !isOpen);
 }
-</script>
 
-<script>
-(function () {
-  function startClock() {
-    function tick() {
-      var now = new Date();
-      var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-      var months = ['January','February','March','April','May','June',
-                    'July','August','September','October','November','December'];
-      var dd = String(now.getDate()).padStart(2,'0');
-      var hh = String(now.getHours()).padStart(2,'0');
-      var mm = String(now.getMinutes()).padStart(2,'0');
-      var ss = String(now.getSeconds()).padStart(2,'0');
-      document.getElementById('ctxTime').textContent =
-        days[now.getDay()] + ', ' + dd + ' ' + months[now.getMonth()] + ' ' +
-        now.getFullYear() + ' — ' + hh + ':' + mm + ':' + ss;
-    }
-    tick();
-    setInterval(tick, 1000);
+// Sidebar logout button
+document.addEventListener('DOMContentLoaded', function() {
+  var sb = document.getElementById('btn-logout-sidebar');
+  if (sb) sb.addEventListener('click', doLogout);
+});
+
+// Live clock
+(function() {
+  function tick() {
+    var now = new Date();
+    var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    var months = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+    var dd = String(now.getDate()).padStart(2,'0');
+    var hh = String(now.getHours()).padStart(2,'0');
+    var mm = String(now.getMinutes()).padStart(2,'0');
+    var ss = String(now.getSeconds()).padStart(2,'0');
+    var el = document.getElementById('ctxTime');
+    if (el) el.textContent =
+      days[now.getDay()] + ', ' + dd + ' ' + months[now.getMonth()] + ' ' +
+      now.getFullYear() + ' — ' + hh + ':' + mm + ':' + ss;
   }
-  function countryFlag(code) {
-    if (!code || code.length !== 2) return '';
-    return code.toUpperCase().split('').map(function(c) {
-      return String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65);
-    }).join('') + ' ';
-  }
-  fetch('/api/auth/session-context')
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-      document.getElementById('ctxIP').textContent      = d.ip      || '—';
-      document.getElementById('ctxCountry').textContent = countryFlag(d.country_code) + (d.country || '—');
-      document.getElementById('ctxCity').textContent    = d.city    || '—';
-      document.getElementById('ctxISP').textContent     = d.isp     || '—';
-      startClock();
-    })
-    .catch(function() {
-      document.getElementById('ctxIP').textContent      = 'Unavailable';
-      document.getElementById('ctxCountry').textContent = '—';
-      document.getElementById('ctxCity').textContent    = '—';
-      document.getElementById('ctxISP').textContent     = '—';
-      startClock();
-    });
+  tick();
+  setInterval(tick, 1000);
 })();
 </script>
 

@@ -116,7 +116,7 @@ def _send_reset_email(to, code):
                      border-radius:16px 16px 0 0;
                      text-align:center;">
         <h1 style="margin:0;color:#fff;font-size:22px;">
-          🔐 RBA-2FA System
+          RBA-2FA System
         </h1>
         <p style="margin:6px 0 0;color:rgba(255,255,255,0.8);
                   font-size:14px;">
@@ -143,12 +143,12 @@ def _send_reset_email(to, code):
           </span>
         </div>
         <p style="color:#6b7386;font-size:13px;text-align:center;">
-          ⏱ Expires in <strong>15 minutes</strong>
+          Expires in <strong>15 minutes</strong>
         </p>
         <div style="background:#fff8e1;border:1px solid #ffd54f;
                     border-radius:10px;padding:14px 18px;margin-top:20px;">
           <p style="margin:0;color:#856404;font-size:13px;">
-            🔒 Never share this code with anyone.
+            Never share this code with anyone.
           </p>
         </div>
         <hr style="border:none;border-top:1px solid #eef0f5;margin:28px 0;">
@@ -177,7 +177,6 @@ def _send_reset_email(to, code):
     msg.attach(MIMEText(plain, "plain"))
     msg.attach(MIMEText(html,  "html"))
 
-    # Try port 587 STARTTLS first
     try:
         with smtplib.SMTP(config.SMTP_HOST, int(config.SMTP_PORT)) as s:
             s.ehlo()
@@ -189,7 +188,6 @@ def _send_reset_email(to, code):
     except Exception as e:
         print(f"[SMTP 587 failed] {e} — trying SSL 465")
 
-    # Try port 465 SSL
     try:
         with smtplib.SMTP_SSL(config.SMTP_HOST, 465) as s:
             s.login(config.SMTP_USER, config.SMTP_PASS)
@@ -268,7 +266,6 @@ def login():
     geo   = lookup_geo(ip)
     dhash = compute_device_hash()
 
-    # Check lockout BEFORE password verification
     if user:
         lockout = _check_lockout(db, user["id"])
         if lockout["locked"]:
@@ -297,13 +294,11 @@ def login():
                 ],
             }), 403
 
-    # Wrong username
     if user is None:
         _log(db, None, username, ip, geo, dhash,
              outcome="failed_password")
         return jsonify({"error": "Invalid credentials"}), 401
 
-    # Wrong password
     if not bcrypt.checkpw(
         password.encode(), user["password_hash"].encode()
     ):
@@ -347,7 +342,6 @@ def login():
                 f"account is locked for {LOCKOUT_MINUTES} minutes.",
         }), 401
 
-    # Password correct — run risk engine
     risk    = assess_risk(user["id"], dhash, geo)
     score   = risk["score"]
     tier    = risk["tier"]
@@ -393,7 +387,6 @@ def _start_challenge(db, user, ip, geo, dhash, score, tier, reasons):
         if f != "password"
     ]
 
-    # HIGH risk — requires TOTP or SMS OTP + Email OTP
     if tier == "HIGH":
         if user["totp_enabled"]:
             required = ["totp", "email_otp"]
@@ -402,7 +395,6 @@ def _start_challenge(db, user, ip, geo, dhash, score, tier, reasons):
         else:
             required = ["email_otp"]
 
-    # MEDIUM risk — require TOTP or Email OTP
     elif tier == "MEDIUM":
         if user["totp_enabled"]:
             required = ["totp"]
@@ -674,21 +666,18 @@ def reset_password_request():
             "message": "If this email exists a reset code has been sent"
         }), 200
 
-    # Generate 6-digit reset code
     import secrets as _secrets
     code    = str(_secrets.randbelow(10**6)).zfill(6)
     expires = (
         datetime.now(timezone.utc) + timedelta(minutes=15)
     ).strftime("%Y-%m-%d %H:%M:%S")
 
-    # Store code
     db.execute(
         "UPDATE users SET totp_secret=? WHERE id=?",
         (f"RESET:{code}:{expires}", user["id"])
     )
     db.commit()
 
-    # Send email
     try:
         _send_reset_email(email, code)
     except Exception as e:
@@ -723,11 +712,9 @@ def reset_password_verify():
         return jsonify({"error": "Invalid or expired reset code"}), 400
 
     try:
-        # Split only on first two colons to handle timestamp with colons
         raw     = user["totp_secret"]
         parts   = raw.split(":")
         stored_code = parts[1]
-        # Rejoin remaining parts as timestamp
         expires = ":".join(parts[2:])
 
         expiry_time = datetime.strptime(
@@ -869,3 +856,43 @@ def _complete_login(user, ip, geo, dhash,
          tier=tier or "LOW",
          reasons=reasons or [],
          required_factors=required_factors or ["password"])
+
+
+# ------------------------------------------------------------------
+# Session Context — real-time IP, location, ISP, server time
+# ------------------------------------------------------------------
+
+@auth_bp.route('/session-context')
+def session_context():
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    if ip and ',' in ip:
+        ip = ip.split(',')[0].strip()
+
+    result = {
+        'ip': ip,
+        'city': 'Unknown',
+        'country': 'Unknown',
+        'country_code': '',
+        'isp': 'Unknown',
+        'server_time': datetime.now().strftime('%A, %d %B %Y - %H:%M:%S'),
+    }
+
+    try:
+        import geoip2.database
+        with geoip2.database.Reader('GeoLite2-City.mmdb') as r:
+            geo = r.city(ip)
+            result['city']         = geo.city.name    or 'Unknown'
+            result['country']      = geo.country.name or 'Unknown'
+            result['country_code'] = geo.country.iso_code or ''
+    except Exception:
+        pass
+
+    try:
+        import geoip2.database
+        with geoip2.database.Reader('GeoLite2-ASN.mmdb') as r:
+            asn = r.asn(ip)
+            result['isp'] = asn.autonomous_system_organization or 'Unknown'
+    except Exception:
+        pass
+
+    return jsonify(result)

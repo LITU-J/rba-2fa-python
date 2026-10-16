@@ -4,14 +4,13 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Sign In — RBA-2FA</title>
-  <link rel="stylesheet" href="/css/style.css"/>
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       min-height: 100vh;
-      background: linear-gradient(135deg,
-        #0f172a 0%, #1e3a8a 50%, #1a1a2e 100%);
+      background: linear-gradient(135deg, #0f0c29 0%, #1a1040 50%, #24243e 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -25,12 +24,9 @@
       top: 0; left: 0;
       width: 100%; height: 100%;
       background-image:
-        radial-gradient(circle at 20% 20%,
-          rgba(99,102,241,0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%,
-          rgba(59,130,246,0.15) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%,
-          rgba(139,92,246,0.08) 0%, transparent 70%);
+        radial-gradient(circle at 20% 20%, rgba(139,92,246,0.18) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(79,70,229,0.15) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(56,189,248,0.07) 0%, transparent 70%);
       pointer-events: none;
       z-index: 0;
     }
@@ -40,13 +36,15 @@
       max-width: 480px;
       border-radius: 24px;
       overflow: hidden;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(139,92,246,0.15);
       position: relative;
       z-index: 1;
     }
 
     .login-right {
-      background: #ffffff;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.1);
       padding: 48px 44px;
       display: flex;
       flex-direction: column;
@@ -63,47 +61,48 @@
 
     .login-brand-icon {
       width: 42px; height: 42px;
-      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      background: linear-gradient(135deg, #8b5cf6, #4f46e5);
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.3rem;
+      box-shadow: 0 4px 14px rgba(139,92,246,0.5);
     }
 
     .login-brand-name {
       font-size: 1.1rem;
       font-weight: 800;
-      color: #0f172a;
+      color: #fff;
     }
 
     .login-brand-sub {
       font-size: 0.7rem;
-      color: #64748b;
+      color: rgba(255,255,255,0.4);
     }
 
     .login-right h1 {
       font-size: 1.7rem;
       font-weight: 800;
-      color: #0f172a;
+      color: #fff;
       margin-bottom: 6px;
       text-align: center;
     }
 
     .subtitle {
       font-size: 0.88rem;
-      color: #64748b;
+      color: rgba(255,255,255,0.4);
       margin-bottom: 32px;
       text-align: center;
     }
 
     .field-label {
       display: block;
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: #374151;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: rgba(255,255,255,0.45);
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
       margin-bottom: 8px;
     }
 
@@ -115,22 +114,22 @@
     .input-wrap input {
       width: 100%;
       padding: 13px 16px;
-      border: 2px solid #e2e8f0;
+      border: 1.5px solid rgba(255,255,255,0.12);
       border-radius: 12px;
       font-size: 0.95rem;
-      color: #0f172a;
-      background: #f8fafc;
+      color: #fff;
+      background: rgba(255,255,255,0.07);
       transition: border-color 0.2s, box-shadow 0.2s;
       outline: none;
     }
 
     .input-wrap input:focus {
-      border-color: #4f46e5;
-      background: #fff;
-      box-shadow: 0 0 0 4px rgba(79,70,229,0.08);
+      border-color: #8b5cf6;
+      background: rgba(139,92,246,0.1);
+      box-shadow: 0 0 0 3px rgba(139,92,246,0.2);
     }
 
-    .input-wrap input::placeholder { color: #94a3b8; }
+    .input-wrap input::placeholder { color: rgba(255,255,255,0.25); }
 
     .eye-btn {
       position: absolute;
@@ -141,21 +140,21 @@
       border: none;
       cursor: pointer;
       font-size: 1rem;
-      color: #94a3b8;
+      color: rgba(255,255,255,0.35);
       padding: 0;
       transition: color 0.2s;
     }
 
-    .eye-btn:hover { color: #4f46e5; }
+    .eye-btn:hover { color: #a78bfa; }
 
     .sim-toggle {
       width: 100%;
-      background: #f1f5f9;
-      border: 2px solid #e2e8f0;
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(255,255,255,0.1);
       border-radius: 12px;
       padding: 11px 16px;
       font-size: 0.82rem;
-      color: #64748b;
+      color: rgba(255,255,255,0.5);
       font-weight: 600;
       cursor: pointer;
       text-align: left;
@@ -163,15 +162,15 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, color 0.2s;
     }
 
-    .sim-toggle:hover { border-color: #4f46e5; color: #4f46e5; }
+    .sim-toggle:hover { border-color: #8b5cf6; color: #c4b5fd; }
 
     .sim-panel {
       display: none;
-      background: #f8fafc;
-      border: 2px solid #e2e8f0;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(255,255,255,0.08);
       border-radius: 12px;
       padding: 16px;
       margin-bottom: 16px;
@@ -182,16 +181,17 @@
     .sim-panel input {
       width: 100%;
       padding: 10px 14px;
-      border: 1.5px solid #e2e8f0;
+      border: 1.5px solid rgba(255,255,255,0.1);
       border-radius: 8px;
       font-size: 0.88rem;
-      background: #fff;
+      background: rgba(255,255,255,0.06);
       margin-bottom: 10px;
       outline: none;
-      color: #0f172a;
+      color: #fff;
     }
 
-    .sim-panel input:focus { border-color: #4f46e5; }
+    .sim-panel input::placeholder { color: rgba(255,255,255,0.25); }
+    .sim-panel input:focus { border-color: #8b5cf6; }
 
     .ip-chips {
       display: flex;
@@ -200,9 +200,9 @@
     }
 
     .ip-chip {
-      background: #ede9fe;
-      color: #5b21b6;
-      border: none;
+      background: rgba(139,92,246,0.2);
+      color: #c4b5fd;
+      border: 1px solid rgba(139,92,246,0.3);
       border-radius: 6px;
       padding: 4px 10px;
       font-size: 0.75rem;
@@ -211,32 +211,32 @@
       transition: background 0.15s;
     }
 
-    .ip-chip:hover { background: #ddd6fe; }
+    .ip-chip:hover { background: rgba(139,92,246,0.35); color: #e9d5ff; }
 
     .signin-btn {
       width: 100%;
       padding: 14px;
-      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      background: linear-gradient(135deg, #8b5cf6, #4f46e5);
       color: #fff;
       border: none;
       border-radius: 12px;
       font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
+      transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
       margin-top: 8px;
       margin-bottom: 20px;
-      box-shadow: 0 4px 16px rgba(79,70,229,0.4);
+      box-shadow: 0 6px 20px rgba(139,92,246,0.5);
     }
 
-    .signin-btn:hover   { opacity: 0.92; transform: translateY(-1px); }
+    .signin-btn:hover   { opacity: 0.92; transform: translateY(-2px); box-shadow: 0 10px 28px rgba(139,92,246,0.6); }
     .signin-btn:active  { transform: translateY(0); }
     .signin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .divider {
       text-align: center;
       font-size: 0.82rem;
-      color: #94a3b8;
+      color: rgba(255,255,255,0.2);
       margin-bottom: 16px;
       position: relative;
     }
@@ -247,7 +247,7 @@
       top: 50%;
       width: 43%;
       height: 1px;
-      background: #e2e8f0;
+      background: rgba(255,255,255,0.08);
     }
 
     .divider::before { left: 0; }
@@ -256,34 +256,34 @@
     .bottom-links {
       text-align: center;
       font-size: 0.86rem;
-      color: #64748b;
+      color: rgba(255,255,255,0.4);
     }
 
     .bottom-links a {
-      color: #4f46e5;
+      color: #a78bfa;
       font-weight: 700;
       text-decoration: none;
     }
 
-    .bottom-links a:hover { text-decoration: underline; }
+    .bottom-links a:hover { color: #c4b5fd; text-decoration: underline; }
 
     .back-link {
       display: block;
       text-align: center;
       font-size: 0.8rem;
-      color: #94a3b8;
+      color: rgba(255,255,255,0.25);
       margin-top: 10px;
       text-decoration: none;
     }
 
-    .back-link:hover { color: #64748b; }
+    .back-link:hover { color: rgba(255,255,255,0.5); }
 
     #msg { margin-top: 4px; }
 
     .alert-error {
-      background: #fef2f2;
-      color: #991b1b;
-      border: 1.5px solid #fca5a5;
+      background: rgba(239,68,68,0.12);
+      color: #fca5a5;
+      border: 1.5px solid rgba(239,68,68,0.3);
       border-radius: 10px;
       padding: 12px 16px;
       font-size: 0.86rem;
@@ -292,9 +292,9 @@
     }
 
     .alert-success {
-      background: #f0fdf4;
-      color: #166534;
-      border: 1.5px solid #86efac;
+      background: rgba(16,185,129,0.12);
+      color: #6ee7b7;
+      border: 1.5px solid rgba(16,185,129,0.3);
       border-radius: 10px;
       padding: 12px 16px;
       font-size: 0.86rem;
@@ -351,42 +351,23 @@
     </div>
 
     <button class="sim-toggle" onclick="toggleSim()">
-      🔬 Risk Engine Demo — Simulate a different IP location
+      🔬 Risk Engine Demo — Simulate IP location
     </button>
 
     <div class="sim-panel" id="simPanel">
       <input type="text" id="debugIp"
              placeholder="e.g. 41.182.0.1 (Windhoek)"/>
       <div class="ip-chips">
-        <button class="ip-chip"
-                onclick="setIp('41.182.0.1')">
-          Windhoek
-        </button>
-        <button class="ip-chip"
-                onclick="setIp('41.182.0.2')">
-          Swakopmund
-        </button>
-        <button class="ip-chip"
-                onclick="setIp('41.182.0.4')">
-          Oshakati
-        </button>
-        <button class="ip-chip"
-                onclick="setIp('196.216.2.1')">
-          South Africa
-        </button>
-        <button class="ip-chip"
-                onclick="setIp('203.0.113.5')">
-          Japan
-        </button>
-        <button class="ip-chip"
-                onclick="setIp('8.8.8.8')">
-          USA
-        </button>
+        <button class="ip-chip" onclick="setIp('41.182.0.1')">Windhoek</button>
+        <button class="ip-chip" onclick="setIp('41.182.0.2')">Swakopmund</button>
+        <button class="ip-chip" onclick="setIp('41.182.0.4')">Oshakati</button>
+        <button class="ip-chip" onclick="setIp('196.216.2.1')">South Africa</button>
+        <button class="ip-chip" onclick="setIp('203.0.113.5')">Japan</button>
+        <button class="ip-chip" onclick="setIp('8.8.8.8')">USA</button>
       </div>
     </div>
 
-    <button class="signin-btn" id="loginBtn"
-            onclick="doLogin()">
+    <button class="signin-btn" id="loginBtn" onclick="doLogin()">
       Sign In →
     </button>
 
@@ -398,7 +379,7 @@
       Don't have an account?
       <a href="/register.html">Create one</a>
     </div>
-    <a href="/reset.html" class="back-link">🔑 Forgot your password?</a>
+    <a href="/reset.html" class="back-link">🔑 Forgot password?</a>
     <a href="/" class="back-link">← Back to home</a>
 
   </div>

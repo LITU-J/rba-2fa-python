@@ -3,386 +3,261 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Usability Questionnaire — RBA-2FA</title>
-  <link rel="stylesheet" href="/css/style.css" />
+  <title>App Rating &amp; Feedback Survey — RBA-2FA</title>
   <style>
-    .sus-q {
-      background: var(--card);
-      border: 1.5px solid var(--border);
-      border-left: 4px solid var(--primary-light);
-      border-radius: 14px;
-      padding: 22px 26px;
-      margin-bottom: 16px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .sus-q:hover {
-      border-color: #93c5fd;
-      box-shadow: 0 2px 12px rgba(47,93,240,0.08);
-    }
-    .sus-q.answered { border-left-color: #22c55e; }
-    .q-num {
-      font-size: 0.74rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.06em;
-      color: var(--muted); margin-bottom: 6px;
-    }
-    .q-text {
-      font-size: 0.97rem; font-weight: 600;
-      color: var(--text); margin-bottom: 18px; line-height: 1.5;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: linear-gradient(135deg, #0f0c29 0%, #1a1040 50%, #24243e 100%); min-height: 100vh; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+    /* NAV */
+    .navbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 50; }
+    .nav-brand { display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 800; color: #fff; text-decoration: none; }
+    .nav-actions { display: flex; gap: 10px; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-primary { background: linear-gradient(135deg,#8b5cf6,#4f46e5); color: #fff; box-shadow: 0 4px 14px rgba(139,92,246,0.4); }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-secondary { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.15); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.15); }
+    .btn-outline { background: transparent; color: rgba(255,255,255,0.7); border: 1.5px solid rgba(255,255,255,0.2); }
+    .btn-outline:hover { background: rgba(255,255,255,0.08); }
+    .btn-block { width: 100%; justify-content: center; }
+    .btn-lg { padding: 14px 20px; font-size: 1rem; border-radius: 12px; }
+
+    /* PAGE */
+    .page { max-width: 720px; margin: 0 auto; padding: 32px 24px; }
+    h1 { font-size: 1.7rem; font-weight: 900; color: #fff; margin-bottom: 8px; }
+    h3 { font-size: 1rem; font-weight: 700; color: #fff; }
+    p  { color: rgba(255,255,255,0.6); font-size: 0.93rem; line-height: 1.6; }
+
+    /* ALREADY SUBMITTED */
+    #alreadySubmittedBanner { background: rgba(34,197,94,0.1); border: 1.5px solid rgba(34,197,94,0.3); border-radius: 14px; padding: 28px 32px; text-align: center; margin-bottom: 24px; display: none; }
+    #alreadySubmittedBanner h2 { color: #4ade80; margin-bottom: 8px; }
+    #alreadySubmittedBanner p  { color: rgba(255,255,255,0.6); margin-bottom: 16px; }
+
+    /* NAME INPUT */
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.45); margin-bottom: 6px; }
+    .form-group input { width: 100%; padding: 12px 14px; background: rgba(255,255,255,0.07); border: 1.5px solid rgba(255,255,255,0.12); border-radius: 10px; font-size: 0.92rem; color: #fff; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .form-group input:focus { border-color: #8b5cf6; background: rgba(139,92,246,0.1); box-shadow: 0 0 0 3px rgba(139,92,246,0.2); }
+    .form-group input::placeholder { color: rgba(255,255,255,0.25); }
+    .required-star { color: #f87171; font-weight: 700; margin-left: 3px; }
+
+    /* RATING GUIDE */
+    .rating-guide { background: rgba(139,92,246,0.1); border: 1.5px solid rgba(139,92,246,0.25); border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; }
+    .rating-guide-title { font-weight: 700; margin-bottom: 10px; color: #c4b5fd; font-size: 0.9rem; }
+    .rating-guide-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; text-align: center; }
+    .rg-1 { background: rgba(220,38,38,0.15);  border-radius: 8px; padding: 10px 6px; }
+    .rg-2 { background: rgba(234,88,12,0.15);  border-radius: 8px; padding: 10px 6px; }
+    .rg-3 { background: rgba(217,119,6,0.15);  border-radius: 8px; padding: 10px 6px; }
+    .rg-4 { background: rgba(22,163,74,0.15);  border-radius: 8px; padding: 10px 6px; }
+    .rg-5 { background: rgba(21,128,61,0.2);   border-radius: 8px; padding: 10px 6px; }
+    .rg-num { font-size: 1.4rem; font-weight: 900; }
+    .rg-label { font-size: 0.72rem; font-weight: 700; margin-top: 3px; }
+    .rg-1 .rg-num, .rg-1 .rg-label { color: #f87171; }
+    .rg-2 .rg-num, .rg-2 .rg-label { color: #fb923c; }
+    .rg-3 .rg-num, .rg-3 .rg-label { color: #fbbf24; }
+    .rg-4 .rg-num, .rg-4 .rg-label { color: #4ade80; }
+    .rg-5 .rg-num, .rg-5 .rg-label { color: #86efac; }
+
+    /* PROGRESS */
+    .progress-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .progress-header span { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.5); }
+    .progress-header #progressText { color: #a78bfa; font-weight: 700; }
+    .progress-bar-wrap { background: rgba(255,255,255,0.08); border-radius: 4px; height: 6px; margin-bottom: 20px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg,#8b5cf6,#4f46e5); border-radius: 4px; transition: width 0.3s ease; }
+
+    /* QUESTION CARDS */
+    .sus-q { background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); border-left: 4px solid rgba(139,92,246,0.5); border-radius: 14px; padding: 22px 26px; margin-bottom: 16px; transition: border-color 0.2s, box-shadow 0.2s; }
+    .sus-q:hover { border-color: rgba(167,139,250,0.4); box-shadow: 0 4px 20px rgba(139,92,246,0.1); }
+    .sus-q.answered { border-left-color: #22c55e; background: rgba(34,197,94,0.04); }
+    .q-num { font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.35); margin-bottom: 6px; }
+    .q-text { font-size: 0.97rem; font-weight: 600; color: #fff; margin-bottom: 18px; line-height: 1.5; }
     .scale-wrap { display: flex; flex-direction: column; gap: 8px; }
-    .scale-labels {
-      display: flex; justify-content: space-between;
-      font-size: 0.74rem; color: var(--muted); padding: 0 4px;
-    }
+    .scale-labels { display: flex; justify-content: space-between; font-size: 0.74rem; color: rgba(255,255,255,0.35); padding: 0 4px; }
     .scale-options { display: flex; gap: 8px; }
-    .scale-option {
-      flex: 1; display: flex;
-      flex-direction: column; align-items: center; gap: 6px;
-    }
-    .scale-option input[type="radio"] {
-      width: 0; height: 0; position: absolute; opacity: 0;
-    }
-    .scale-option .btn-scale {
-      width: 100%; padding: 10px 4px;
-      border: 2px solid var(--border); border-radius: 10px;
-      text-align: center; font-size: 1rem; font-weight: 700;
-      color: var(--muted); cursor: pointer; background: #f8fafc;
-      transition: all 0.15s; user-select: none;
-    }
-    .scale-option .btn-scale:hover {
-      border-color: var(--primary-light);
-      background: #eff2ff; color: var(--primary-light);
-    }
-    .scale-option input:checked + .btn-scale {
-      border-color: var(--primary-light);
-      background: var(--primary-light); color: #fff;
-      box-shadow: 0 3px 12px rgba(47,93,240,0.3);
-    }
-    .scale-option[data-val="1"] input:checked + .btn-scale,
-    .scale-option[data-val="2"] input:checked + .btn-scale {
-      background: #dc2626; border-color: #dc2626;
-    }
-    .scale-option[data-val="3"] input:checked + .btn-scale {
-      background: #d97706; border-color: #d97706;
-    }
-    .scale-option[data-val="4"] input:checked + .btn-scale {
-      background: #16a34a; border-color: #16a34a;
-    }
-    .scale-option[data-val="5"] input:checked + .btn-scale {
-      background: #15803d; border-color: #15803d;
-    }
-    .q-rating-hint {
-      font-size: 0.76rem; color: var(--muted);
-      margin-top: 6px; font-style: italic;
-    }
-    .calc-table {
-      width: 100%; border-collapse: collapse;
-      font-size: 0.88rem; margin-top: 12px;
-    }
-    .calc-table th {
-      padding: 8px 12px; background: #f1f5f9;
-      text-align: left; font-size: 0.75rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.05em;
-      color: var(--muted);
-    }
-    .calc-table td {
-      padding: 9px 12px; border-bottom: 1px solid #f1f5f9;
-    }
-    .calc-table tr:last-child td { border-bottom: none; }
-    .score-poor   { color: #dc2626; font-weight: 700; }
-    .score-medium { color: #d97706; font-weight: 700; }
-    .score-good   { color: #16a34a; font-weight: 700; }
-    .result-card {
-      border-radius: 16px; padding: 32px;
-      text-align: center; color: #fff; margin-bottom: 24px;
-    }
+    .scale-option { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .scale-option input[type="radio"] { width: 0; height: 0; position: absolute; opacity: 0; }
+    .scale-option .btn-scale { width: 100%; padding: 10px 4px; border: 1.5px solid rgba(255,255,255,0.12); border-radius: 10px; text-align: center; font-size: 1rem; font-weight: 700; color: rgba(255,255,255,0.45); cursor: pointer; background: rgba(255,255,255,0.05); transition: all 0.15s; user-select: none; }
+    .scale-option .btn-scale:hover { border-color: #a78bfa; background: rgba(139,92,246,0.15); color: #c4b5fd; }
+    .scale-option input:checked + .btn-scale { border-color: #8b5cf6; background: #8b5cf6; color: #fff; box-shadow: 0 3px 12px rgba(139,92,246,0.4); }
+    .scale-option[data-val="1"] input:checked + .btn-scale { background: #dc2626; border-color: #dc2626; box-shadow: 0 3px 12px rgba(220,38,38,0.4); }
+    .scale-option[data-val="2"] input:checked + .btn-scale { background: #ea580c; border-color: #ea580c; box-shadow: 0 3px 12px rgba(234,88,12,0.4); }
+    .scale-option[data-val="3"] input:checked + .btn-scale { background: #d97706; border-color: #d97706; box-shadow: 0 3px 12px rgba(217,119,6,0.4); }
+    .scale-option[data-val="4"] input:checked + .btn-scale { background: #16a34a; border-color: #16a34a; box-shadow: 0 3px 12px rgba(22,163,74,0.4); }
+    .scale-option[data-val="5"] input:checked + .btn-scale { background: #15803d; border-color: #15803d; box-shadow: 0 3px 12px rgba(21,128,61,0.4); }
+    .q-rating-hint { font-size: 0.76rem; color: rgba(255,255,255,0.35); margin-top: 6px; font-style: italic; }
+
+    /* SUGGESTIONS */
+    .suggestions-box { background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 22px 26px; margin-bottom: 24px; }
+    .suggestions-box .box-label { font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+    .suggestions-box h3 { font-size: 0.95rem; font-weight: 600; color: #fff; margin-bottom: 8px; }
+    .suggestions-box p  { font-size: 0.84rem; color: rgba(255,255,255,0.45); margin-bottom: 12px; }
+    .suggestions-box textarea { width: 100%; min-height: 100px; padding: 12px 14px; border: 1.5px solid rgba(255,255,255,0.12); border-radius: 10px; font-size: 0.92rem; font-family: inherit; color: #fff; background: rgba(255,255,255,0.07); resize: vertical; outline: none; line-height: 1.6; transition: border-color 0.2s, box-shadow 0.2s; }
+    .suggestions-box textarea:focus { border-color: #8b5cf6; background: rgba(139,92,246,0.1); box-shadow: 0 0 0 3px rgba(139,92,246,0.2); }
+    .suggestions-box textarea::placeholder { color: rgba(255,255,255,0.25); }
+
+    /* ALERT / SPINNER */
+    .alert-error { background: rgba(239,68,68,0.12); color: #fca5a5; border: 1.5px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 10px 14px; font-size: 0.83rem; font-weight: 600; margin-top: 10px; }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* RESULT */
+    .result-card { border-radius: 16px; padding: 32px; text-align: center; color: #fff; margin-bottom: 24px; }
     .result-card.excellent { background: linear-gradient(135deg,#15803d,#22c55e); }
-    .result-card.good      { background: linear-gradient(135deg,#1d4ed8,#2f5df0); }
+    .result-card.good      { background: linear-gradient(135deg,#4f46e5,#8b5cf6); }
     .result-card.fair      { background: linear-gradient(135deg,#b45309,#d97706); }
     .result-card.poor      { background: linear-gradient(135deg,#991b1b,#dc2626); }
-    .big-score  { font-size: 4.5rem; font-weight: 900; line-height: 1; }
+    .big-score { font-size: 4.5rem; font-weight: 900; line-height: 1; }
     .grade-text { font-size: 1.4rem; font-weight: 700; margin-top: 6px; opacity: 0.95; }
-    .formula-box {
-      background: #f8faff; border: 1.5px solid #c7d5fd;
-      border-radius: 12px; padding: 18px 22px;
-      margin-bottom: 20px; font-size: 0.88rem; line-height: 2;
-    }
-    .formula-step {
-      display: flex; align-items: center; gap: 10px; padding: 4px 0;
-    }
-    .formula-step .step-num {
-      width: 24px; height: 24px; border-radius: 50%;
-      background: var(--primary-light); color: #fff;
-      font-size: 0.72rem; font-weight: 800;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .formula-step .step-value {
-      font-weight: 800; color: var(--primary); margin-left: auto;
-    }
-    .suggestions-box {
-      background: var(--card); border: 1.5px solid var(--border);
-      border-radius: 14px; padding: 22px 26px; margin-bottom: 24px;
-    }
-    .suggestions-box textarea {
-      width: 100%; min-height: 100px; padding: 12px 14px;
-      border: 1.5px solid var(--border); border-radius: 10px;
-      font-size: 0.92rem; font-family: inherit; color: var(--text);
-      background: #fafbfc; resize: vertical; outline: none;
-      line-height: 1.6; transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .suggestions-box textarea:focus {
-      border-color: var(--primary-light);
-      box-shadow: 0 0 0 3px rgba(47,93,240,0.10); background: #fff;
-    }
-    .progress-bar-wrap {
-      background: #e2e8f0; border-radius: 4px;
-      height: 6px; margin-bottom: 20px; overflow: hidden;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg,var(--primary),var(--primary-light));
-      border-radius: 4px; transition: width 0.3s ease;
-    }
+
+    /* FORMULA */
+    .formula-box { background: rgba(139,92,246,0.08); border: 1.5px solid rgba(139,92,246,0.2); border-radius: 12px; padding: 18px 22px; margin-bottom: 20px; font-size: 0.88rem; line-height: 2; }
+    .formula-step { display: flex; align-items: center; gap: 10px; padding: 4px 0; color: rgba(255,255,255,0.75); }
+    .formula-step .step-num { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg,#8b5cf6,#4f46e5); color: #fff; font-size: 0.72rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .formula-step .step-value { font-weight: 800; color: #c4b5fd; margin-left: auto; }
+
+    /* TABLE */
+    .table-wrap { background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; margin-bottom: 24px; }
+    .calc-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .calc-table th { padding: 8px 12px; background: rgba(255,255,255,0.06); text-align: left; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.4); }
+    .calc-table td { padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.8); }
+    .calc-table tr:last-child td { border-bottom: none; }
+    .calc-table tfoot tr td { background: rgba(139,92,246,0.08); }
+    .score-poor   { color: #f87171; font-weight: 700; }
+    .score-medium { color: #fbbf24; font-weight: 700; }
+    .score-good   { color: #4ade80; font-weight: 700; }
+
+    /* SCORE SCALE */
+    .scale-ref { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 18px 22px; margin-bottom: 24px; }
+    .scale-ref h3 { margin-bottom: 14px; font-size: 0.95rem; }
+    .scale-ref-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; text-align: center; }
+    .sr-poor  { background: rgba(153,27,27,0.2);  border: 1px solid rgba(248,113,113,0.2); border-radius: 10px; padding: 12px 8px; }
+    .sr-fair  { background: rgba(133,77,14,0.2);  border: 1px solid rgba(251,191,36,0.2);  border-radius: 10px; padding: 12px 8px; }
+    .sr-good  { background: rgba(29,78,216,0.2);  border: 1px solid rgba(147,197,253,0.2); border-radius: 10px; padding: 12px 8px; }
+    .sr-excel { background: rgba(21,128,61,0.2);  border: 1px solid rgba(134,239,172,0.2); border-radius: 10px; padding: 12px 8px; }
+    .sr-poor  .sr-num, .sr-poor  .sr-lbl { color: #f87171; }
+    .sr-fair  .sr-num, .sr-fair  .sr-lbl { color: #fbbf24; }
+    .sr-good  .sr-num, .sr-good  .sr-lbl { color: #93c5fd; }
+    .sr-excel .sr-num, .sr-excel .sr-lbl { color: #86efac; }
+    .sr-num { font-size: 1.1rem; font-weight: 900; }
+    .sr-lbl { font-size: 0.75rem; font-weight: 700; margin-top: 4px; }
   </style>
 </head>
 <body>
 
 <nav class="navbar">
-  <a href="/dashboard.html" class="nav-brand">
-    <span>🔐</span> RBA-2FA System
-  </a>
+  <a href="/dashboard.html" class="nav-brand"><span>🔐</span> RBA-2FA System</a>
   <div class="nav-actions">
-    <a href="/evaluation.html" class="btn btn-secondary"
-       style="font-size:0.85rem;">📊 Metrics</a>
-    <a href="/dashboard.html" class="btn btn-outline"
-       style="font-size:0.85rem;">← Dashboard</a>
+    <a href="/evaluation.html" class="btn btn-secondary">📊 Metrics</a>
+    <a href="/dashboard.html" class="btn btn-outline">← Dashboard</a>
   </div>
 </nav>
 
-<div style="max-width:720px;margin:0 auto;padding:32px 24px;">
+<div class="page">
 
-  <!-- ===== FORM SECTION ===== -->
+  <div id="alreadySubmittedBanner">
+    <h2>✅ Thank you for your feedback!</h2>
+    <p>You have already submitted your App Rating &amp; Feedback Survey response.<br/>
+       Each participant submits only once to keep the research data accurate.</p>
+    <br/>
+    <a href="/dashboard.html" class="btn btn-primary">← Back to Dashboard</a>
+  </div>
+
   <div id="formSection">
-
     <div style="margin-bottom:24px;">
-      <h1 style="margin-bottom:8px;">📝 Usability Questionnaire</h1>
-      <p>Rate your experience using the RBA-2FA login system.
-         Answer all 10 questions honestly — your feedback
-         improves the system.</p>
+      <h1>⭐ App Rating &amp; Feedback Survey</h1>
+      <p style="margin-top:8px;">Rate your experience using the RBA-2FA login system. Answer all 10 questions honestly — your feedback improves the system.</p>
     </div>
 
-    <div class="form-group"
-         style="max-width:300px;margin-bottom:20px;">
-      <label>Your name
-        <span style="font-weight:400;text-transform:none;">
-          (optional)
-        </span>
+    <div class="form-group" style="max-width:300px;">
+      <label>YOUR NAME <span class="required-star">*</span>
+        <span style="font-weight:400;text-transform:none;color:rgba(255,255,255,0.3);">(required)</span>
       </label>
-      <input type="text" id="participant"
-             placeholder="e.g. Participant 1"/>
-    </div>
-
-    <div style="background:#f0fdf4;border:1.5px solid #86efac;
-                border-radius:12px;padding:16px 20px;
-                margin-bottom:24px;">
-      <div style="font-weight:700;margin-bottom:10px;
-                  color:#15803d;font-size:0.9rem;">
-        ⭐ Rating Guide — Higher number always means better
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);
-                  gap:8px;text-align:center;">
-        <div style="background:#fef2f2;border-radius:8px;padding:10px 6px;">
-          <div style="font-size:1.4rem;font-weight:900;color:#dc2626;">1</div>
-          <div style="font-size:0.72rem;color:#dc2626;font-weight:700;
-                      margin-top:3px;">Very Poor</div>
-        </div>
-        <div style="background:#fff7ed;border-radius:8px;padding:10px 6px;">
-          <div style="font-size:1.4rem;font-weight:900;color:#ea580c;">2</div>
-          <div style="font-size:0.72rem;color:#ea580c;font-weight:700;
-                      margin-top:3px;">Poor</div>
-        </div>
-        <div style="background:#fffbeb;border-radius:8px;padding:10px 6px;">
-          <div style="font-size:1.4rem;font-weight:900;color:#d97706;">3</div>
-          <div style="font-size:0.72rem;color:#d97706;font-weight:700;
-                      margin-top:3px;">Medium</div>
-        </div>
-        <div style="background:#f0fdf4;border-radius:8px;padding:10px 6px;">
-          <div style="font-size:1.4rem;font-weight:900;color:#16a34a;">4</div>
-          <div style="font-size:0.72rem;color:#16a34a;font-weight:700;
-                      margin-top:3px;">Good</div>
-        </div>
-        <div style="background:#dcfce7;border-radius:8px;padding:10px 6px;">
-          <div style="font-size:1.4rem;font-weight:900;color:#15803d;">5</div>
-          <div style="font-size:0.72rem;color:#15803d;font-weight:700;
-                      margin-top:3px;">Excellent</div>
-        </div>
+      <input type="text" id="participant" placeholder="e.g. Participant 1" required />
+      <div id="nameError" style="display:none;color:#f87171;font-size:0.82rem;margin-top:4px;font-weight:600;">
+        ❌ Please enter your name before submitting.
       </div>
     </div>
 
-    <div style="display:flex;align-items:center;
-                justify-content:space-between;margin-bottom:8px;">
-      <span style="font-size:0.82rem;color:var(--muted);font-weight:600;">
-        Questions answered
-      </span>
-      <span style="font-size:0.82rem;font-weight:700;color:var(--primary);"
-            id="progressText">0 / 10</span>
+    <div class="rating-guide">
+      <div class="rating-guide-title">⭐ Rating Guide — Higher number always means better</div>
+      <div class="rating-guide-grid">
+        <div class="rg-1"><div class="rg-num">1</div><div class="rg-label">Very Poor</div></div>
+        <div class="rg-2"><div class="rg-num">2</div><div class="rg-label">Poor</div></div>
+        <div class="rg-3"><div class="rg-num">3</div><div class="rg-label">Medium</div></div>
+        <div class="rg-4"><div class="rg-num">4</div><div class="rg-label">Good</div></div>
+        <div class="rg-5"><div class="rg-num">5</div><div class="rg-label">Excellent</div></div>
+      </div>
     </div>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar-fill" id="progressBar"
-           style="width:0%;"></div>
+
+    <div class="progress-header">
+      <span>Questions answered</span>
+      <span id="progressText">0 / 10</span>
     </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:0%;"></div></div>
 
     <div id="questionsArea"></div>
 
     <div class="suggestions-box">
-      <div style="font-size:0.82rem;font-weight:700;color:var(--muted);
-                  text-transform:uppercase;letter-spacing:0.06em;
-                  margin-bottom:6px;">
-        💬 Suggestions &amp; Comments
-      </div>
-      <h3 style="font-size:0.95rem;font-weight:600;color:var(--text);
-                 margin-bottom:8px;">
-        What would you improve about the RBA-2FA system?
-      </h3>
-      <p style="font-size:0.84rem;color:var(--muted);margin-bottom:12px;">
-        Share anything that was confusing, slow, or could be made better.
-      </p>
-      <textarea id="suggestions"
-        placeholder="e.g. The OTP was quick. I would suggest clearer error messages...">
-      </textarea>
+      <div class="box-label">💬 Suggestions &amp; Comments</div>
+      <h3>What would you improve about the RBA-2FA system?</h3>
+      <p>Share anything that was confusing, slow, or could be made better.</p>
+      <textarea id="suggestions" placeholder="e.g. The OTP was quick. I would suggest clearer error messages..."></textarea>
     </div>
 
-    <button class="btn btn-primary btn-block btn-lg"
-            id="submitBtn" onclick="submitForm()">
-      Submit &amp; See My Results →
-    </button>
+    <button class="btn btn-primary btn-block btn-lg" id="submitBtn" onclick="submitForm()">Submit &amp; See My Results →</button>
     <div id="msg"></div>
+  </div>
 
-  </div><!-- end formSection -->
-
-  <!-- ===== RESULT SECTION ===== -->
   <div id="resultSection" style="display:none;">
-
     <div class="result-card" id="resultCard">
-      <div style="font-size:0.85rem;opacity:0.8;margin-bottom:6px;"
-           id="resultName"></div>
+      <div style="font-size:0.85rem;opacity:0.8;margin-bottom:6px;" id="resultName"></div>
       <div class="big-score" id="resultScore"></div>
-      <div style="font-size:1rem;opacity:0.75;margin-top:2px;">
-        out of 100
-      </div>
+      <div style="font-size:1rem;opacity:0.75;margin-top:2px;">out of 100</div>
       <div class="grade-text" id="resultGrade"></div>
-      <div style="font-size:0.88rem;opacity:0.75;margin-top:8px;"
-           id="resultMsg"></div>
+      <div style="font-size:0.88rem;opacity:0.75;margin-top:8px;" id="resultMsg"></div>
     </div>
 
-    <div style="margin-bottom:20px;">
+    <div style="margin-bottom:24px;">
       <h3 style="margin-bottom:12px;">🧮 How your score was calculated</h3>
       <div class="formula-box">
-        <div class="formula-step">
-          <div class="step-num">1</div>
-          <div>Each question rated from 1 (Very Poor) to 5 (Excellent)</div>
-        </div>
-        <div class="formula-step">
-          <div class="step-num">2</div>
-          <div id="formulaStep2"></div>
-        </div>
-        <div class="formula-step">
-          <div class="step-num">3</div>
-          <div id="formulaStep3"></div>
-        </div>
-        <div class="formula-step">
-          <div class="step-num">4</div>
-          <div id="formulaStep4"></div>
-          <div class="step-value" id="formulaFinal"></div>
-        </div>
+        <div class="formula-step"><div class="step-num">1</div><div>Each question rated from 1 (Very Poor) to 5 (Excellent)</div></div>
+        <div class="formula-step"><div class="step-num">2</div><div id="formulaStep2"></div></div>
+        <div class="formula-step"><div class="step-num">3</div><div id="formulaStep3"></div></div>
+        <div class="formula-step"><div class="step-num">4</div><div id="formulaStep4"></div><div class="step-value" id="formulaFinal"></div></div>
       </div>
     </div>
 
     <div style="margin-bottom:24px;">
-      <h3 style="margin-bottom:12px;">
-        📋 Question-by-question breakdown
-      </h3>
-      <div style="background:var(--card);border-radius:12px;
-                  box-shadow:var(--shadow);border:1px solid var(--border);
-                  overflow:hidden;">
+      <h3 style="margin-bottom:12px;">📋 Question-by-question breakdown</h3>
+      <div class="table-wrap">
         <table class="calc-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Question</th>
-              <th>Your Rating</th>
-              <th>Level</th>
-            </tr>
-          </thead>
+          <thead><tr><th>#</th><th>Question</th><th>Your Rating</th><th>Level</th></tr></thead>
           <tbody id="breakdownBody"></tbody>
           <tfoot>
-            <tr style="background:#f8faff;">
-              <td colspan="2"
-                  style="padding:10px 12px;font-weight:700;">
-                Total raw score
-              </td>
-              <td style="padding:10px 12px;font-weight:900;
-                         color:var(--primary);font-size:1.1rem;"
-                  id="rawScoreCell"></td>
-              <td style="padding:10px 12px;font-size:0.78rem;
-                         color:var(--muted);">
-                out of 50
-              </td>
+            <tr>
+              <td colspan="2" style="padding:10px 12px;font-weight:700;color:#fff;">Total raw score</td>
+              <td style="padding:10px 12px;font-weight:900;color:#a78bfa;font-size:1.1rem;" id="rawScoreCell"></td>
+              <td style="padding:10px 12px;font-size:0.78rem;color:rgba(255,255,255,0.4);">out of 50</td>
             </tr>
           </tfoot>
         </table>
       </div>
     </div>
 
-    <div style="background:#f8faff;border:1px solid var(--border);
-                border-radius:12px;padding:18px 22px;margin-bottom:24px;">
-      <h3 style="margin-bottom:14px;font-size:0.95rem;">
-        📊 Score scale reference
-      </h3>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);
-                  gap:10px;text-align:center;">
-        <div style="background:#fee2e2;border-radius:10px;padding:12px 8px;">
-          <div style="font-size:1.1rem;font-weight:900;color:#991b1b;">
-            0 – 39
-          </div>
-          <div style="font-size:0.75rem;color:#991b1b;font-weight:700;
-                      margin-top:4px;">Poor</div>
-        </div>
-        <div style="background:#fef9c3;border-radius:10px;padding:12px 8px;">
-          <div style="font-size:1.1rem;font-weight:900;color:#854d0e;">
-            40 – 59
-          </div>
-          <div style="font-size:0.75rem;color:#854d0e;font-weight:700;
-                      margin-top:4px;">Fair</div>
-        </div>
-        <div style="background:#dbeafe;border-radius:10px;padding:12px 8px;">
-          <div style="font-size:1.1rem;font-weight:900;color:#1d4ed8;">
-            60 – 79
-          </div>
-          <div style="font-size:0.75rem;color:#1d4ed8;font-weight:700;
-                      margin-top:4px;">Good</div>
-        </div>
-        <div style="background:#dcfce7;border-radius:10px;padding:12px 8px;">
-          <div style="font-size:1.1rem;font-weight:900;color:#15803d;">
-            80 – 100
-          </div>
-          <div style="font-size:0.75rem;color:#15803d;font-weight:700;
-                      margin-top:4px;">Excellent</div>
-        </div>
+    <div class="scale-ref">
+      <h3>📊 Score scale reference</h3>
+      <div class="scale-ref-grid">
+        <div class="sr-poor" ><div class="sr-num">0 – 39</div> <div class="sr-lbl">Poor</div></div>
+        <div class="sr-fair" ><div class="sr-num">40 – 59</div><div class="sr-lbl">Fair</div></div>
+        <div class="sr-good" ><div class="sr-num">60 – 79</div><div class="sr-lbl">Good</div></div>
+        <div class="sr-excel"><div class="sr-num">80 – 100</div><div class="sr-lbl">Excellent</div></div>
       </div>
     </div>
 
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px;">
-      <button class="btn btn-secondary" onclick="resetForm()">
-        📝 Submit another response
-      </button>
-      <a href="/dashboard.html" class="btn btn-primary">
-        ← Back to Dashboard
-      </a>
+      <a href="/dashboard.html" class="btn btn-primary">← Back to Dashboard</a>
     </div>
-
-  </div><!-- end resultSection -->
+  </div>
 
 </div>
 
@@ -400,6 +275,15 @@ const QUESTIONS = [
   "Overall, I am satisfied with the security and usability of this system.",
 ];
 
+(function checkAlreadySubmitted() {
+  try {
+    if (localStorage.getItem("sus_submitted") === "1") {
+      document.getElementById("formSection").style.display = "none";
+      document.getElementById("alreadySubmittedBanner").style.display = "block";
+    }
+  } catch(e) {}
+})();
+
 function renderQuestions() {
   document.getElementById("questionsArea").innerHTML =
     QUESTIONS.map((q, i) => `
@@ -410,38 +294,28 @@ function renderQuestions() {
           <div class="scale-options">
             ${[1,2,3,4,5].map(v => `
               <div class="scale-option" data-val="${v}">
-                <input type="radio" name="q${i}"
-                       id="q${i}v${v}" value="${v}"
-                       onchange="onAnswer(${i})"/>
-                <label for="q${i}v${v}" class="btn-scale">
-                  ${v}
-                </label>
+                <input type="radio" name="q${i}" id="q${i}v${v}" value="${v}" onchange="onAnswer(${i})"/>
+                <label for="q${i}v${v}" class="btn-scale">${v}</label>
               </div>`).join("")}
           </div>
           <div class="scale-labels">
-            <span>1 = Very Poor</span>
-            <span>3 = Medium</span>
-            <span>5 = Excellent</span>
+            <span>1 = Very Poor</span><span>3 = Medium</span><span>5 = Excellent</span>
           </div>
-          <div class="q-rating-hint" id="hint${i}">
-            Select a number above — 1 is worst, 5 is best
-          </div>
+          <div class="q-rating-hint" id="hint${i}">Select a number above — 1 is worst, 5 is best</div>
         </div>
       </div>`).join("");
 }
 
 function onAnswer(i) {
-  const val  = parseInt(
-    document.querySelector(`input[name="q${i}"]:checked`).value
-  );
+  const val  = parseInt(document.querySelector(`input[name="q${i}"]:checked`).value);
   const card = document.getElementById(`card${i}`);
   const hint = document.getElementById(`hint${i}`);
   card.classList.add("answered");
   const labels = ["","Very Poor","Poor","Medium","Good","Excellent"];
-  const colors = ["","#dc2626","#ea580c","#d97706","#16a34a","#15803d"];
-  hint.textContent      = `You selected: ${val} — ${labels[val]}`;
-  hint.style.color      = colors[val];
-  hint.style.fontStyle  = "normal";
+  const colors = ["","#f87171","#fb923c","#fbbf24","#4ade80","#86efac"];
+  hint.textContent = `You selected: ${val} — ${labels[val]}`;
+  hint.style.color = colors[val];
+  hint.style.fontStyle = "normal";
   hint.style.fontWeight = "600";
   updateProgress();
 }
@@ -452,156 +326,87 @@ function updateProgress() {
     if (document.querySelector(`input[name="q${i}"]:checked`)) count++;
   }
   document.getElementById("progressText").textContent = `${count} / 10`;
-  document.getElementById("progressBar").style.width  =
-    (count / 10 * 100) + "%";
+  document.getElementById("progressBar").style.width = (count / 10 * 100) + "%";
 }
 
 async function submitForm() {
+  const participant = (document.getElementById("participant").value || "").trim();
+  const nameError = document.getElementById("nameError");
+  if (!participant) {
+    nameError.style.display = "block";
+    document.getElementById("participant").focus();
+    return;
+  }
+  nameError.style.display = "none";
+  try {
+    if (localStorage.getItem("sus_submitted") === "1") {
+      document.getElementById("formSection").style.display = "none";
+      document.getElementById("alreadySubmittedBanner").style.display = "block";
+      return;
+    }
+  } catch(e) {}
   const answers = [];
   for (let i = 0; i < 10; i++) {
     const sel = document.querySelector(`input[name="q${i}"]:checked`);
     if (!sel) {
       document.getElementById("msg").innerHTML =
-        `<div class="alert alert-error" style="margin-top:14px;">
-           ❌ Please answer question ${i + 1} before submitting.
-         </div>`;
-      document.getElementById(`card${i}`).scrollIntoView({
-        behavior: "smooth", block: "center"
-      });
+        `<div class="alert-error">❌ Please answer question ${i + 1} before submitting.</div>`;
+      document.getElementById(`card${i}`).scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
     answers.push(parseInt(sel.value));
   }
-
-  const participant =
-    (document.getElementById("participant").value || "").trim();
-  const suggestions =
-    (document.getElementById("suggestions").value || "").trim();
-
+  const suggestions = (document.getElementById("suggestions").value || "").trim();
   const btn = document.getElementById("submitBtn");
   btn.innerHTML = '<span class="spinner"></span> Submitting…';
-  btn.disabled  = true;
-
+  btn.disabled = true;
   try {
     const res  = await fetch("/api/sus/submit", {
-      method:  "POST",
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ participant, answers, suggestions }),
+      body: JSON.stringify({ participant, answers, suggestions }),
     });
     const data = await res.json();
-
     if (!res.ok) {
       document.getElementById("msg").innerHTML =
-        `<div class="alert alert-error" style="margin-top:14px;">
-           ❌ ${data.error}
-         </div>`;
+        `<div class="alert-error" style="margin-top:14px;">❌ ${data.error}</div>`;
       return;
     }
-    showResult(data, answers, participant || "Anonymous");
-
+    try { localStorage.setItem("sus_submitted", "1"); } catch(e) {}
+    showResult(data, answers, participant);
   } catch(e) {
     document.getElementById("msg").innerHTML =
-      `<div class="alert alert-error" style="margin-top:14px;">
-         Network error. Please try again.
-       </div>`;
+      `<div class="alert-error" style="margin-top:14px;">Network error. Please try again.</div>`;
   } finally {
     btn.innerHTML = "Submit & See My Results →";
-    btn.disabled  = false;
+    btn.disabled = false;
   }
 }
 
 function showResult(data, answers, participant) {
-  document.getElementById("formSection").style.display   = "none";
+  document.getElementById("formSection").style.display = "none";
   document.getElementById("resultSection").style.display = "block";
   window.scrollTo({ top: 0, behavior: "smooth" });
-
-  const score = data.total_score;
-  const grade = data.grade;
-  const raw   = data.raw_score;
-
-  const gradeClass = {
-    Excellent:"excellent", Good:"good",
-    Fair:"fair", Poor:"poor"
-  }[grade] || "fair";
-
-  const gradeMsg = {
-    Excellent: "Outstanding! The system achieved excellent usability.",
-    Good:      "Good usability — users found the system easy and secure.",
-    Fair:      "Fair usability — some improvements would be beneficial.",
-    Poor:      "Poor usability — significant improvements are recommended.",
-  }[grade] || "";
-
-  document.getElementById("resultCard").className =
-    `result-card ${gradeClass}`;
-  document.getElementById("resultName").textContent  =
-    `${participant}'s result`;
+  const score = data.total_score, grade = data.grade, raw = data.raw_score;
+  const gradeClass = { Excellent:"excellent", Good:"good", Fair:"fair", Poor:"poor" }[grade] || "fair";
+  const gradeMsg = { Excellent:"Outstanding! The system achieved excellent usability.", Good:"Good usability — users found the system easy and secure.", Fair:"Fair usability — some improvements would be beneficial.", Poor:"Poor usability — significant improvements are recommended." }[grade] || "";
+  document.getElementById("resultCard").className = `result-card ${gradeClass}`;
+  document.getElementById("resultName").textContent = `${participant}'s result`;
   document.getElementById("resultScore").textContent = score;
   document.getElementById("resultGrade").textContent = grade;
-  document.getElementById("resultMsg").textContent   = gradeMsg;
-
-  document.getElementById("formulaStep2").textContent =
-    `Sum of all 10 ratings: ${answers.join(" + ")} = ${raw}`;
-  document.getElementById("formulaStep3").textContent =
-    `Convert to 0–100 scale: (${raw} ÷ 50) × 100 = ${score}`;
-  document.getElementById("formulaStep4").textContent =
-    `Final usability score:`;
+  document.getElementById("resultMsg").textContent = gradeMsg;
+  document.getElementById("formulaStep2").textContent = `Sum of all 10 ratings: ${answers.join(" + ")} = ${raw}`;
+  document.getElementById("formulaStep3").textContent = `Convert to 0–100 scale: (${raw} ÷ 50) × 100 = ${score}`;
+  document.getElementById("formulaStep4").textContent = `Final usability score:`;
   document.getElementById("formulaFinal").textContent = `${score} / 100`;
-
-  const QSHORT = [
-    "Ease of use","Completing login","OTP step clarity",
-    "Account security confidence","Clear instructions",
-    "Risk feedback clarity","OTP time acceptable",
-    "Would use regularly","System response speed",
-    "Overall satisfaction",
-  ];
-
-  const tbody = document.getElementById("breakdownBody");
-  tbody.innerHTML = answers.map((a, i) => {
-    const lc = a <= 2 ? "score-poor" :
-               a === 3 ? "score-medium" : "score-good";
-    const lt = a <= 2 ? (a===1?"Very Poor":"Poor") :
-               a === 3 ? "Medium" : (a===4?"Good":"Excellent");
+  const QSHORT = ["Ease of use","Completing login","OTP step clarity","Account security confidence","Clear instructions","Risk feedback clarity","OTP time acceptable","Would use regularly","System response speed","Overall satisfaction"];
+  document.getElementById("breakdownBody").innerHTML = answers.map((a, i) => {
+    const lc = a <= 2 ? "score-poor" : a === 3 ? "score-medium" : "score-good";
+    const lt = a <= 2 ? (a===1?"Very Poor":"Poor") : a === 3 ? "Medium" : (a===4?"Good":"Excellent");
     const st = "★".repeat(a) + "☆".repeat(5 - a);
-    return `
-      <tr>
-        <td style="font-weight:700;color:var(--muted);">Q${i+1}</td>
-        <td style="font-size:0.85rem;">${QSHORT[i]}</td>
-        <td>
-          <span class="${lc}" style="font-size:1.1rem;">${a}</span>
-          <span style="color:#e2c55e;font-size:0.85rem;margin-left:4px;">
-            ${st}
-          </span>
-        </td>
-        <td class="${lc}" style="font-size:0.84rem;">${lt}</td>
-      </tr>`;
+    return `<tr><td style="font-weight:700;color:rgba(255,255,255,0.4);">Q${i+1}</td><td style="font-size:0.85rem;">${QSHORT[i]}</td><td><span class="${lc}" style="font-size:1.1rem;">${a}</span><span style="color:#e2c55e;font-size:0.85rem;margin-left:4px;">${st}</span></td><td class="${lc}" style="font-size:0.84rem;">${lt}</td></tr>`;
   }).join("");
-
   document.getElementById("rawScoreCell").textContent = raw;
-}
-
-function resetForm() {
-  document.querySelectorAll("input[type=radio]").forEach(
-    r => r.checked = false
-  );
-  document.getElementById("participant").value          = "";
-  document.getElementById("suggestions").value          = "";
-  document.getElementById("msg").innerHTML              = "";
-  document.getElementById("formSection").style.display  = "block";
-  document.getElementById("resultSection").style.display= "none";
-  for (let i = 0; i < 10; i++) {
-    const card = document.getElementById(`card${i}`);
-    if (card) card.classList.remove("answered");
-    const hint = document.getElementById(`hint${i}`);
-    if (hint) {
-      hint.textContent      =
-        "Select a number above — 1 is worst, 5 is best";
-      hint.style.color      = "";
-      hint.style.fontWeight = "";
-      hint.style.fontStyle  = "italic";
-    }
-  }
-  updateProgress();
-  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 renderQuestions();

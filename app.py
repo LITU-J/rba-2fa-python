@@ -29,11 +29,6 @@ def index():
     return app.send_static_file("index.html")
 
 
-@app.get("/api/health")
-def health_check():
-    return {"status": "ok"}
-
-
 @app.errorhandler(404)
 def not_found(e):
     return app.send_static_file("404.html"), 404

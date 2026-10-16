@@ -6,204 +6,244 @@
   <title>Dashboard — RBA-2FA</title>
   <link rel="stylesheet" href="/css/style.css"/>
   <style>
-    /* ---- Page background ---- */
-    body { background: #f0f4ff; }
-
-    /* ---- Navbar ---- */
+    * { box-sizing: border-box; }
+    body {
+      background: #0f0c29 !important;
+      background: linear-gradient(135deg, #0f0c29 0%, #1a1040 50%, #24243e 100%) !important;
+      min-height: 100vh !important;
+    }
     .navbar {
-      background: linear-gradient(135deg, #1a3c8f 0%, #2f5df0 100%);
-      border-bottom: none;
-      box-shadow: 0 2px 16px rgba(26,60,143,0.25);
+      background: rgba(255,255,255,0.04) !important;
+      backdrop-filter: blur(20px) !important;
+      border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.3) !important;
     }
-    .nav-brand { color: #fff !important; }
-    .nav-brand span { font-size: 1.4rem; }
-    .nav-user { color: rgba(255,255,255,0.85) !important; font-weight: 600; }
-    .navbar .btn-outline {
-      background: rgba(255,255,255,0.15);
-      color: #fff;
-      border-color: rgba(255,255,255,0.3);
+    .nav-brand { color: #fff !important; font-weight: 800 !important; }
+    .nav-brand span { font-size: 1.4rem !important; }
+    .nav-user { color: rgba(255,255,255,0.85) !important; font-weight: 600 !important; }
+    .navbar .btn-outline, .navbar button.btn-outline {
+      background: rgba(255,255,255,0.1) !important; color: #fff !important;
+      border: 1px solid rgba(255,255,255,0.2) !important; border-radius: 10px !important;
     }
-    .navbar .btn-outline:hover { background: rgba(255,255,255,0.25); }
-    .navbar .btn-secondary {
-      background: rgba(255,255,255,0.2);
-      color: #fff;
-      border-color: rgba(255,255,255,0.3);
+    .navbar .btn-secondary, .navbar a.btn-secondary {
+      background: rgba(139,92,246,0.25) !important; color: #c4b5fd !important;
+      border: 1px solid rgba(139,92,246,0.3) !important; border-radius: 10px !important;
     }
-    .navbar .btn-secondary:hover { background: rgba(255,255,255,0.3); }
-
-    /* ---- Sidebar ---- */
+    .dash-layout {
+      min-height: calc(100vh - 64px) !important;
+      display: grid !important;
+      grid-template-columns: 230px 1fr !important;
+    }
     .dash-sidebar {
-      background: #1a2744;
-      border-right: none;
-      padding: 20px 12px;
-      box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+      background: rgba(255,255,255,0.03) !important;
+      backdrop-filter: blur(20px) !important;
+      border-right: 1px solid rgba(255,255,255,0.07) !important;
+      padding: 24px 14px !important;
+      display: flex !important; flex-direction: column !important;
+      box-shadow: none !important;
     }
-
-    /* Sidebar section label */
     .sidebar-section-label {
-      font-size: 0.68rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: rgba(255,255,255,0.35);
-      padding: 0 10px;
-      margin: 18px 0 8px;
+      font-size: 0.65rem !important; font-weight: 800 !important;
+      text-transform: uppercase !important; letter-spacing: 0.15em !important;
+      color: rgba(255,255,255,0.25) !important; padding: 0 10px !important;
+      margin: 20px 0 8px !important;
     }
-    .sidebar-section-label:first-child { margin-top: 4px; }
-
-    /* Sidebar divider */
-    .sidebar-divider {
-      height: 1px;
-      background: rgba(255,255,255,0.08);
-      margin: 14px 0;
-    }
-
-    /* Sidebar items */
+    .sidebar-section-label:first-child { margin-top: 4px !important; }
+    .sidebar-divider { height: 1px !important; background: rgba(255,255,255,0.07) !important; margin: 14px 0 !important; }
     .sidebar-item {
-      color: rgba(255,255,255,0.65) !important;
-      border-radius: 10px;
-      padding: 10px 12px;
-      margin-bottom: 3px;
-      font-size: 0.88rem;
-      font-weight: 500;
+      color: rgba(255,255,255,0.55) !important; border-radius: 12px !important;
+      padding: 11px 14px !important; margin-bottom: 4px !important;
+      font-size: 0.88rem !important; font-weight: 500 !important;
+      transition: all 0.2s ease !important; border: 1px solid transparent !important;
+      background: transparent !important;
     }
     .sidebar-item:hover {
-      background: rgba(255,255,255,0.1) !important;
-      color: #fff !important;
+      background: rgba(255,255,255,0.08) !important; color: #fff !important;
+      border-color: rgba(255,255,255,0.1) !important;
     }
     .sidebar-item.active {
-      background: linear-gradient(135deg, #2f5df0, #1a3c8f) !important;
-      color: #fff !important;
-      font-weight: 700;
-      box-shadow: 0 2px 8px rgba(47,93,240,0.4);
+      background: linear-gradient(135deg, rgba(139,92,246,0.35), rgba(79,70,229,0.25)) !important;
+      color: #c4b5fd !important; font-weight: 700 !important;
+      border-color: rgba(139,92,246,0.4) !important;
+      box-shadow: 0 4px 20px rgba(139,92,246,0.2) !important;
     }
-    .sidebar-item span { font-size: 1rem; }
-
-    /* Collapsible group */
-    .sidebar-group { margin-bottom: 4px; }
     .sidebar-group-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 12px;
-      border-radius: 10px;
-      cursor: pointer;
-      color: rgba(255,255,255,0.65);
-      font-size: 0.88rem;
-      font-weight: 500;
-      transition: background 0.15s, color 0.15s;
-      user-select: none;
+      display: flex !important; align-items: center !important;
+      justify-content: space-between !important;
+      padding: 11px 14px !important; border-radius: 12px !important;
+      cursor: pointer !important; color: rgba(255,255,255,0.55) !important;
+      font-size: 0.88rem !important; font-weight: 500 !important;
+      transition: all 0.2s !important; user-select: none !important;
+      border: 1px solid transparent !important;
     }
-    .sidebar-group-header:hover {
-      background: rgba(255,255,255,0.08);
-      color: #fff;
-    }
-    .sidebar-group-header .left {
-      display: flex; align-items: center; gap: 10px;
-    }
-    .sidebar-group-header .arrow {
-      font-size: 0.7rem;
-      transition: transform 0.25s ease;
-      opacity: 0.6;
-    }
-    .sidebar-group-header.open .arrow { transform: rotate(90deg); }
-    .sidebar-group-items {
-      overflow: hidden;
-      max-height: 0;
-      transition: max-height 0.3s ease;
-      padding-left: 8px;
-    }
-    .sidebar-group-items.open { max-height: 300px; }
-
-    /* User card at bottom of sidebar */
+    .sidebar-group-header:hover { background: rgba(255,255,255,0.08) !important; color: #fff !important; }
+    .sidebar-group-header .left { display: flex !important; align-items: center !important; gap: 10px !important; }
+    .sidebar-group-header .arrow { font-size: 0.7rem !important; transition: transform 0.25s ease !important; opacity: 0.5 !important; }
+    .sidebar-group-header.open .arrow { transform: rotate(90deg) !important; }
+    .sidebar-group-items { overflow: hidden !important; max-height: 0 !important; transition: max-height 0.3s ease !important; padding-left: 8px !important; }
+    .sidebar-group-items.open { max-height: 300px !important; }
     .sidebar-user {
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 12px 14px;
-      margin-top: auto;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      background: rgba(255,255,255,0.05) !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+      border-radius: 14px !important; padding: 14px !important;
+      margin-top: auto !important; display: flex !important; align-items: center !important; gap: 12px !important;
     }
     .sidebar-user .avatar {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #2f5df0, #60a5fa);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1rem; font-weight: 800; color: #fff;
-      flex-shrink: 0;
+      width: 38px !important; height: 38px !important; border-radius: 50% !important;
+      background: linear-gradient(135deg, #8b5cf6, #06b6d4) !important;
+      display: flex !important; align-items: center !important; justify-content: center !important;
+      font-size: 1rem !important; font-weight: 800 !important; color: #fff !important;
+      flex-shrink: 0 !important; box-shadow: 0 4px 14px rgba(139,92,246,0.4) !important;
     }
-    .sidebar-user .info .name {
-      font-size: 0.88rem; font-weight: 700; color: #fff;
+    .sidebar-user .info .name { font-size: 0.88rem !important; font-weight: 700 !important; color: #fff !important; }
+    .sidebar-user .info .role { font-size: 0.72rem !important; color: rgba(255,255,255,0.35) !important; }
+    .sidebar-logout-btn {
+      width: 100% !important; margin-top: 10px !important; padding: 10px 14px !important;
+      background: rgba(239,68,68,0.1) !important; border: 1px solid rgba(239,68,68,0.2) !important;
+      border-radius: 12px !important; color: #fca5a5 !important;
+      font-size: 0.83rem !important; font-weight: 600 !important; cursor: pointer !important;
+      text-align: left !important; display: flex !important; align-items: center !important; gap: 8px !important;
+      transition: all 0.2s !important;
     }
-    .sidebar-user .info .role {
-      font-size: 0.72rem; color: rgba(255,255,255,0.45);
+    .sidebar-logout-btn:hover {
+      background: rgba(239,68,68,0.22) !important; color: #fff !important;
+      border-color: rgba(239,68,68,0.4) !important;
     }
-
-    /* ---- Main content ---- */
-    .dash-main { background: #f0f4ff; padding: 28px; }
-    .dash-layout {
-      min-height: calc(100vh - 64px);
-      display: grid;
-      grid-template-columns: 220px 1fr;
-    }
-    .dash-sidebar {
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ---- Stat cards ---- */
-    .stat-card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 22px;
-      box-shadow: 0 2px 12px rgba(26,60,143,0.08);
-      border: 1px solid rgba(47,93,240,0.08);
-    }
-    .stat-card .stat-value { color: #1a3c8f; font-size: 1.9rem; }
-
-    /* ---- Location card ---- */
-    .location-card {
-      background: linear-gradient(135deg, #1a2744 0%, #1a3c8f 60%, #2f5df0 100%);
-      border-radius: 16px;
-    }
-
-    /* ---- Section card ---- */
-    .section-card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 2px 12px rgba(26,60,143,0.08);
-      border: 1px solid rgba(47,93,240,0.08);
-      margin-bottom: 20px;
-    }
-
-    /* ---- Page header ---- */
+    .dash-main { background: transparent !important; padding: 28px !important; }
     .page-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-      gap: 12px;
+      display: flex !important; align-items: center !important;
+      justify-content: space-between !important;
+      margin-bottom: 26px !important; flex-wrap: wrap !important; gap: 12px !important;
     }
-    .page-header h2 { color: #1a2744; }
-    .page-header p  { color: var(--muted); margin-top: 4px; font-size: 0.9rem; }
+    .page-header h2 { color: #fff !important; font-size: 1.5rem !important; font-weight: 800 !important; }
+    .page-header p { color: rgba(255,255,255,0.45) !important; margin-top: 4px !important; font-size: 0.9rem !important; }
+    .stat-grid {
+      display: grid !important; grid-template-columns: repeat(4,1fr) !important;
+      gap: 16px !important; margin-bottom: 20px !important;
+    }
+    .stat-card {
+      border-radius: 18px !important; padding: 22px !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25) !important;
+      position: relative !important; overflow: hidden !important;
+      transition: transform 0.2s, box-shadow 0.2s !important;
+    }
+    .stat-card:hover { transform: translateY(-3px) !important; box-shadow: 0 16px 40px rgba(0,0,0,0.35) !important; }
+    .stat-card:nth-child(1) { background: linear-gradient(135deg, #1e1040 0%, #2d1b69 100%) !important; }
+    .stat-card:nth-child(2) { background: linear-gradient(135deg, #0c1a2e 0%, #0e3a5c 100%) !important; }
+    .stat-card:nth-child(3) { background: linear-gradient(135deg, #0a2318 0%, #064e3b 100%) !important; }
+    .stat-card:nth-child(4) { background: linear-gradient(135deg, #1c1000 0%, #451a03 100%) !important; }
+    .stat-card .stat-icon { font-size: 1.6rem !important; display: block !important; margin-bottom: 14px !important; filter: drop-shadow(0 0 8px currentColor) !important; }
+    .stat-card .stat-value { font-size: 2rem !important; font-weight: 900 !important; line-height: 1 !important; margin-bottom: 6px !important; display: block !important; }
+    .stat-card:nth-child(1) .stat-value { color: #c4b5fd !important; }
+    .stat-card:nth-child(2) .stat-value { color: #67e8f9 !important; }
+    .stat-card:nth-child(3) .stat-value { color: #6ee7b7 !important; }
+    .stat-card:nth-child(4) .stat-value { color: #fcd34d !important; }
+    .stat-card .stat-label { font-size: 0.78rem !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.06em !important; color: rgba(255,255,255,0.4) !important; }
+    .location-card {
+      background: linear-gradient(135deg, #312e81 0%, #4f46e5 50%, #7c3aed 100%) !important;
+      border-radius: 18px !important; margin-bottom: 20px !important; padding: 24px 28px !important;
+      display: flex !important; align-items: center !important; gap: 20px !important;
+      box-shadow: 0 8px 40px rgba(79,70,229,0.4) !important;
+      border: 1px solid rgba(139,92,246,0.3) !important;
+      position: relative !important; overflow: hidden !important;
+    }
+    .location-card::before {
+      content: "" !important; position: absolute !important; inset: 0 !important;
+      background: radial-gradient(circle at 80% 50%, rgba(255,255,255,0.08) 0%, transparent 60%) !important;
+      pointer-events: none !important;
+    }
+    .location-icon { font-size: 2.2rem !important; flex-shrink: 0 !important; filter: drop-shadow(0 0 10px rgba(196,181,253,0.6)) !important; }
+    .location-info .label { font-size: 0.7rem !important; text-transform: uppercase !important; letter-spacing: 0.12em !important; color: rgba(255,255,255,0.5) !important; font-weight: 700 !important; margin-bottom: 4px !important; }
+    .location-info .value { font-size: 1.3rem !important; font-weight: 800 !important; color: #fff !important; margin-bottom: 4px !important; }
+    .location-info .sub { font-size: 0.8rem !important; color: rgba(255,255,255,0.55) !important; }
 
-    /* Table inside white card */
-    .table-card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 2px 12px rgba(26,60,143,0.08);
-      border: 1px solid rgba(47,93,240,0.08);
-      overflow: hidden;
+    /* ── Session Context Card ── */
+    .session-ctx-card {
+      background: rgba(255,255,255,0.05) !important;
+      backdrop-filter: blur(20px) !important;
+      border: 1px solid rgba(255,255,255,0.09) !important;
+      border-radius: 18px !important; padding: 22px 26px !important;
+      margin-bottom: 20px !important; box-shadow: 0 8px 32px rgba(0,0,0,0.2) !important;
     }
+    .session-ctx-card .ctx-header {
+      font-size: 0.72rem !important; text-transform: uppercase !important;
+      letter-spacing: 0.13em !important; color: rgba(255,255,255,0.35) !important;
+      font-weight: 700 !important; margin-bottom: 18px !important;
+    }
+    .session-ctx-grid {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+      gap: 18px !important;
+    }
+    .ctx-item .ctx-label {
+      font-size: 0.67rem !important; text-transform: uppercase !important;
+      letter-spacing: 0.1em !important; color: rgba(255,255,255,0.3) !important;
+      font-weight: 700 !important; margin-bottom: 5px !important;
+    }
+    .ctx-item .ctx-value { font-size: 0.92rem !important; font-weight: 700 !important; color: #fff !important; }
+    .ctx-item.ctx-ip .ctx-value { color: #c4b5fd !important; }
+    .ctx-item.ctx-time { grid-column: 1 / -1 !important; }
+    .ctx-item.ctx-time .ctx-value {
+      font-size: 1.05rem !important; font-weight: 800 !important;
+      color: #38bdf8 !important; letter-spacing: 0.02em !important;
+    }
+    .session-ctx-card .ctx-note {
+      margin-top: 16px !important; font-size: 0.72rem !important;
+      color: rgba(255,255,255,0.22) !important;
+      border-top: 1px solid rgba(255,255,255,0.06) !important;
+      padding-top: 12px !important;
+    }
+
+    .table-card, .section-card {
+      background: rgba(255,255,255,0.04) !important; backdrop-filter: blur(20px) !important;
+      border-radius: 18px !important; border: 1px solid rgba(255,255,255,0.08) !important;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2) !important; overflow: hidden !important; margin-bottom: 20px !important;
+    }
+    .section-title { color: #fff !important; font-weight: 700 !important; font-size: 0.95rem !important; }
+    .table-card table { width: 100% !important; border-collapse: collapse !important; }
+    .table-card thead th {
+      background: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.4) !important;
+      font-size: 0.73rem !important; font-weight: 700 !important; text-transform: uppercase !important;
+      letter-spacing: 0.08em !important; border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+      padding: 13px 16px !important;
+    }
+    .table-card tbody td { color: rgba(255,255,255,0.75) !important; border-bottom: 1px solid rgba(255,255,255,0.05) !important; padding: 13px 16px !important; font-size: 0.88rem !important; }
+    .table-card tbody tr:hover { background: rgba(255,255,255,0.04) !important; }
+    .table-card tbody tr:last-child td { border-bottom: none !important; }
+    .dash-main .btn-secondary {
+      background: rgba(139,92,246,0.2) !important; color: #c4b5fd !important;
+      border: 1px solid rgba(139,92,246,0.3) !important; border-radius: 10px !important;
+    }
+    .dash-main .btn-secondary:hover { background: rgba(139,92,246,0.35) !important; color: #fff !important; }
+    #inactivityWarning {
+      display: none !important; position: fixed !important; bottom: 28px !important; right: 28px !important; z-index: 9999 !important;
+      background: linear-gradient(135deg, #1e1040, #2d1b69) !important; color: #fff !important;
+      border: 1px solid rgba(139,92,246,0.4) !important; border-radius: 16px !important;
+      padding: 18px 22px !important; font-size: 0.9rem !important;
+      box-shadow: 0 16px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(139,92,246,0.15) !important;
+      max-width: 320px !important;
+    }
+    #inactivityWarning[style*="block"] { display: block !important; }
+    #inactivityWarning strong { color: #fbbf24 !important; }
+    #inactivityWarning .warn-btn {
+      margin-top: 12px !important; padding: 10px 18px !important;
+      background: linear-gradient(135deg, #8b5cf6, #4f46e5) !important;
+      border: none !important; border-radius: 10px !important; color: #fff !important;
+      font-weight: 700 !important; font-size: 0.85rem !important; cursor: pointer !important;
+      width: 100% !important; box-shadow: 0 4px 16px rgba(139,92,246,0.4) !important;
+    }
+    .section-card .alert { border-radius: 12px !important; }
+    .section-card .alert-success { background: rgba(16,185,129,0.12) !important; border: 1px solid rgba(16,185,129,0.3) !important; color: #6ee7b7 !important; }
+    .section-card .alert-warning { background: rgba(245,158,11,0.12) !important; border: 1px solid rgba(245,158,11,0.3) !important; color: #fcd34d !important; }
+    .section-card .form-group label { color: rgba(255,255,255,0.7) !important; font-size: 0.85rem !important; }
+    .section-card input { background: rgba(255,255,255,0.06) !important; border: 1px solid rgba(255,255,255,0.12) !important; color: #fff !important; border-radius: 10px !important; }
+    .section-card h2 { color: #fff !important; }
+    .section-card p { color: rgba(255,255,255,0.5) !important; }
   </style>
 </head>
 <body>
 
-<!-- ===== Navbar ===== -->
 <nav class="navbar">
   <a href="/" class="nav-brand"><span>🔐</span> RBA-2FA System</a>
   <div class="nav-actions">
@@ -214,60 +254,33 @@
 </nav>
 
 <div class="dash-layout">
-
-  <!-- ===== Sidebar ===== -->
   <aside class="dash-sidebar">
-
-    <!-- Main navigation -->
     <div class="sidebar-section-label">Main</div>
-
-    <button class="sidebar-item active" onclick="showSection('overview')">
-      <span>🏠</span> Overview
-    </button>
-
-    <!-- Collapsible Login group -->
+    <button class="sidebar-item active" onclick="showSection('overview')"><span>🏠</span> Overview</button>
     <div class="sidebar-group">
       <div class="sidebar-group-header" onclick="toggleGroup('loginGroup', this)">
         <div class="left"><span>📋</span> Login Activity</div>
         <span class="arrow">▶</span>
       </div>
       <div class="sidebar-group-items" id="loginGroup">
-        <button class="sidebar-item" onclick="showSection('history')" style="font-size:0.84rem;">
-          <span>📄</span> Login History
-        </button>
-        <button class="sidebar-item" onclick="showSection('devices')" style="font-size:0.84rem;">
-          <span>💻</span> Known Devices
-        </button>
+        <button class="sidebar-item" onclick="showSection('history')" style="font-size:0.84rem;"><span>📄</span> Login History</button>
+        <button class="sidebar-item" onclick="showSection('devices')" style="font-size:0.84rem;"><span>💻</span> Known Devices</button>
       </div>
     </div>
-
-    <button class="sidebar-item" onclick="showSection('totp')">
-      <span>🔑</span> Authenticator App
-    </button>
-
+    <button class="sidebar-item" onclick="showSection('totp')"><span>🔑</span> Authenticator App</button>
     <div class="sidebar-divider"></div>
-
-    <!-- Collapsible Research group -->
     <div class="sidebar-section-label">Research Evaluation</div>
-
     <div class="sidebar-group">
       <div class="sidebar-group-header" onclick="toggleGroup('researchGroup', this)">
         <div class="left"><span>📊</span> Evaluation</div>
         <span class="arrow">▶</span>
       </div>
       <div class="sidebar-group-items" id="researchGroup">
-        <a href="/evaluation.html" class="sidebar-item" style="text-decoration:none;font-size:0.84rem;">
-          <span>📈</span> Metrics Dashboard
-        </a>
-        <a href="/sus.html" class="sidebar-item" style="text-decoration:none;font-size:0.84rem;">
-          <span>📝</span> SUS Questionnaire
-        </a>
+        <a href="/evaluation.html" class="sidebar-item" style="text-decoration:none;font-size:0.84rem;"><span>📈</span> Metrics Dashboard</a>
+        <a href="/sus.html" class="sidebar-item" style="text-decoration:none;font-size:0.84rem;"><span>⭐</span> App Rating &amp; Feedback Survey</a>
       </div>
     </div>
-
     <div class="sidebar-divider"></div>
-
-    <!-- User card at bottom -->
     <div class="sidebar-user">
       <div class="avatar" id="sidebarAvatar">?</div>
       <div class="info">
@@ -275,165 +288,204 @@
         <div class="role">Authenticated User</div>
       </div>
     </div>
-
+    <button class="sidebar-logout-btn" onclick="doLogout()">🚪 Sign Out</button>
   </aside>
 
-  <!-- ===== Main content ===== -->
   <main class="dash-main">
-
-    <!-- ========== OVERVIEW ========== -->
     <section id="sec-overview">
       <div class="page-header">
         <div>
-          <h2>Welcome back, <span id="welcomeName" style="color:#2f5df0;"></span> 👋</h2>
+          <h2>Welcome back, <span id="welcomeName" style="background:linear-gradient(135deg,#a78bfa,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;"></span> 👋</h2>
           <p>Here is your security overview and recent activity.</p>
         </div>
-        <div style="font-size:0.82rem;color:var(--muted);" id="lastSeen"></div>
+        <div style="font-size:0.82rem;color:rgba(255,255,255,0.35);" id="lastSeen"></div>
       </div>
 
-      <div class="stat-grid" style="margin-bottom:20px;">
+      <div class="stat-grid">
         <div class="stat-card">
+          <span class="stat-icon">🎯</span>
           <div class="stat-value" id="statScore">—</div>
           <div class="stat-label">Last Risk Score</div>
         </div>
         <div class="stat-card">
+          <span class="stat-icon">🛡️</span>
           <div class="stat-value" id="statTier">—</div>
           <div class="stat-label">Last Risk Tier</div>
         </div>
         <div class="stat-card">
+          <span class="stat-icon">💻</span>
           <div class="stat-value" id="statDevices">—</div>
           <div class="stat-label">Known Devices</div>
         </div>
         <div class="stat-card">
+          <span class="stat-icon">📱</span>
           <div class="stat-value" id="statTotp">—</div>
           <div class="stat-label">Authenticator</div>
         </div>
       </div>
 
-      <div class="location-card" style="margin-bottom:20px;">
+      <div class="location-card">
         <div class="location-icon">📍</div>
         <div class="location-info">
           <div class="label">Last Login Location</div>
           <div class="value" id="locCity">Loading…</div>
-          <div class="sub"   id="locDetails"></div>
+          <div class="sub" id="locDetails"></div>
+        </div>
+      </div>
+
+      <div class="session-ctx-card">
+        <div class="ctx-header">🌐 Current Session — Real-Time Detection</div>
+        <div class="session-ctx-grid">
+          <div class="ctx-item ctx-ip">
+            <div class="ctx-label">IP Address</div>
+            <div class="ctx-value" id="ctxIP">Detecting…</div>
+          </div>
+          <div class="ctx-item">
+            <div class="ctx-label">Country</div>
+            <div class="ctx-value" id="ctxCountry">Detecting…</div>
+          </div>
+          <div class="ctx-item">
+            <div class="ctx-label">City</div>
+            <div class="ctx-value" id="ctxCity">Detecting…</div>
+          </div>
+          <div class="ctx-item">
+            <div class="ctx-label">ISP / Network</div>
+            <div class="ctx-value" id="ctxISP">Detecting…</div>
+          </div>
+          <div class="ctx-item ctx-time">
+            <div class="ctx-label">🕒 Date &amp; Time (Server)</div>
+            <div class="ctx-value" id="ctxTime">—</div>
+          </div>
+        </div>
+        <div class="ctx-note">
+          ℹ️ IP address, geolocation and network data are fed into the risk engine to evaluate login trust.
         </div>
       </div>
 
       <div class="table-card">
-        <div style="padding:18px 20px 0; display:flex; align-items:center; justify-content:space-between;">
+        <div style="padding:18px 20px 0;display:flex;align-items:center;justify-content:space-between;">
           <div class="section-title" style="margin-bottom:0;">Recent login attempts</div>
-          <button class="btn btn-secondary" onclick="showSection('history')"
-                  style="font-size:0.8rem;padding:6px 14px;">View all →</button>
+          <button class="btn btn-secondary" onclick="showSection('history')" style="font-size:0.8rem;padding:6px 14px;">View all →</button>
         </div>
         <div class="table-wrap" style="margin-top:0;">
           <table>
-            <thead>
-              <tr>
-                <th>Time</th><th>Location</th><th>Risk Tier</th>
-                <th>Auth Method</th><th>Outcome</th>
-              </tr>
-            </thead>
-            <tbody id="recentBody">
-              <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted);">Loading…</td></tr>
-            </tbody>
+            <thead><tr><th>Time</th><th>Location</th><th>Risk Tier</th><th>Auth Method</th><th>Outcome</th></tr></thead>
+            <tbody id="recentBody"><tr><td colspan="5" style="text-align:center;padding:24px;color:rgba(255,255,255,0.3);">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- ========== LOGIN HISTORY ========== -->
     <section id="sec-history" style="display:none;">
       <div class="page-header">
-        <div>
-          <h2>Login History</h2>
-          <p>Your 50 most recent login attempts with full risk analysis.</p>
-        </div>
+        <div><h2>Login History</h2><p>Your 50 most recent login attempts with full risk analysis.</p></div>
         <button class="btn btn-secondary" onclick="exportCSV()">📥 Export CSV</button>
       </div>
       <div class="table-card">
         <div class="table-wrap" style="margin-top:0;">
           <table>
-            <thead>
-              <tr>
-                <th>Timestamp</th><th>IP Address</th><th>Location</th><th>ISP</th>
-                <th>Risk Score</th><th>Tier</th><th>Auth Method</th><th>Outcome</th>
-              </tr>
-            </thead>
-            <tbody id="historyBody">
-              <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted);">Loading…</td></tr>
-            </tbody>
+            <thead><tr><th>Timestamp</th><th>IP Address</th><th>Location</th><th>ISP</th><th>Risk Score</th><th>Tier</th><th>Auth Method</th><th>Outcome</th></tr></thead>
+            <tbody id="historyBody"><tr><td colspan="8" style="text-align:center;padding:24px;color:rgba(255,255,255,0.3);">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- ========== KNOWN DEVICES ========== -->
     <section id="sec-devices" style="display:none;">
       <div class="page-header">
-        <div>
-          <h2>Known Devices</h2>
-          <p>Devices that have previously completed a successful login on your account.</p>
-        </div>
+        <div><h2>Known Devices</h2><p>Devices that have previously completed a successful login on your account.</p></div>
       </div>
       <div class="table-card">
         <div class="table-wrap" style="margin-top:0;">
           <table>
-            <thead>
-              <tr><th>Device Fingerprint</th><th>First Seen</th><th>Last Seen</th></tr>
-            </thead>
-            <tbody id="devicesBody">
-              <tr><td colspan="3" style="text-align:center;padding:24px;color:var(--muted);">Loading…</td></tr>
-            </tbody>
+            <thead><tr><th>Device Fingerprint</th><th>First Seen</th><th>Last Seen</th></tr></thead>
+            <tbody id="devicesBody"><tr><td colspan="3" style="text-align:center;padding:24px;color:rgba(255,255,255,0.3);">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- ========== TOTP ========== -->
     <section id="sec-totp" style="display:none;">
       <div class="page-header">
-        <div>
-          <h2>Authenticator App (TOTP)</h2>
-          <p>Set up Google Authenticator, Authy, or Microsoft Authenticator.</p>
-        </div>
+        <div><h2>Authenticator App (TOTP)</h2><p>Set up Google Authenticator, Authy, or Microsoft Authenticator.</p></div>
       </div>
-
-      <div class="section-card">
+      <div class="section-card" style="padding:24px;">
         <div id="totpStatusBox" class="alert" style="margin-bottom:20px;"></div>
-        <button class="btn btn-secondary" id="setupTotpBtn" onclick="setupTotp()">
-          📱 Set up authenticator app
-        </button>
+        <button class="btn btn-secondary" id="setupTotpBtn" onclick="setupTotp()">📱 Set up authenticator app</button>
         <div id="qrArea" class="qr-box" style="display:none;max-width:340px;margin-top:20px;">
-          <img id="qrImg" width="200" height="200" alt="QR Code"
-               style="margin-bottom:16px;display:block;margin-left:auto;margin-right:auto;"/>
-          <p style="font-size:0.88rem;color:var(--muted);margin-bottom:16px;text-align:center;">
-            Scan this QR code with your authenticator app, then enter
-            the 6-digit code below to confirm enrolment.
-          </p>
+          <img id="qrImg" width="200" height="200" alt="QR Code" style="margin-bottom:16px;display:block;margin-left:auto;margin-right:auto;border-radius:12px;"/>
+          <p style="font-size:0.88rem;color:rgba(255,255,255,0.5);margin-bottom:16px;text-align:center;">Scan this QR code with your authenticator app, then enter the 6-digit code below to confirm enrolment.</p>
           <div class="form-group">
             <label>Confirmation code</label>
             <input type="number" id="totpConfirmCode" class="otp-input" placeholder="000000"/>
           </div>
-          <button class="btn btn-primary btn-block" style="margin-top:12px;" onclick="confirmTotp()">
-            ✅ Confirm &amp; Enable
-          </button>
+          <button class="btn btn-primary btn-block" style="margin-top:12px;" onclick="confirmTotp()">✅ Confirm &amp; Enable</button>
         </div>
         <div id="totpMsg"></div>
       </div>
     </section>
-
   </main>
+</div>
+
+<div id="inactivityWarning">
+  <strong>⚠️ Session Timeout Warning</strong><br/>
+  You have been inactive for 25 minutes. You will be automatically signed out in <span id="inactivityCountdown">5:00</span>.
+  <button class="warn-btn" onclick="resetInactivityTimer()">Stay signed in</button>
 </div>
 
 <script src="/js/dashboard.js"></script>
 <script>
-// Collapsible sidebar groups
 function toggleGroup(groupId, header) {
-  const items  = document.getElementById(groupId);
+  const items = document.getElementById(groupId);
   const isOpen = items.classList.contains("open");
   items.classList.toggle("open", !isOpen);
   header.classList.toggle("open", !isOpen);
 }
 </script>
+
+<script>
+(function () {
+  function startClock() {
+    function tick() {
+      var now = new Date();
+      var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      var months = ['January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
+      var dd = String(now.getDate()).padStart(2,'0');
+      var hh = String(now.getHours()).padStart(2,'0');
+      var mm = String(now.getMinutes()).padStart(2,'0');
+      var ss = String(now.getSeconds()).padStart(2,'0');
+      document.getElementById('ctxTime').textContent =
+        days[now.getDay()] + ', ' + dd + ' ' + months[now.getMonth()] + ' ' +
+        now.getFullYear() + ' — ' + hh + ':' + mm + ':' + ss;
+    }
+    tick();
+    setInterval(tick, 1000);
+  }
+  function countryFlag(code) {
+    if (!code || code.length !== 2) return '';
+    return code.toUpperCase().split('').map(function(c) {
+      return String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65);
+    }).join('') + ' ';
+  }
+  fetch('/api/auth/session-context')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      document.getElementById('ctxIP').textContent      = d.ip      || '—';
+      document.getElementById('ctxCountry').textContent = countryFlag(d.country_code) + (d.country || '—');
+      document.getElementById('ctxCity').textContent    = d.city    || '—';
+      document.getElementById('ctxISP').textContent     = d.isp     || '—';
+      startClock();
+    })
+    .catch(function() {
+      document.getElementById('ctxIP').textContent      = 'Unavailable';
+      document.getElementById('ctxCountry').textContent = '—';
+      document.getElementById('ctxCity').textContent    = '—';
+      document.getElementById('ctxISP').textContent     = '—';
+      startClock();
+    });
+})();
+</script>
+
 </body>
 </html>

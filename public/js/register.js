@@ -9,7 +9,6 @@ async function doRegister() {
 
   const SPECIAL = "!@#$%^&*()_+-=[]{}|;':\",./<>?";
 
-  // Client-side validation
   if (!username || !email || !password) {
     showMsg("error", "Please fill in username, email and password.");
     return;
@@ -23,8 +22,7 @@ async function doRegister() {
     return;
   }
   if (!/[A-Z]/.test(password)) {
-    showMsg("error",
-      "Password must contain at least one uppercase letter.");
+    showMsg("error", "Password must contain at least one uppercase letter.");
     return;
   }
   if (!/[0-9]/.test(password)) {
@@ -32,9 +30,7 @@ async function doRegister() {
     return;
   }
   if (!password.split("").some(c => SPECIAL.includes(c))) {
-    showMsg("error",
-      "Password must contain at least one special character " +
-      "e.g. !@#$%^&*");
+    showMsg("error", "Password must contain at least one special character e.g. !@#$%^&*");
     return;
   }
   if (password !== confirmPwd) {
@@ -42,7 +38,7 @@ async function doRegister() {
     return;
   }
 
-  const btn = document.querySelector("button.btn-primary");
+  const btn = document.getElementById("registerBtn");
   btn.innerHTML = '<span class="spinner"></span> Creating account…';
   btn.disabled  = true;
 
@@ -59,8 +55,7 @@ async function doRegister() {
       return;
     }
 
-    showMsg("success",
-      "✅ Account created successfully! Redirecting…");
+    showMsg("success", "Account created successfully! Redirecting…");
     setTimeout(() => location.href = "/dashboard.html", 1000);
 
   } catch (e) {
@@ -73,10 +68,26 @@ async function doRegister() {
 
 function showMsg(type, text) {
   document.getElementById("msg").innerHTML =
-    `<div class="alert alert-${type}" style="margin-top:14px;">
-       ${text}
-     </div>`;
+    `<div class="alert alert-${type}" style="margin-top:14px;">${text}</div>`;
 }
+
+// Wire up button click AND prevent any form submit
+document.addEventListener("DOMContentLoaded", function() {
+  var btn = document.querySelector("button.btn-primary");
+  if (btn) {
+    btn.addEventListener("click", function(e) {
+      e.preventDefault();
+      doRegister();
+    });
+  }
+  var form = document.querySelector("form");
+  if (form) {
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      doRegister();
+    });
+  }
+});
 
 document.addEventListener("keydown", e => {
   if (e.key === "Enter") doRegister();

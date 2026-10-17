@@ -132,7 +132,7 @@ function showSection(name) {
   if (name === 'history')  loadHistory(1);
   if (name === 'devices')  loadDevices();
   if (name === 'sessions') loadSessions();
-  if (name === 'totp')     loadBackupCodes();
+  if (name === 'totp')     loadTotpSection();
   if (name === 'admin')    loadAdmin();
 }
 
@@ -145,6 +145,7 @@ function toggleGroup(id) {
 async function loadMe() {
   try {
     const r = await fetch('/api/dashboard/overview');
+    if (r.status === 401) { window.location.href = '/login.html'; return; }
     if (!r.ok) return;
     const d = await r.json();
     const last = d.last_login || {};
@@ -186,7 +187,7 @@ async function init() {
 async function loadCurrentSession() {
   try {
     const r = await fetch('/api/auth/session-context');
-    if (r.status === 401) { window.location.href = '/login'; return; }
+    if (r.status === 401) { window.location.href = '/login.html'; return; }
     const d = await r.json();
     setText('sess-ip',      d.ip      || 'Unavailable');
     setText('sess-country', d.country || 'Unavailable');
@@ -414,6 +415,29 @@ async function loadRiskTrend() {
   } catch (e) { console.error('loadRiskTrend', e); }
 }
 
+// ── TOTP Section (status + backup codes) ─────────────────
+async function loadTotpSection() {
+  try {
+    const r = await fetch('/api/dashboard/overview');
+    if (!r.ok) return;
+    const d = await r.json();
+    const statusBox = document.getElementById('totpStatusBox');
+    const setupBtn  = document.getElementById('btn-setup-totp');
+    if (statusBox) {
+      if (d.totp_enabled) {
+        statusBox.className = 'alert alert-success';
+        statusBox.textContent = '✅ Authenticator app is enabled on your account.';
+        if (setupBtn) setupBtn.textContent = '🔄 Re-setup authenticator app';
+      } else {
+        statusBox.className = 'alert alert-warning';
+        statusBox.textContent = '⚠️ Authenticator app is not set up yet.';
+        if (setupBtn) setupBtn.textContent = '📱 Set up authenticator app';
+      }
+    }
+  } catch (e) { console.error('loadTotpSection', e); }
+  loadBackupCodes();
+}
+
 // ── TOTP Backup Codes ─────────────────────────────────────
 async function loadBackupCodes() {
   try {
@@ -430,7 +454,7 @@ async function generateBackupCodes() {
     const r = await fetch('/api/auth/totp/backup-codes/generate', { method: 'POST' });
     const d = await r.json();
     if (!r.ok) { showToast(d.error || 'Failed', 'error'); return; }
-    const codes = d.backup_codes || [];
+    const codes = d.codes || d.backup_codes || [];
     const container = document.getElementById('backup-codes-display');
     if (container) {
       container.innerHTML = `
@@ -502,11 +526,11 @@ async function setupTotp() {
     const r = await fetch('/api/auth/totp/setup', { method: 'POST' });
     const d = await r.json();
     if (!r.ok) { showToast(d.error || 'Setup failed', 'error'); return; }
-    const qrImg = document.getElementById('totp-qr');
-    const secretEl = document.getElementById('totp-secret');
+    const qrImg        = document.getElementById('totp-qr');
+    const secretEl     = document.getElementById('totp-secret');
     const setupSection = document.getElementById('totp-setup-section');
-    if (qrImg) qrImg.src = d.qr_code;
-    if (secretEl) secretEl.textContent = d.secret;
+    if (qrImg)        qrImg.src = d.qrDataUrl;           // FIX: was d.qr_code
+    if (secretEl)     secretEl.textContent = d.secretBase32; // FIX: was d.secret
     if (setupSection) setupSection.style.display = 'block';
   } catch { showToast('Network error', 'error'); }
 }
@@ -519,20 +543,21 @@ async function confirmTotp() {
     const r = await fetch('/api/auth/totp/confirm', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code })
+      body: JSON.stringify({ token: code })  // FIX: was { code } — backend expects "token"
     });
     const d = await r.json();
     if (!r.ok) { showToast(d.error || 'Invalid code', 'error'); return; }
     showToast('2FA enabled successfully!', 'success');
     const setupSection = document.getElementById('totp-setup-section');
     if (setupSection) setupSection.style.display = 'none';
-    if (d.backup_codes && d.backup_codes.length) {
+    const backupCodes = d.backupCodes || d.backup_codes || [];
+    if (backupCodes.length) {
       const container = document.getElementById('backup-codes-display');
       if (container) {
         container.innerHTML = `
           <p><strong style="color:#c4b5fd;">Your backup codes — save these now:</strong></p>
           <div class="backup-codes-grid">
-            ${d.backup_codes.map(c => `<code class="backup-code">${c}</code>`).join('')}
+            ${backupCodes.map(c => `<code class="backup-code">${c}</code>`).join('')}
           </div>
           <p class="backup-codes-note">⚠️ These will not be shown again.</p>`;
         container.style.display = 'block';

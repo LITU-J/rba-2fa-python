@@ -7,8 +7,6 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: linear-gradient(135deg, #0f0c29 0%, #1a1040 50%, #24243e 100%); min-height: 100vh; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-
-    /* NAV */
     .navbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 50; }
     .nav-brand { display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 800; color: #fff; text-decoration: none; }
     .nav-actions { display: flex; gap: 10px; }
@@ -21,27 +19,19 @@
     .btn-outline:hover { background: rgba(255,255,255,0.08); }
     .btn-block { width: 100%; justify-content: center; }
     .btn-lg { padding: 14px 20px; font-size: 1rem; border-radius: 12px; }
-
-    /* PAGE */
     .page { max-width: 720px; margin: 0 auto; padding: 32px 24px; }
     h1 { font-size: 1.7rem; font-weight: 900; color: #fff; margin-bottom: 8px; }
     h3 { font-size: 1rem; font-weight: 700; color: #fff; }
     p  { color: rgba(255,255,255,0.6); font-size: 0.93rem; line-height: 1.6; }
-
-    /* ALREADY SUBMITTED */
     #alreadySubmittedBanner { background: rgba(34,197,94,0.1); border: 1.5px solid rgba(34,197,94,0.3); border-radius: 14px; padding: 28px 32px; text-align: center; margin-bottom: 24px; display: none; }
     #alreadySubmittedBanner h2 { color: #4ade80; margin-bottom: 8px; }
     #alreadySubmittedBanner p  { color: rgba(255,255,255,0.6); margin-bottom: 16px; }
-
-    /* NAME INPUT */
     .form-group { margin-bottom: 20px; }
     .form-group label { display: block; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.45); margin-bottom: 6px; }
     .form-group input { width: 100%; padding: 12px 14px; background: rgba(255,255,255,0.07); border: 1.5px solid rgba(255,255,255,0.12); border-radius: 10px; font-size: 0.92rem; color: #fff; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
     .form-group input:focus { border-color: #8b5cf6; background: rgba(139,92,246,0.1); box-shadow: 0 0 0 3px rgba(139,92,246,0.2); }
     .form-group input::placeholder { color: rgba(255,255,255,0.25); }
     .required-star { color: #f87171; font-weight: 700; margin-left: 3px; }
-
-    /* RATING GUIDE */
     .rating-guide { background: rgba(139,92,246,0.1); border: 1.5px solid rgba(139,92,246,0.25); border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; }
     .rating-guide-title { font-weight: 700; margin-bottom: 10px; color: #c4b5fd; font-size: 0.9rem; }
     .rating-guide-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; text-align: center; }
@@ -57,15 +47,11 @@
     .rg-3 .rg-num, .rg-3 .rg-label { color: #fbbf24; }
     .rg-4 .rg-num, .rg-4 .rg-label { color: #4ade80; }
     .rg-5 .rg-num, .rg-5 .rg-label { color: #86efac; }
-
-    /* PROGRESS */
     .progress-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .progress-header span { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.5); }
     .progress-header #progressText { color: #a78bfa; font-weight: 700; }
     .progress-bar-wrap { background: rgba(255,255,255,0.08); border-radius: 4px; height: 6px; margin-bottom: 20px; overflow: hidden; }
     .progress-bar-fill { height: 100%; background: linear-gradient(90deg,#8b5cf6,#4f46e5); border-radius: 4px; transition: width 0.3s ease; }
-
-    /* QUESTION CARDS */
     .sus-q { background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); border-left: 4px solid rgba(139,92,246,0.5); border-radius: 14px; padding: 22px 26px; margin-bottom: 16px; transition: border-color 0.2s, box-shadow 0.2s; }
     .sus-q:hover { border-color: rgba(167,139,250,0.4); box-shadow: 0 4px 20px rgba(139,92,246,0.1); }
     .sus-q.answered { border-left-color: #22c55e; background: rgba(34,197,94,0.04); }
@@ -85,8 +71,6 @@
     .scale-option[data-val="4"] input:checked + .btn-scale { background: #16a34a; border-color: #16a34a; box-shadow: 0 3px 12px rgba(22,163,74,0.4); }
     .scale-option[data-val="5"] input:checked + .btn-scale { background: #15803d; border-color: #15803d; box-shadow: 0 3px 12px rgba(21,128,61,0.4); }
     .q-rating-hint { font-size: 0.76rem; color: rgba(255,255,255,0.35); margin-top: 6px; font-style: italic; }
-
-    /* SUGGESTIONS */
     .suggestions-box { background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 22px 26px; margin-bottom: 24px; }
     .suggestions-box .box-label { font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
     .suggestions-box h3 { font-size: 0.95rem; font-weight: 600; color: #fff; margin-bottom: 8px; }
@@ -94,13 +78,9 @@
     .suggestions-box textarea { width: 100%; min-height: 100px; padding: 12px 14px; border: 1.5px solid rgba(255,255,255,0.12); border-radius: 10px; font-size: 0.92rem; font-family: inherit; color: #fff; background: rgba(255,255,255,0.07); resize: vertical; outline: none; line-height: 1.6; transition: border-color 0.2s, box-shadow 0.2s; }
     .suggestions-box textarea:focus { border-color: #8b5cf6; background: rgba(139,92,246,0.1); box-shadow: 0 0 0 3px rgba(139,92,246,0.2); }
     .suggestions-box textarea::placeholder { color: rgba(255,255,255,0.25); }
-
-    /* ALERT / SPINNER */
     .alert-error { background: rgba(239,68,68,0.12); color: #fca5a5; border: 1.5px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 10px 14px; font-size: 0.83rem; font-weight: 600; margin-top: 10px; }
     .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* RESULT */
     .result-card { border-radius: 16px; padding: 32px; text-align: center; color: #fff; margin-bottom: 24px; }
     .result-card.excellent { background: linear-gradient(135deg,#15803d,#22c55e); }
     .result-card.good      { background: linear-gradient(135deg,#4f46e5,#8b5cf6); }
@@ -108,14 +88,10 @@
     .result-card.poor      { background: linear-gradient(135deg,#991b1b,#dc2626); }
     .big-score { font-size: 4.5rem; font-weight: 900; line-height: 1; }
     .grade-text { font-size: 1.4rem; font-weight: 700; margin-top: 6px; opacity: 0.95; }
-
-    /* FORMULA */
     .formula-box { background: rgba(139,92,246,0.08); border: 1.5px solid rgba(139,92,246,0.2); border-radius: 12px; padding: 18px 22px; margin-bottom: 20px; font-size: 0.88rem; line-height: 2; }
     .formula-step { display: flex; align-items: center; gap: 10px; padding: 4px 0; color: rgba(255,255,255,0.75); }
     .formula-step .step-num { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg,#8b5cf6,#4f46e5); color: #fff; font-size: 0.72rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .formula-step .step-value { font-weight: 800; color: #c4b5fd; margin-left: auto; }
-
-    /* TABLE */
     .table-wrap { background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; margin-bottom: 24px; }
     .calc-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
     .calc-table th { padding: 8px 12px; background: rgba(255,255,255,0.06); text-align: left; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.4); }
@@ -125,8 +101,6 @@
     .score-poor   { color: #f87171; font-weight: 700; }
     .score-medium { color: #fbbf24; font-weight: 700; }
     .score-good   { color: #4ade80; font-weight: 700; }
-
-    /* SCORE SCALE */
     .scale-ref { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 18px 22px; margin-bottom: 24px; }
     .scale-ref h3 { margin-bottom: 14px; font-size: 0.95rem; }
     .scale-ref-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; text-align: center; }
@@ -162,7 +136,7 @@
     <a href="/dashboard.html" class="btn btn-primary">← Back to Dashboard</a>
   </div>
 
-  <div id="formSection">
+  <div id="formSection" style="display:none;">
     <div style="margin-bottom:24px;">
       <h1>⭐ App Rating &amp; Feedback Survey</h1>
       <p style="margin-top:8px;">Rate your experience using the RBA-2FA login system. Answer all 10 questions honestly — your feedback improves the system.</p>
@@ -275,13 +249,21 @@ const QUESTIONS = [
   "Overall, I am satisfied with the security and usability of this system.",
 ];
 
-(function checkAlreadySubmitted() {
+// ── Check server-side if this user already submitted ──────────────────────────
+(async function checkAlreadySubmitted() {
   try {
-    if (localStorage.getItem("sus_submitted") === "1") {
+    const res  = await fetch("/api/sus/status");
+    const data = await res.json();
+    if (data.submitted) {
       document.getElementById("formSection").style.display = "none";
       document.getElementById("alreadySubmittedBanner").style.display = "block";
+    } else {
+      document.getElementById("formSection").style.display = "block";
     }
-  } catch(e) {}
+  } catch(e) {
+    // If check fails just show the form
+    document.getElementById("formSection").style.display = "block";
+  }
 })();
 
 function renderQuestions() {
@@ -338,13 +320,7 @@ async function submitForm() {
     return;
   }
   nameError.style.display = "none";
-  try {
-    if (localStorage.getItem("sus_submitted") === "1") {
-      document.getElementById("formSection").style.display = "none";
-      document.getElementById("alreadySubmittedBanner").style.display = "block";
-      return;
-    }
-  } catch(e) {}
+
   const answers = [];
   for (let i = 0; i < 10; i++) {
     const sel = document.querySelector(`input[name="q${i}"]:checked`);
@@ -372,7 +348,6 @@ async function submitForm() {
         `<div class="alert-error" style="margin-top:14px;">❌ ${data.error}</div>`;
       return;
     }
-    try { localStorage.setItem("sus_submitted", "1"); } catch(e) {}
     showResult(data, answers, participant);
   } catch(e) {
     document.getElementById("msg").innerHTML =

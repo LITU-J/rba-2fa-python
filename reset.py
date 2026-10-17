@@ -1,0 +1,13 @@
+import sqlite3
+db = sqlite3.connect('data/app.sqlite')
+db.execute('DELETE FROM login_logs')
+db.execute('DELETE FROM known_devices')
+db.execute('DELETE FROM pending_challenges')
+db.execute('DELETE FROM sus_responses')
+db.execute('DELETE FROM active_sessions')
+db.execute('DELETE FROM totp_backup_codes')
+db.execute('DELETE FROM security_alerts')
+db.execute('DELETE FROM users')
+db.commit()
+db.close()
+print('Done — all data cleared')

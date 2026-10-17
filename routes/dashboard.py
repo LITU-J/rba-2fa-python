@@ -2,6 +2,7 @@
 from flask import Blueprint, jsonify, session, request
 from db import get_db
 import math
+import json
 
 dashboard_bp = Blueprint("dashboard_bp", __name__, url_prefix="/api/dashboard")
 
@@ -188,3 +189,118 @@ def admin_users():
         FROM users ORDER BY id
     """).fetchall()
     return jsonify({"users": [dict(r) for r in rows]})
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  SUS — Survey Blueprint  (/api/sus/*)
+# ══════════════════════════════════════════════════════════════════════════════
+
+sus_bp = Blueprint("sus_bp", __name__, url_prefix="/api/sus")
+
+
+def _ensure_sus_table(db):
+    """Create survey_responses table if it does not exist yet."""
+    db.execute("""
+        CREATE TABLE IF NOT EXISTS survey_responses (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id      INTEGER,
+            participant  TEXT,
+            answers      TEXT,
+            suggestions  TEXT,
+            raw_score    INTEGER,
+            total_score  INTEGER,
+            grade        TEXT,
+            submitted_at TEXT DEFAULT (datetime('now'))
+        )
+    """)
+    db.commit()
+
+
+@sus_bp.route("/status")
+def sus_status():
+    """Return whether the current logged-in user has already submitted the survey."""
+    uid = session.get("user_id")
+    if not uid:
+        return jsonify({"submitted": False})
+    db = get_db()
+    _ensure_sus_table(db)
+    row = db.execute(
+        "SELECT id FROM survey_responses WHERE user_id=?", (uid,)
+    ).fetchone()
+    return jsonify({"submitted": bool(row)})
+
+
+@sus_bp.route("/submit", methods=["POST"])
+def sus_submit():
+    """Accept a survey submission — one per user, tracked server-side."""
+    uid = session.get("user_id")
+    if not uid:
+        return jsonify({"error": "Not authenticated"}), 401
+
+    data        = request.get_json() or {}
+    answers     = data.get("answers", [])
+    participant = (data.get("participant") or "").strip()
+    suggestions = (data.get("suggestions") or "").strip()
+
+    if not participant:
+        return jsonify({"error": "Name is required"}), 400
+    if len(answers) != 10 or any(a not in (1, 2, 3, 4, 5) for a in answers):
+        return jsonify({"error": "Please answer all 10 questions with values 1–5"}), 400
+
+    db = get_db()
+    _ensure_sus_table(db)
+
+    # Block duplicate submissions
+    existing = db.execute(
+        "SELECT id FROM survey_responses WHERE user_id=?", (uid,)
+    ).fetchone()
+    if existing:
+        return jsonify({"error": "You have already submitted the survey"}), 409
+
+    raw   = sum(answers)
+    total = round(raw / 50 * 100)
+    if   total >= 80: grade = "Excellent"
+    elif total >= 60: grade = "Good"
+    elif total >= 40: grade = "Fair"
+    else:             grade = "Poor"
+
+    db.execute(
+        """INSERT INTO survey_responses
+               (user_id, participant, answers, suggestions, raw_score, total_score, grade)
+           VALUES (?, ?, ?, ?, ?, ?, ?)""",
+        (uid, participant, json.dumps(answers), suggestions, raw, total, grade)
+    )
+    db.commit()
+    return jsonify({"ok": True, "raw_score": raw, "total_score": total, "grade": grade})
+
+
+@sus_bp.route("/responses")
+def sus_responses():
+    """Admin-only: view all submitted survey responses."""
+    user, err = _require_auth()
+    if err: return err
+    if not user["is_admin"]:
+        return jsonify({"error": "Access denied — admin only"}), 403
+
+    db = get_db()
+    _ensure_sus_table(db)
+
+    rows = db.execute("""
+        SELECT sr.id, sr.participant, sr.answers, sr.suggestions,
+               sr.raw_score, sr.total_score, sr.grade, sr.submitted_at,
+               u.username
+        FROM survey_responses sr
+        LEFT JOIN users u ON u.id = sr.user_id
+        ORDER BY sr.submitted_at DESC
+    """).fetchall()
+
+    result = []
+    for r in rows:
+        d = dict(r)
+        try:
+            d["answers"] = json.loads(d["answers"])
+        except Exception:
+            d["answers"] = []
+        result.append(d)
+
+    return jsonify({"responses": result, "count": len(result)})

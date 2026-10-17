@@ -5,14 +5,20 @@ Weighted Risk-Scoring Engine — Research Objective 2.
 Evaluates 7 contextual indicators for every login attempt.
 
 Indicators:
-  1. New country        — foreign country login           (+65)
-  2. New city           — different city same country     (+30)
+  1. New country        — foreign country login           (+30)
+  2. New city           — different city, any country     (+30)
   3. New device         — unrecognised device             (+25)
   4. Unusual time       — unusual login hour              (+10)
   5. High frequency     — too many attempts               (+20)
   6. Consecutive fails  — brute-force pattern             (+25)
-  7. Impossible travel  — distance over 1000km at
-                          impossible speed → CRITICAL
+  7. Impossible travel  — distance >5000 km at
+                          impossible speed → CRITICAL     (+100)
+
+Score → Tier:
+  0–29   LOW      (password only)
+  30–59  MEDIUM   (+ email OTP or TOTP)
+  60–84  HIGH     (+ email OTP + TOTP/SMS)
+  85–100 CRITICAL (blocked)
 """
 
 from datetime import datetime, timedelta, timezone
@@ -57,7 +63,9 @@ def assess_risk(user_id, device_hash, geo, now=None):
         }
 
     # ------------------------------------------------------------------
-    # Indicator 1: New country (+65 → HIGH immediately on its own)
+    # Indicator 1: New country (+30)
+    # Fires when the login country has never been seen before.
+    # SA example: new_country(+30) + new_city(+30) = 60 → HIGH
     # ------------------------------------------------------------------
     if geo["country"] and len(history) > 0:
         known_countries = [r["country"] for r in history if r["country"]]
@@ -69,23 +77,22 @@ def assess_risk(user_id, device_hash, geo, now=None):
             )
 
     # ------------------------------------------------------------------
-    # Indicator 2: New city same country (+30 → MEDIUM on its own)
-    # Only fires when country is already known — avoids double penalty
+    # Indicator 2: New city (+30)
+    # Fires for any new city — including same-country cities.
+    # Swakopmund example: new_city(+30) = 30 → MEDIUM (OTP required)
     # ------------------------------------------------------------------
-    if geo["country"] and geo["city"] and geo["city"] not in ("Local Network", "Unknown"):
-        known_countries = [r["country"] for r in history if r["country"]]
-        if geo["country"] in known_countries:
-            known_cities = [
-                r["city"] for r in history
-                if r["country"] == geo["country"] and r["city"]
-            ]
-            if known_cities and geo["city"] not in known_cities:
-                pts = config.RISK_WEIGHTS["new_city"]
-                score += pts
-                reasons.append(
-                    f"Login from a new city within {geo['country']}: "
-                    f"{geo['city']} (+{pts})"
-                )
+        # Indicator 2: New city (+30)
+    if geo["city"] and geo["city"] not in ("Local Network", "Unknown") and len(history) > 0:
+        known_cities = [
+            r["city"] for r in history
+            if r["city"] and r["city"] not in ("Local Network", "Unknown")
+        ]
+        if geo["city"] not in known_cities:
+            pts = config.RISK_WEIGHTS["new_city"]
+            score += pts
+            reasons.append(
+                f"Login from a new city: {geo['city']} (+{pts})"
+            )
 
     # ------------------------------------------------------------------
     # Indicator 3: New device (+25)
@@ -158,12 +165,11 @@ def assess_risk(user_id, device_hash, geo, now=None):
         )
 
     # ------------------------------------------------------------------
-    # Indicator 7: Geo-velocity — impossible travel
+    # Indicator 7: Geo-velocity — impossible travel (+100 → CRITICAL)
     #
-    # Returns CRITICAL immediately when triggered.
-    # Minimum distance is 1000 km to avoid flagging domestic city
-    # changes like Windhoek to Swakopmund (263 km) as impossible travel.
-    # Those are correctly handled by Indicator 2 (new city).
+    # Only triggers above 5000 km so Windhoek↔Swakopmund (263 km)
+    # and Namibia↔South Africa (1423 km) are NOT flagged here.
+    # Japan (14 567 km) is correctly blocked.
     # ------------------------------------------------------------------
     if geo["lat"] is not None and geo["lon"] is not None:
 

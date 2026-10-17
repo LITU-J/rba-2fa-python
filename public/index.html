@@ -234,47 +234,43 @@
           <button class="signin-btn" id="loginBtn" onclick="doLogin()">Sign In →</button>
           <div id="homeMsg"></div>
 
-          <!-- IP Simulation Panel -->
+                    <!-- Location Simulation Panel -->
           <details style="margin-top:12px;border:1px solid rgba(139,92,246,0.3);
                           border-radius:10px;overflow:hidden;">
             <summary style="cursor:pointer;font-size:0.78rem;font-weight:700;
                             color:#a78bfa;padding:10px 14px;
                             background:rgba(139,92,246,0.1);
                             list-style:none;user-select:none;">
-              🔬 Risk Engine Demo — Simulate IP location
+              🔬 Risk Engine Demo — Simulate Login Location
             </summary>
             <div style="padding:14px;background:rgba(255,255,255,0.04);
                         border-top:1px solid rgba(255,255,255,0.08);">
               <p style="font-size:0.72rem;color:rgba(255,255,255,0.35);margin:0 0 10px;">
-                Override IP seen by the risk engine (demo only)
+                Simulate a login location for the risk engine (demo only)
               </p>
-              <input type="text" id="debugIp" placeholder="e.g. 203.0.113.5"
+              <input type="text" id="debugLocation" placeholder="e.g. windhoek, swakopmund, sa, japan"
                      style="width:100%;padding:8px 12px;
                             border:1.5px solid rgba(255,255,255,0.1);
                             border-radius:8px;font-size:0.82rem;margin-bottom:10px;
                             outline:none;box-sizing:border-box;
                             background:rgba(255,255,255,0.07);color:#fff;"/>
               <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                <button type="button" onclick="document.getElementById('debugIp').value='41.182.0.1'"
+                <button type="button" onclick="document.getElementById('debugLocation').value='windhoek'"
                         style="background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.35);
                                border-radius:6px;padding:4px 10px;font-size:0.74rem;
                                cursor:pointer;color:#c4b5fd;">🇳🇦 Windhoek</button>
-                <button type="button" onclick="document.getElementById('debugIp').value='41.182.0.2'"
+                <button type="button" onclick="document.getElementById('debugLocation').value='swakopmund'"
                         style="background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.35);
                                border-radius:6px;padding:4px 10px;font-size:0.74rem;
                                cursor:pointer;color:#c4b5fd;">🇳🇦 Swakopmund</button>
-                <button type="button" onclick="document.getElementById('debugIp').value='196.216.2.1'"
+                <button type="button" onclick="document.getElementById('debugLocation').value='sa'"
                         style="background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.35);
                                border-radius:6px;padding:4px 10px;font-size:0.74rem;
                                cursor:pointer;color:#c4b5fd;">🇿🇦 South Africa</button>
-                <button type="button" onclick="document.getElementById('debugIp').value='203.0.113.5'"
+                <button type="button" onclick="document.getElementById('debugLocation').value='japan'"
                         style="background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.35);
                                border-radius:6px;padding:4px 10px;font-size:0.74rem;
                                cursor:pointer;color:#c4b5fd;">🇯🇵 Japan</button>
-                <button type="button" onclick="document.getElementById('debugIp').value='8.8.8.8'"
-                        style="background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.35);
-                               border-radius:6px;padding:4px 10px;font-size:0.74rem;
-                               cursor:pointer;color:#c4b5fd;">🇺🇸 USA</button>
               </div>
             </div>
           </details>
@@ -324,8 +320,8 @@
     <p class="sub">The risk engine scores each indicator using weighted rules (0–100 total) to classify every login attempt.</p>
     <div class="indicators">
       <div class="indicator"><div class="indicator-icon">🌍</div><div><h3>IP Geolocation — Country</h3><p>Login from a country never used before? (+30 pts)</p></div></div>
-      <div class="indicator"><div class="indicator-icon">🏙️</div><div><h3>IP Geolocation — City</h3><p>Different city within same country? Catches domestic attackers. (+15 pts)</p></div></div>
-      <div class="indicator"><div class="indicator-icon">💻</div><div><h3>Device Fingerprint</h3><p>Unrecognised browser or device for this account? (+25 pts)</p></div></div>
+      <div class="indicator"><div class="indicator-icon">🏙️</div><div><h3>IP Geolocation — City</h3><p>Different city within same country? Catches domestic attackers. (+30 pts)</p></div></div>
+      <div class="indicator"><div class="indicator-icon">💻</div><div><h3>Device Fingerprint</h3><p>Unrecognised browser or device for this account? (+30 pts)</p></div></div>
       <div class="indicator"><div class="indicator-icon">🕐</div><div><h3>Login Time</h3><p>Login at a significantly different hour than normal? (+10 pts)</p></div></div>
       <div class="indicator"><div class="indicator-icon">⚡</div><div><h3>Login Frequency</h3><p>Too many attempts in a short window — brute-force signal. (+20 pts)</p></div></div>
       <div class="indicator"><div class="indicator-icon">🚫</div><div><h3>Consecutive Failures</h3><p>Three or more failed attempts in a row — credential stuffing signal. (+25 pts)</p></div></div>

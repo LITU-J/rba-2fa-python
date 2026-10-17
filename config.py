@@ -24,15 +24,17 @@ MAILGUN_FROM    = os.environ.get("MAILGUN_FROM", "")
 TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID", "")
 TWILIO_AUTH_TOKEN  = os.environ.get("TWILIO_AUTH_TOKEN", "")
 TWILIO_FROM_NUMBER = os.environ.get("TWILIO_FROM_NUMBER", "")
-
+AT_USERNAME  = os.environ.get("AT_USERNAME", "")
+AT_API_KEY   = os.environ.get("AT_API_KEY", "")
+AT_SENDER_ID = os.environ.get("AT_SENDER_ID", "")
 RISK_WEIGHTS = {
-    "new_country":          65,
-    "new_city":             30,
-    "new_device":           25,
-    "unusual_time":         10,
-    "high_frequency":       20,
-    "consecutive_failures": 25,
-    "impossible_travel":    40,
+    "new_country":          30,   # IP Geolocation — Country  (+30)
+    "new_city":             30,   # different city = MEDIUM on its own
+    "new_device":           30,   # Device Fingerprint        (+30)
+    "unusual_time":         10,   # Login Time                (+10)
+    "high_frequency":       20,   # Login Frequency           (+20)
+    "consecutive_failures": 25,   # Consecutive Failures      (+25)
+    "impossible_travel":    40,   # Geo-Velocity              (+40)
 }
 
 RISK_TIERS = {

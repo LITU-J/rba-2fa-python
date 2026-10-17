@@ -132,6 +132,7 @@ def _check_velocity(db, user_id, current_country):
     recent = db.execute(
         "SELECT country, timestamp FROM login_logs "
         "WHERE user_id=? AND outcome='success' AND country IS NOT NULL "
+        "AND country NOT IN ('Unknown', 'Local Network') "
         "ORDER BY timestamp DESC LIMIT 1",
         (user_id,)
     ).fetchone()
@@ -149,24 +150,51 @@ def _check_velocity(db, user_id, current_country):
 
 
 # ------------------------------------------------------------------
-# Geofencing — new country never seen before
+# Geofencing — new country never seen before (with continent detection)
 # ------------------------------------------------------------------
 
-def _check_geofencing(db, user_id, current_country):
+def _get_continent(timezone_str):
+    """Extract continent prefix from IANA timezone string."""
+    if not timezone_str or "/" not in timezone_str:
+        return None
+    prefix = timezone_str.split("/")[0]
+    continent_map = {
+        "Africa": "Africa", "America": "Americas", "Antarctica": "Antarctica",
+        "Arctic": "Arctic", "Asia": "Asia", "Atlantic": "Atlantic",
+        "Australia": "Oceania", "Europe": "Europe", "Indian": "Indian",
+        "Pacific": "Pacific", "US": "Americas", "Canada": "Americas",
+    }
+    return continent_map.get(prefix, prefix)
+
+
+def _check_geofencing(db, user_id, current_country, current_timezone=None):
     if not current_country or current_country in ("Unknown", "Local Network"):
-        return False
+        return False, None
     total = db.execute(
         "SELECT COUNT(*) as cnt FROM login_logs WHERE user_id=? AND outcome='success'",
         (user_id,)
     ).fetchone()["cnt"]
     if total < 3:
-        return False
+        return False, None
     seen = db.execute(
         "SELECT DISTINCT country FROM login_logs WHERE user_id=? AND outcome='success'",
         (user_id,)
     ).fetchall()
-    return current_country not in {r["country"] for r in seen}
-
+    known_countries = {r["country"] for r in seen}
+    if current_country not in known_countries:
+        current_continent = _get_continent(current_timezone)
+        if current_continent:
+            seen_tzs = db.execute(
+                "SELECT DISTINCT timezone FROM login_logs "
+                "WHERE user_id=? AND outcome='success' AND timezone IS NOT NULL",
+                (user_id,)
+            ).fetchall()
+            known_continents = {_get_continent(r["timezone"]) for r in seen_tzs if r["timezone"]}
+            known_continents.discard(None)
+            if known_continents and current_continent not in known_continents:
+                return True, "different_continent"
+        return True, "same_region"
+    return False, None
 
 # ------------------------------------------------------------------
 # IP Reputation — proxy/VPN/hosting detection (ip-api.com, free)
@@ -344,16 +372,30 @@ def login():
     b        = request.get_json(force=True, silent=True) or {}
     username = b.get("username")
     password = b.get("password")
-
     if not username or not password:
         return jsonify({"error": "username and password required"}), 400
-
     db    = get_db()
     user  = db.execute("SELECT * FROM users WHERE username=?", (username,)).fetchone()
     ip    = resolve_client_ip()
     geo   = lookup_geo(ip)
-    dhash = compute_device_hash()
 
+    # ── debug_location override (simulation only) ─────────────────────
+    _DEMO_LOCATIONS = {
+        "windhoek":   {"country": "Namibia",      "city": "Windhoek",
+                       "timezone": "Africa/Windhoek",     "lat": -22.5597, "lon": 17.0832},
+        "swakopmund": {"country": "Namibia",      "city": "Swakopmund",
+                       "timezone": "Africa/Windhoek",     "lat": -22.6784, "lon": 14.5271},
+        "sa":         {"country": "South Africa", "city": "Johannesburg",
+                       "timezone": "Africa/Johannesburg",  "lat": -26.2041, "lon": 28.0473},
+        "japan":      {"country": "Japan",        "city": "Tokyo",
+                       "timezone": "Asia/Tokyo",           "lat":  35.6762, "lon": 139.6503},
+    }
+    debug_loc = request.args.get("debug_location", "").lower()
+    if debug_loc in _DEMO_LOCATIONS:
+        geo = {**geo, **_DEMO_LOCATIONS[debug_loc]}
+    # ──────────────────────────────────────────────────────────────────
+
+    dhash = compute_device_hash()
     if user:
         lockout = _check_lockout(db, user["id"])
         if lockout["locked"]:
@@ -370,12 +412,10 @@ def login():
                 "seconds_remaining": secs,
                 "riskScore": 100, "riskTier": "CRITICAL",
             }), 403
-
     if user is None:
         _log(db, None, username, ip, geo, dhash,
              outcome="failed_password", auth_method=None)
         return jsonify({"error": "Invalid credentials"}), 401
-
     if not bcrypt.checkpw(password.encode(), user["password_hash"].encode()):
         _log(db, user["id"], username, ip, geo, dhash,
              outcome="failed_password", score=0, tier="LOW",
@@ -388,32 +428,28 @@ def login():
         remaining   = max(0, LOCKOUT_ATTEMPTS - consecutive)
         if consecutive >= LOCKOUT_ATTEMPTS:
             return jsonify({
-                "error": f"Account temporarily locked for {LOCKOUT_MINUTES} minutes.",
+                "error": f"Account temporarily locked for {LOCKOUT_MINUTES} minutes due to too many failed attempts.",
                 "locked": True, "riskScore": 100, "riskTier": "CRITICAL",
+                "attemptsRemaining": 0,
             }), 403
+        warning = None
+        if remaining <= 2:
+            warning = f"⚠️ Warning: Only {remaining} attempt{'s' if remaining != 1 else ''} left before your account is locked for {LOCKOUT_MINUTES} minutes!"
         return jsonify({
-            "error": f"Invalid credentials. {remaining} attempt{'s' if remaining != 1 else ''} remaining.",
+            "error": "Invalid username or password.",
+            "attemptsRemaining": remaining,
+            "maxAttempts": LOCKOUT_ATTEMPTS,
+            "lockoutMinutes": LOCKOUT_MINUTES,
+            "warning": warning,
         }), 401
 
+    # ── Risk assessment (7 indicators via risk_engine) ───────────────
     risk    = assess_risk(user["id"], dhash, geo)
     score   = risk["score"]
     tier    = risk["tier"]
     reasons = list(risk["reasons"])
 
-    # ── Velocity check (impossible travel) ──────────────────────────
-    if _check_velocity(db, user["id"], geo.get("country")):
-        score   = min(score + 40, 100)
-        reasons.append("⚡ Impossible travel: different country within 2 hours")
-        tier    = _escalate_tier(tier)
-
-    # ── Geofencing (new country) ─────────────────────────────────────
-    if _check_geofencing(db, user["id"], geo.get("country")):
-        score   = min(score + 25, 100)
-        reasons.append("🌍 Login from a new country not in your history")
-        if tier == "LOW":
-            tier = "MEDIUM"
-
-    # ── IP Reputation ────────────────────────────────────────────────
+    # ── IP Reputation (extra signal not in risk_engine) ──────────────
     ip_rep = _check_ip_reputation(ip)
     if ip_rep.get("proxy"):
         score   = min(score + 30, 100)
@@ -426,9 +462,12 @@ def login():
         if tier == "LOW":
             tier = "MEDIUM"
 
-    # Re-evaluate CRITICAL after augmentation
-    if score >= 80 and tier != "CRITICAL":
-        tier = "CRITICAL"
+    # ── Normalize tier to match final score ──────────────────────────
+    _TIER_ORDER = ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+    _score_tier = ("CRITICAL" if score >= 85 else
+                   "HIGH"     if score >= 60 else
+                   "MEDIUM"   if score >= 30 else "LOW")
+    tier = _TIER_ORDER[max(_TIER_ORDER.index(tier), _TIER_ORDER.index(_score_tier))]
 
     if tier == "CRITICAL":
         _log(db, user["id"], username, ip, geo, dhash,
@@ -928,7 +967,6 @@ def session_context():
         'server_time': datetime.now().strftime('%A, %d %B %Y - %H:%M:%S'),
     }
 
-    # Private / local IPs have no geo record — label them immediately
     if _is_private_ip(ip):
         result['city']    = 'Local Network'
         result['country'] = 'Local Network'
@@ -991,20 +1029,21 @@ def _log(db, user_id, username, ip, geo, dhash,
 def _complete_login(user, ip, geo, dhash, score, tier, reasons, required_factors):
     db = get_db()
     session["user_id"] = user["id"]
-
-    # Derive auth_method from what factors were satisfied
+    factor_labels = []
     if "totp_backup" in required_factors:
-        auth_method = "totp_backup"
+        factor_labels.append("totp_backup")
     elif "totp" in required_factors:
-        auth_method = "totp"
-    elif "sms_otp" in required_factors:
-        auth_method = "sms_otp"
-    elif "email_otp" in required_factors:
-        auth_method = "email_otp"
+        factor_labels.append("totp")
+    if "sms_otp" in required_factors:
+        factor_labels.append("sms_otp")
+    if "email_otp" in required_factors:
+        factor_labels.append("email_otp")
+
+    if factor_labels:
+        auth_method = "password + " + " + ".join(factor_labels)
     else:
         auth_method = "password"
 
-    # Check if device is new BEFORE inserting
     existing = db.execute(
         "SELECT id FROM known_devices WHERE user_id=? AND device_hash=?",
         (user["id"], dhash)
@@ -1020,7 +1059,6 @@ def _complete_login(user, ip, geo, dhash, score, tier, reasons, required_factors
         (user["id"], dhash)
     )
 
-    # Track session
     sess_uuid  = str(uuid.uuid4())
     session["session_uuid"] = sess_uuid
     user_agent = request.headers.get("User-Agent", "Unknown")[:300]
@@ -1038,7 +1076,6 @@ def _complete_login(user, ip, geo, dhash, score, tier, reasons, required_factors
          auth_method=auth_method)
     db.commit()
 
-    # Send login alert email in background thread
     try:
         alert_token = str(uuid.uuid4())
         db.execute("""

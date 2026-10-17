@@ -1,8 +1,8 @@
 async function doLogin() {
-  const username  = document.getElementById("username").value.trim();
-  const password  = document.getElementById("password").value;
-  const debugIpEl = document.getElementById("debugIp");
-  const debugIp   = debugIpEl ? debugIpEl.value.trim() : "";
+  const username       = document.getElementById("username").value.trim();
+  const password       = document.getElementById("password").value;
+  const debugLocationEl = document.getElementById("debugLocation");
+  const debugLocation   = debugLocationEl ? debugLocationEl.value.trim() : "";
   const btn       = document.getElementById("loginBtn");
   const msg       = document.getElementById("msg");
   msg.innerHTML   = "";
@@ -17,7 +17,7 @@ async function doLogin() {
 
   try {
     const url = "/api/auth/login" +
-      (debugIp ? "?debug_ip=" + encodeURIComponent(debugIp) : "");
+      (debugLocation ? "?debug_location=" + encodeURIComponent(debugLocation) : "");
 
     const res  = await fetch(url, {
       method:  "POST",

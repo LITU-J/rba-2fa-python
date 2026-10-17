@@ -95,16 +95,10 @@ def _send_email(to, subject, html_content, plain_content):
                 }
             )
             if response.status_code in (200, 201, 202):
-                print(
-                    f"[EMAIL SENT via Resend] "
-                    f"Status {response.status_code} → {to}"
-                )
+                print(f"[EMAIL SENT via Resend] Status {response.status_code} → {to}")
                 return
             else:
-                print(
-                    f"[RESEND ERROR] "
-                    f"Status {response.status_code}: {response.text}"
-                )
+                print(f"[RESEND ERROR] Status {response.status_code}: {response.text}")
         except Exception as e:
             print(f"[RESEND EXCEPTION] {e}")
 
@@ -128,16 +122,10 @@ def _send_email(to, subject, html_content, plain_content):
                 }
             )
             if response.status_code in (200, 201, 202):
-                print(
-                    f"[EMAIL SENT via Mailgun] "
-                    f"Status {response.status_code} → {to}"
-                )
+                print(f"[EMAIL SENT via Mailgun] Status {response.status_code} → {to}")
                 return
             else:
-                print(
-                    f"[MAILGUN ERROR] "
-                    f"Status {response.status_code}: {response.text}"
-                )
+                print(f"[MAILGUN ERROR] Status {response.status_code}: {response.text}")
         except Exception as e:
             print(f"[MAILGUN EXCEPTION] {e}")
 
@@ -255,27 +243,50 @@ def send_email_otp(email):
 
 def send_sms_otp(phone):
     code = _generate_otp()
-    if config.TWILIO_ACCOUNT_SID and \
-       config.TWILIO_AUTH_TOKEN and phone:
+    message = (
+        f"RBA-2FA Code: {code}\n"
+        f"Expires in {config.OTP_EXPIRY_MINUTES} min. "
+        f"Do not share."
+    )
+
+    # Method 1 — Twilio
+    if getattr(config, "TWILIO_ACCOUNT_SID", "") and \
+       getattr(config, "TWILIO_AUTH_TOKEN", "") and phone:
         try:
             from twilio.rest import Client
             Client(
                 config.TWILIO_ACCOUNT_SID,
                 config.TWILIO_AUTH_TOKEN
             ).messages.create(
-                body=(
-                    f"RBA-2FA Code: {code}\n"
-                    f"Expires in {config.OTP_EXPIRY_MINUTES} min. "
-                    f"Do not share."
-                ),
+                body=message,
                 from_=config.TWILIO_FROM_NUMBER,
                 to=phone
             )
-            print(f"[SMS SENT] OTP delivered to {phone}")
+            print(f"[SMS SENT via Twilio] → {phone}")
+            return code, _hash(code), _expiry()
         except Exception as e:
-            print(f"[SMS ERROR] {e}")
-            print(f"[CONSOLE OTP] SMS OTP for {phone}: {code}")
-    else:
-        print(f"[MOCK SMS] OTP for {phone or '(no phone)'}: {code}")
+            print(f"[TWILIO ERROR] {e}")
 
+    # Method 2 — Africa's Talking (sandbox or live)
+    at_username = getattr(config, "AT_USERNAME", "")
+    at_api_key  = getattr(config, "AT_API_KEY", "")
+
+    if at_username and at_api_key and phone:
+        try:
+            import africastalking
+            africastalking.initialize(at_username, at_api_key)
+            sms = africastalking.SMS
+            sender = getattr(config, "AT_SENDER_ID", None) or None
+            response = sms.send(message, [phone], sender_id=sender)
+            recipients = response.get("SMSMessageData", {}).get("Recipients", [])
+            if recipients and recipients[0].get("status") == "Success":
+                print(f"[SMS SENT via Africa's Talking] → {phone}")
+                return code, _hash(code), _expiry()
+            else:
+                print(f"[AT ERROR] {response}")
+        except Exception as e:
+            print(f"[AT EXCEPTION] {e}")
+
+    # Fallback — print to terminal
+    print(f"[MOCK SMS] OTP for {phone or '(no phone)'}: {code}")
     return code, _hash(code), _expiry()

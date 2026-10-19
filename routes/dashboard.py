@@ -49,8 +49,10 @@ def recent_activity():
     user, err = _require_auth()
     if err: return err
     db = get_db()
+    # UPDATED: added ip, isp, risk_reasons for gauge + timeline features
     rows = db.execute("""
-        SELECT timestamp, outcome, auth_method, city, country, risk_tier, risk_score
+        SELECT timestamp, outcome, auth_method, ip, city, country, isp,
+               risk_tier, risk_score, risk_reasons
         FROM login_logs WHERE user_id=?
         ORDER BY timestamp DESC LIMIT 5
     """, (user["id"],)).fetchall()
@@ -66,13 +68,31 @@ def login_history():
     offset = (page - 1) * per_page
     db = get_db()
     total = db.execute("SELECT COUNT(*) FROM login_logs WHERE user_id=?", (user["id"],)).fetchone()[0]
+    # UPDATED: added risk_reasons, required_factors for Feature #1 panel
     rows = db.execute("""
-        SELECT timestamp, outcome, auth_method, ip, city, country, isp, risk_tier, risk_score
+        SELECT timestamp, outcome, auth_method, ip, city, country, isp,
+               risk_tier, risk_score, risk_reasons, required_factors
         FROM login_logs WHERE user_id=?
         ORDER BY timestamp DESC LIMIT ? OFFSET ?
     """, (user["id"], per_page, offset)).fetchall()
     pages = math.ceil(total / per_page) if total > 0 else 1
     return jsonify({"history": [dict(r) for r in rows], "total": total, "pages": pages, "current_page": page})
+
+
+# NEW — Feature #3: Login location map data
+@dashboard_bp.route("/login-locations")
+def login_locations():
+    user, err = _require_auth()
+    if err: return err
+    db = get_db()
+    rows = db.execute("""
+        SELECT lat, lon, city, country, risk_tier, risk_score, timestamp, outcome
+        FROM login_logs
+        WHERE user_id=? AND lat IS NOT NULL AND lon IS NOT NULL
+          AND lat != '' AND lon != ''
+        ORDER BY timestamp DESC LIMIT 50
+    """, (user["id"],)).fetchall()
+    return jsonify({"locations": [dict(r) for r in rows]})
 
 
 @dashboard_bp.route("/known-devices")
@@ -250,7 +270,6 @@ def sus_submit():
     db = get_db()
     _ensure_sus_table(db)
 
-    # Block duplicate submissions
     existing = db.execute(
         "SELECT id FROM survey_responses WHERE user_id=?", (uid,)
     ).fetchone()

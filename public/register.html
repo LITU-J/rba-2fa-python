@@ -7,22 +7,21 @@
   <link rel="stylesheet" href="/css/style.css"/>
   <style>
     html, body {
-      background: linear-gradient(135deg, #0f0c29 0%, #1a1040 50%, #24243e 100%) !important;
+      background: #f0f4ff !important;
       min-height: 100vh !important;
       margin: 0 !important;
     }
-    .risk-bar-fill.critical { background: linear-gradient(90deg,#dc2626,#ef4444) !important; box-shadow: 0 0 8px rgba(239,68,68,0.5) !important; }
-    .risk-bar-fill.high     { background: linear-gradient(90deg,#ea580c,#f97316) !important; box-shadow: 0 0 8px rgba(249,115,22,0.5) !important; }
-    .risk-bar-fill.medium   { background: linear-gradient(90deg,#d97706,#fbbf24) !important; box-shadow: 0 0 8px rgba(251,191,36,0.5) !important; }
-    .risk-bar-fill.low      { background: linear-gradient(90deg,#059669,#10b981) !important; box-shadow: 0 0 8px rgba(16,185,129,0.5) !important; }
+    .risk-bar-fill.critical { background: linear-gradient(90deg,#dc2626,#ef4444) !important; }
+    .risk-bar-fill.high     { background: linear-gradient(90deg,#ea580c,#f97316) !important; }
+    .risk-bar-fill.medium   { background: linear-gradient(90deg,#d97706,#fbbf24) !important; }
+    .risk-bar-fill.low      { background: linear-gradient(90deg,#059669,#10b981) !important; }
   </style>
 </head>
-<body style="background:linear-gradient(135deg,#0f0c29 0%,#1a1040 50%,#24243e 100%);min-height:100vh;margin:0;">
+<body style="background:#f0f4ff;min-height:100vh;margin:0;">
 
 <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 16px;">
-  <div style="background:rgba(255,255,255,0.06);backdrop-filter:blur(24px);
-              border:1px solid rgba(255,255,255,0.12);border-radius:22px;
-              box-shadow:0 24px 64px rgba(0,0,0,0.5),0 0 0 1px rgba(139,92,246,0.15);
+  <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:22px;
+              box-shadow:0 8px 40px rgba(99,102,241,0.1);
               padding:40px 36px;width:100%;max-width:440px;">
 
     <!-- Header -->
@@ -30,68 +29,68 @@
       <div style="font-size:2.4rem;display:inline-flex;align-items:center;
                   justify-content:center;width:70px;height:70px;
                   background:linear-gradient(135deg,#8b5cf6,#4f46e5);
-                  border-radius:20px;box-shadow:0 8px 24px rgba(139,92,246,0.5);
+                  border-radius:20px;box-shadow:0 8px 24px rgba(139,92,246,0.35);
                   margin-bottom:16px;">🔐</div>
-      <h1 style="color:#fff;font-size:1.6rem;font-weight:900;margin:0 0 6px;">Create your account</h1>
-      <p style="color:rgba(255,255,255,0.4);font-size:0.9rem;margin:0;">Join the RBA-2FA adaptive security system</p>
+      <h1 style="color:#1e293b;font-size:1.6rem;font-weight:900;margin:0 0 6px;">Create your account</h1>
+      <p style="color:#64748b;font-size:0.9rem;margin:0;">Join the RBA-2FA adaptive security system</p>
     </div>
 
     <!-- Username -->
     <div style="margin-bottom:18px;">
-      <label style="display:block;font-size:0.73rem;font-weight:800;text-transform:uppercase;
-                    letter-spacing:0.08em;color:rgba(255,255,255,0.5);margin-bottom:7px;">Username</label>
+      <label style="display:block;font-size:0.73rem;font-weight:700;text-transform:uppercase;
+                    letter-spacing:0.08em;color:#64748b;margin-bottom:7px;">Username</label>
       <input type="text" id="username" placeholder="Choose a username" autocomplete="username"
-             style="width:100%;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.12);
-                    border-radius:12px;color:#fff;font-size:0.95rem;padding:12px 16px;
+             style="width:100%;background:#ffffff;border:1.5px solid #d1d5db;
+                    border-radius:12px;color:#1e293b;font-size:0.95rem;padding:12px 16px;
                     outline:none;box-sizing:border-box;"
-             onfocus="this.style.borderColor='#8b5cf6';this.style.boxShadow='0 0 0 3px rgba(139,92,246,0.2)'"
-             onblur="this.style.borderColor='rgba(255,255,255,0.12)';this.style.boxShadow='none'"/>
+             onfocus="this.style.borderColor='#8b5cf6';this.style.boxShadow='0 0 0 3px rgba(139,92,246,0.15)'"
+             onblur="this.style.borderColor='#d1d5db';this.style.boxShadow='none'"/>
     </div>
 
     <!-- Email -->
     <div style="margin-bottom:18px;">
-      <label style="display:block;font-size:0.73rem;font-weight:800;text-transform:uppercase;
-                    letter-spacing:0.08em;color:rgba(255,255,255,0.5);margin-bottom:7px;">Email address</label>
+      <label style="display:block;font-size:0.73rem;font-weight:700;text-transform:uppercase;
+                    letter-spacing:0.08em;color:#64748b;margin-bottom:7px;">Email address</label>
       <input type="email" id="email" placeholder="you@example.com" autocomplete="email"
-             style="width:100%;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.12);
-                    border-radius:12px;color:#fff;font-size:0.95rem;padding:12px 16px;
+             style="width:100%;background:#ffffff;border:1.5px solid #d1d5db;
+                    border-radius:12px;color:#1e293b;font-size:0.95rem;padding:12px 16px;
                     outline:none;box-sizing:border-box;"
-             onfocus="this.style.borderColor='#8b5cf6';this.style.boxShadow='0 0 0 3px rgba(139,92,246,0.2)'"
-             onblur="this.style.borderColor='rgba(255,255,255,0.12)';this.style.boxShadow='none'"/>
-      <div style="color:rgba(255,255,255,0.35);font-size:0.8rem;margin-top:6px;">
+             onfocus="this.style.borderColor='#8b5cf6';this.style.boxShadow='0 0 0 3px rgba(139,92,246,0.15)'"
+             onblur="this.style.borderColor='#d1d5db';this.style.boxShadow='none'"/>
+      <div style="color:#64748b;font-size:0.8rem;margin-top:6px;">
         📧 OTP verification codes will be sent to this email
       </div>
     </div>
 
     <!-- Phone -->
     <div style="margin-bottom:18px;">
-      <label style="display:block;font-size:0.73rem;font-weight:800;text-transform:uppercase;
-                    letter-spacing:0.08em;color:rgba(255,255,255,0.5);margin-bottom:7px;">
+      <label style="display:block;font-size:0.73rem;font-weight:700;text-transform:uppercase;
+                    letter-spacing:0.08em;color:#64748b;margin-bottom:7px;">
         Phone number <span style="font-weight:400;text-transform:none;">(optional)</span>
       </label>
       <input type="tel" id="phone" placeholder="+264 81 234 5678"
-             style="width:100%;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.12);
-                    border-radius:12px;color:#fff;font-size:0.95rem;padding:12px 16px;
+             style="width:100%;background:#ffffff;border:1.5px solid #d1d5db;
+                    border-radius:12px;color:#1e293b;font-size:0.95rem;padding:12px 16px;
                     outline:none;box-sizing:border-box;"
-             onfocus="this.style.borderColor='#8b5cf6';this.style.boxShadow='0 0 0 3px rgba(139,92,246,0.2)'"
-             onblur="this.style.borderColor='rgba(255,255,255,0.12)';this.style.boxShadow='none'"/>
-      <div style="color:rgba(255,255,255,0.35);font-size:0.8rem;margin-top:6px;">
+             onfocus="this.style.borderColor='#8b5cf6';this.style.boxShadow='0 0 0 3px rgba(139,92,246,0.15)'"
+             onblur="this.style.borderColor='#d1d5db';this.style.boxShadow='none'"/>
+      <div style="color:#64748b;font-size:0.8rem;margin-top:6px;">
         📱 Required for SMS OTP on high-risk logins
       </div>
     </div>
 
     <!-- Password -->
     <div style="margin-bottom:18px;">
-      <label style="display:block;font-size:0.73rem;font-weight:800;text-transform:uppercase;
-                    letter-spacing:0.08em;color:rgba(255,255,255,0.5);margin-bottom:7px;">Password</label>
+      <label style="display:block;font-size:0.73rem;font-weight:700;text-transform:uppercase;
+                    letter-spacing:0.08em;color:#64748b;margin-bottom:7px;">Password</label>
       <div style="position:relative;">
         <input type="password" id="password" placeholder="Create a strong password"
                autocomplete="new-password"
-               style="width:100%;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.12);
-                      border-radius:12px;color:#fff;font-size:0.95rem;padding:12px 44px 12px 16px;
+               style="width:100%;background:#ffffff;border:1.5px solid #d1d5db;
+                      border-radius:12px;color:#1e293b;font-size:0.95rem;padding:12px 44px 12px 16px;
                       outline:none;box-sizing:border-box;"
-               onfocus="this.style.borderColor='#8b5cf6';this.style.boxShadow='0 0 0 3px rgba(139,92,246,0.2)'"
-               onblur="this.style.borderColor='rgba(255,255,255,0.12)';this.style.boxShadow='none'"/>
+               onfocus="this.style.borderColor='#8b5cf6';this.style.boxShadow='0 0 0 3px rgba(139,92,246,0.15)'"
+               onblur="this.style.borderColor='#d1d5db';this.style.boxShadow='none'"/>
         <button type="button" onclick="togglePwd('password','eyeIcon')" id="eyeIcon"
                 style="position:absolute;right:12px;top:50%;transform:translateY(-50%);
                        background:none;border:none;cursor:pointer;font-size:1.1rem;padding:0;">👁️</button>
@@ -101,10 +100,10 @@
     <!-- Strength bar -->
     <div style="margin-bottom:8px;">
       <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-        <span style="color:rgba(255,255,255,0.35);font-size:0.8rem;">Password strength</span>
-        <span style="color:rgba(255,255,255,0.5);font-size:0.8rem;font-weight:700;" id="strengthLabel">—</span>
+        <span style="color:#64748b;font-size:0.8rem;">Password strength</span>
+        <span style="color:#374151;font-size:0.8rem;font-weight:700;" id="strengthLabel">—</span>
       </div>
-      <div class="risk-bar" style="background:rgba(255,255,255,0.08);border-radius:6px;height:6px;overflow:hidden;">
+      <div class="risk-bar" style="background:#e2e8f0;border-radius:6px;height:6px;overflow:hidden;">
         <div id="strengthBar" class="risk-bar-fill low" style="width:0%;transition:width 0.3s;height:100%;border-radius:6px;"></div>
       </div>
     </div>
@@ -112,31 +111,31 @@
     <!-- Password hints -->
     <div id="passwordHints"
          style="display:none;margin-bottom:18px;padding:12px 14px;
-                background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.25);border-radius:12px;">
-      <div style="font-size:0.73rem;font-weight:700;color:rgba(255,255,255,0.4);
+                background:#f5f3ff;border:1px solid #ddd6fe;border-radius:12px;">
+      <div style="font-size:0.73rem;font-weight:700;color:#6d28d9;
                   text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">
         Password Requirements
       </div>
       <div style="display:flex;flex-direction:column;gap:5px;">
-        <span id="hintLength"  style="font-size:0.82rem;">❌ At least 8 characters</span>
-        <span id="hintUpper"   style="font-size:0.82rem;">❌ At least one uppercase letter (A-Z)</span>
-        <span id="hintNumber"  style="font-size:0.82rem;">❌ At least one number (0-9)</span>
-        <span id="hintSpecial" style="font-size:0.82rem;">❌ At least one special character (!@#$%^&*)</span>
+        <span id="hintLength"  style="font-size:0.82rem;color:#374151;">❌ At least 8 characters</span>
+        <span id="hintUpper"   style="font-size:0.82rem;color:#374151;">❌ At least one uppercase letter (A-Z)</span>
+        <span id="hintNumber"  style="font-size:0.82rem;color:#374151;">❌ At least one number (0-9)</span>
+        <span id="hintSpecial" style="font-size:0.82rem;color:#374151;">❌ At least one special character (!@#$%^&*)</span>
       </div>
     </div>
 
     <!-- Confirm password -->
     <div style="margin-bottom:24px;">
-      <label style="display:block;font-size:0.73rem;font-weight:800;text-transform:uppercase;
-                    letter-spacing:0.08em;color:rgba(255,255,255,0.5);margin-bottom:7px;">Confirm password</label>
+      <label style="display:block;font-size:0.73rem;font-weight:700;text-transform:uppercase;
+                    letter-spacing:0.08em;color:#64748b;margin-bottom:7px;">Confirm password</label>
       <div style="position:relative;">
         <input type="password" id="confirmPwd" placeholder="Repeat your password"
                autocomplete="new-password"
-               style="width:100%;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.12);
-                      border-radius:12px;color:#fff;font-size:0.95rem;padding:12px 44px 12px 16px;
+               style="width:100%;background:#ffffff;border:1.5px solid #d1d5db;
+                      border-radius:12px;color:#1e293b;font-size:0.95rem;padding:12px 44px 12px 16px;
                       outline:none;box-sizing:border-box;"
-               onfocus="this.style.borderColor='#8b5cf6';this.style.boxShadow='0 0 0 3px rgba(139,92,246,0.2)'"
-               onblur="this.style.borderColor='rgba(255,255,255,0.12)';this.style.boxShadow='none'"/>
+               onfocus="this.style.borderColor='#8b5cf6';this.style.boxShadow='0 0 0 3px rgba(139,92,246,0.15)'"
+               onblur="this.style.borderColor='#d1d5db';this.style.boxShadow='none'"/>
         <button type="button" onclick="togglePwd('confirmPwd','eyeIcon2')" id="eyeIcon2"
                 style="position:absolute;right:12px;top:50%;transform:translateY(-50%);
                        background:none;border:none;cursor:pointer;font-size:1.1rem;padding:0;">👁️</button>
@@ -147,29 +146,28 @@
     <button id="registerBtn" onclick="doRegister()"
         style="width:100%;background:linear-gradient(135deg,#8b5cf6,#4f46e5);
                border:none;border-radius:12px;color:#fff;font-size:1rem;font-weight:800;
-               padding:14px;cursor:pointer;box-shadow:0 6px 20px rgba(139,92,246,0.5);
+               padding:14px;cursor:pointer;box-shadow:0 6px 20px rgba(139,92,246,0.4);
                letter-spacing:0.02em;transition:transform 0.15s,box-shadow 0.15s;"
-        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 28px rgba(139,92,246,0.6)'"
-        onmouseout="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(139,92,246,0.5)'">
-  Create Account →
-</button>
+        onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 28px rgba(139,92,246,0.5)'"
+        onmouseout="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(139,92,246,0.4)'">
+      Create Account →
+    </button>
 
-    <div id="msg" style="margin-top:14px;font-size:0.88rem;text-align:center;min-height:20px;color:rgba(255,255,255,0.6);"></div>
+    <div id="msg" style="margin-top:14px;font-size:0.88rem;text-align:center;min-height:20px;color:#64748b;"></div>
 
     <!-- Divider -->
-    <div style="display:flex;align-items:center;gap:12px;margin:20px 0;
-                color:rgba(255,255,255,0.2);font-size:0.8rem;">
-      <div style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></div>
+    <div style="display:flex;align-items:center;gap:12px;margin:20px 0;color:#cbd5e1;font-size:0.8rem;">
+      <div style="flex:1;height:1px;background:#e2e8f0;"></div>
       or
-      <div style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></div>
+      <div style="flex:1;height:1px;background:#e2e8f0;"></div>
     </div>
 
-    <p style="text-align:center;font-size:0.9rem;color:rgba(255,255,255,0.45);margin:0 0 8px;">
+    <p style="text-align:center;font-size:0.9rem;color:#64748b;margin:0 0 8px;">
       Already have an account?
-      <a href="/login.html" style="color:#a78bfa;font-weight:700;text-decoration:none;">Sign in</a>
+      <a href="/login.html" style="color:#7c3aed;font-weight:700;text-decoration:none;">Sign in</a>
     </p>
     <p style="text-align:center;margin:0;">
-      <a href="/" style="color:rgba(255,255,255,0.3);text-decoration:none;font-size:0.85rem;">← Back to home</a>
+      <a href="/" style="color:#94a3b8;text-decoration:none;font-size:0.85rem;">← Back to home</a>
     </p>
 
   </div>
@@ -215,10 +213,10 @@ document.getElementById("password").addEventListener("input", function () {
     document.getElementById("hintUpper").textContent   = (checks.upper   ? "✅" : "❌") + " At least one uppercase letter (A-Z)";
     document.getElementById("hintNumber").textContent  = (checks.number  ? "✅" : "❌") + " At least one number (0-9)";
     document.getElementById("hintSpecial").textContent = (checks.special ? "✅" : "❌") + " At least one special character (!@#$%^&*)";
-    document.getElementById("hintLength").style.color  = checks.length  ? "#6ee7b7" : "#fca5a5";
-    document.getElementById("hintUpper").style.color   = checks.upper   ? "#6ee7b7" : "#fca5a5";
-    document.getElementById("hintNumber").style.color  = checks.number  ? "#6ee7b7" : "#fca5a5";
-    document.getElementById("hintSpecial").style.color = checks.special ? "#6ee7b7" : "#fca5a5";
+    document.getElementById("hintLength").style.color  = checks.length  ? "#059669" : "#dc2626";
+    document.getElementById("hintUpper").style.color   = checks.upper   ? "#059669" : "#dc2626";
+    document.getElementById("hintNumber").style.color  = checks.number  ? "#059669" : "#dc2626";
+    document.getElementById("hintSpecial").style.color = checks.special ? "#059669" : "#dc2626";
   } else {
     hints.style.display = "none";
   }

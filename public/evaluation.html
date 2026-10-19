@@ -8,94 +8,85 @@
   <style>
     * { box-sizing: border-box; }
 
-    body {
-      background: #0f0c29 !important;
-      background: linear-gradient(135deg, #0f0c29 0%, #1a1040 50%, #24243e 100%) !important;
+    html, body {
+      background: #f0f4ff !important;
       min-height: 100vh !important;
     }
 
-    /* ── Navbar ── */
     .navbar {
-      background: rgba(255,255,255,0.04) !important;
-      backdrop-filter: blur(20px) !important;
-      border-bottom: 1px solid rgba(255,255,255,0.08) !important;
-      box-shadow: 0 4px 30px rgba(0,0,0,0.3) !important;
+      background: #ffffff !important;
+      backdrop-filter: none !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+      box-shadow: 0 2px 8px rgba(99,102,241,0.06) !important;
     }
-    .nav-brand { color: #fff !important; font-weight: 800 !important; }
+    .nav-brand { color: #1e293b !important; font-weight: 800 !important; }
     .navbar .btn-outline {
-      background: rgba(255,255,255,0.1) !important;
-      color: #fff !important;
-      border: 1px solid rgba(255,255,255,0.2) !important;
+      background: #ffffff !important;
+      color: #374151 !important;
+      border: 1.5px solid #d1d5db !important;
       border-radius: 10px !important;
     }
+    .navbar .btn-outline:hover { border-color: #8b5cf6 !important; color: #7c3aed !important; }
     .navbar .btn-secondary {
-      background: rgba(139,92,246,0.25) !important;
-      color: #c4b5fd !important;
-      border: 1px solid rgba(139,92,246,0.3) !important;
+      background: rgba(139,92,246,0.08) !important;
+      color: #6d28d9 !important;
+      border: 1px solid rgba(139,92,246,0.2) !important;
       border-radius: 10px !important;
     }
+    .navbar .btn-secondary:hover { background: rgba(139,92,246,0.14) !important; }
 
-    /* ── Page wrapper ── */
     .eval-wrap { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
 
-    /* ── Page title ── */
     .eval-wrap h1 {
-      color: #fff !important;
+      color: #1e293b !important;
       font-size: 1.9rem !important;
       font-weight: 900 !important;
       margin-bottom: 6px !important;
     }
-    .eval-wrap > div > p { color: rgba(255,255,255,0.45) !important; }
+    .eval-wrap > div > p { color: #64748b !important; }
     .eval-wrap code {
-      background: rgba(255,255,255,0.08) !important;
-      color: #a78bfa !important;
+      background: #f1f5f9 !important;
+      color: #7c3aed !important;
       padding: 2px 8px !important;
       border-radius: 6px !important;
       font-size: 0.82rem !important;
     }
 
-    /* ── Setup box ── */
     .setup-box {
-      background: rgba(79,70,229,0.15) !important;
-      border: 1.5px solid rgba(139,92,246,0.35) !important;
+      background: #f5f3ff !important;
+      border: 1.5px solid #ddd6fe !important;
       border-radius: 12px !important;
       padding: 16px 20px !important;
       margin-bottom: 24px !important;
       font-size: 0.88rem !important;
-      color: #c4b5fd !important;
+      color: #5b21b6 !important;
     }
-    .setup-box code {
-      background: rgba(139,92,246,0.2) !important;
-      color: #e9d5ff !important;
-    }
+    .setup-box code { background: #ede9fe !important; color: #6d28d9 !important; }
 
-    /* ── Section cards ── */
     .section-card {
-      background: rgba(255,255,255,0.04) !important;
-      backdrop-filter: blur(20px) !important;
+      background: #ffffff !important;
+      backdrop-filter: none !important;
       border-radius: 18px !important;
       padding: 24px !important;
-      border: 1px solid rgba(255,255,255,0.08) !important;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.2) !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 2px 12px rgba(99,102,241,0.07) !important;
       margin-bottom: 24px !important;
     }
     .section-title {
       font-size: 1rem !important;
       font-weight: 800 !important;
-      color: #fff !important;
+      color: #1e293b !important;
       margin-bottom: 16px !important;
-      letter-spacing: 0.01em !important;
     }
 
-    /* ── Metric cards ── */
     .metric-card {
       border-radius: 16px !important;
       padding: 22px 16px !important;
       text-align: center !important;
-      border: 1px solid rgba(255,255,255,0.08) !important;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2) !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 2px 8px rgba(99,102,241,0.06) !important;
       transition: transform 0.2s !important;
-      background: rgba(255,255,255,0.05) !important;
+      background: #f8fafc !important;
     }
     .metric-card:hover { transform: translateY(-3px) !important; }
     .metric-value {
@@ -109,73 +100,69 @@
       font-weight: 700 !important;
       text-transform: uppercase !important;
       letter-spacing: 0.08em !important;
-      color: rgba(255,255,255,0.35) !important;
+      color: #64748b !important;
       margin-bottom: 4px !important;
     }
-    .metric-desc { font-size: 0.76rem !important; color: rgba(255,255,255,0.35) !important; line-height: 1.5 !important; }
+    .metric-desc { font-size: 0.76rem !important; color: #94a3b8 !important; line-height: 1.5 !important; }
 
-    .metric-far  { color: #fca5a5 !important; text-shadow: 0 0 20px rgba(239,68,68,0.5) !important; }
-    .metric-frr  { color: #fcd34d !important; text-shadow: 0 0 20px rgba(245,158,11,0.5) !important; }
-    .metric-tpr  { color: #6ee7b7 !important; text-shadow: 0 0 20px rgba(16,185,129,0.5) !important; }
-    .metric-eer  { color: #93c5fd !important; text-shadow: 0 0 20px rgba(59,130,246,0.5) !important; }
+    .metric-far  { color: #dc2626 !important; }
+    .metric-frr  { color: #d97706 !important; }
+    .metric-tpr  { color: #059669 !important; }
+    .metric-eer  { color: #2563eb !important; }
 
-    /* ── Bar charts ── */
     .bar-row { display: flex !important; align-items: center !important; gap: 12px !important; margin-bottom: 10px !important; }
-    .bar-label { font-size: 0.78rem !important; color: rgba(255,255,255,0.6) !important; width: 80px !important; flex-shrink: 0 !important; }
-    .bar-track { flex: 1 !important; background: rgba(255,255,255,0.07) !important; border-radius: 6px !important; height: 10px !important; overflow: hidden !important; }
+    .bar-label { font-size: 0.78rem !important; color: #374151 !important; width: 80px !important; flex-shrink: 0 !important; }
+    .bar-track { flex: 1 !important; background: #f1f5f9 !important; border-radius: 6px !important; height: 10px !important; overflow: hidden !important; }
     .bar-fill   { height: 100% !important; border-radius: 6px !important; }
-    .bar-count  { font-size: 0.82rem !important; font-weight: 700 !important; color: rgba(255,255,255,0.6) !important; width: 28px !important; }
-    .bar-CRITICAL { background: linear-gradient(90deg, #dc2626, #ef4444) !important; box-shadow: 0 0 8px rgba(239,68,68,0.4) !important; }
-    .bar-HIGH     { background: linear-gradient(90deg, #ea580c, #f97316) !important; box-shadow: 0 0 8px rgba(249,115,22,0.4) !important; }
-    .bar-MEDIUM   { background: linear-gradient(90deg, #b45309, #d97706) !important; box-shadow: 0 0 8px rgba(217,119,6,0.4) !important; }
-    .bar-LOW      { background: linear-gradient(90deg, #047857, #10b981) !important; box-shadow: 0 0 8px rgba(16,185,129,0.4) !important; }
-    .bar-indicator{ background: linear-gradient(90deg, #4f46e5, #8b5cf6) !important; box-shadow: 0 0 8px rgba(139,92,246,0.4) !important; }
+    .bar-count  { font-size: 0.82rem !important; font-weight: 700 !important; color: #374151 !important; width: 28px !important; }
+    .bar-CRITICAL { background: linear-gradient(90deg, #dc2626, #ef4444) !important; }
+    .bar-HIGH     { background: linear-gradient(90deg, #ea580c, #f97316) !important; }
+    .bar-MEDIUM   { background: linear-gradient(90deg, #b45309, #d97706) !important; }
+    .bar-LOW      { background: linear-gradient(90deg, #047857, #10b981) !important; }
+    .bar-indicator{ background: linear-gradient(90deg, #4f46e5, #8b5cf6) !important; }
 
-    /* ── Attack table ── */
     .section-card table { width: 100% !important; border-collapse: collapse !important; font-size: 0.88rem !important; }
-    .section-card thead tr { background: rgba(255,255,255,0.05) !important; }
+    .section-card thead tr { background: #f8fafc !important; }
     .section-card thead th {
       padding: 10px 14px !important;
       font-size: 0.73rem !important;
       font-weight: 700 !important;
       text-transform: uppercase !important;
       letter-spacing: 0.07em !important;
-      color: rgba(255,255,255,0.35) !important;
-      border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+      color: #64748b !important;
+      border-bottom: 1px solid #e2e8f0 !important;
     }
-    .section-card tbody td { color: rgba(255,255,255,0.75) !important; border-bottom: 1px solid rgba(255,255,255,0.05) !important; }
-    .section-card tbody tr:hover { background: rgba(255,255,255,0.04) !important; }
+    .section-card tbody td { color: #374151 !important; border-bottom: 1px solid #f1f5f9 !important; }
+    .section-card tbody tr:hover { background: #f8fafc !important; }
 
-    /* ── SUS section ── */
-    #susEmpty { color: rgba(255,255,255,0.35) !important; }
-    #susEmpty a { color: #a78bfa !important; }
+    #susEmpty { color: #64748b !important; }
+    #susEmpty a { color: #7c3aed !important; }
     .sus-avg { font-size: 3.5rem !important; font-weight: 900 !important; line-height: 1 !important; }
-    #susCount, #susRange { color: rgba(255,255,255,0.45) !important; font-size: 0.86rem !important; }
+    #susCount, #susRange { color: #64748b !important; font-size: 0.86rem !important; }
 
-    /* ── PIN gate ── */
     .pin-gate {
-      background: rgba(255,255,255,0.04) !important;
-      border: 2px dashed rgba(139,92,246,0.35) !important;
+      background: #f8fafc !important;
+      border: 2px dashed #c4b5fd !important;
       border-radius: 14px !important;
       padding: 24px !important;
       margin-top: 16px !important;
       text-align: center !important;
     }
-    .pin-gate p { font-size: 0.84rem !important; color: rgba(255,255,255,0.5) !important; margin-bottom: 14px !important; }
+    .pin-gate p { font-size: 0.84rem !important; color: #64748b !important; margin-bottom: 14px !important; }
     .pin-row { display: flex !important; gap: 8px !important; justify-content: center !important; }
     .pin-row input {
       padding: 10px 16px !important;
-      border: 1.5px solid rgba(139,92,246,0.3) !important;
+      border: 1.5px solid #c4b5fd !important;
       border-radius: 10px !important;
       font-size: 0.88rem !important;
       width: 170px !important;
       outline: none !important;
       text-align: center !important;
       letter-spacing: 0.1em !important;
-      background: rgba(255,255,255,0.06) !important;
-      color: #fff !important;
+      background: #ffffff !important;
+      color: #1e293b !important;
     }
-    .pin-row input:focus { border-color: #8b5cf6 !important; box-shadow: 0 0 0 3px rgba(139,92,246,0.2) !important; }
+    .pin-row input:focus { border-color: #8b5cf6 !important; box-shadow: 0 0 0 3px rgba(139,92,246,0.15) !important; }
     .pin-row button {
       padding: 10px 20px !important;
       background: linear-gradient(135deg, #8b5cf6, #4f46e5) !important;
@@ -185,31 +172,27 @@
       font-weight: 700 !important;
       font-size: 0.85rem !important;
       cursor: pointer !important;
-      box-shadow: 0 4px 14px rgba(139,92,246,0.4) !important;
+      box-shadow: 0 4px 14px rgba(139,92,246,0.35) !important;
     }
-    .pin-error { color: #fca5a5 !important; font-size: 0.8rem !important; margin-top: 8px !important; font-weight: 600 !important; }
+    .pin-error { color: #dc2626 !important; font-size: 0.8rem !important; margin-top: 8px !important; font-weight: 600 !important; }
 
-    /* ── Response cards ── */
     .response-card {
-      background: rgba(255,255,255,0.04) !important;
-      border: 1px solid rgba(255,255,255,0.08) !important;
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
       border-radius: 14px !important;
       padding: 18px 20px !important;
       margin-bottom: 14px !important;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important;
     }
     .suggestion-box {
-      background: rgba(79,70,229,0.12) !important;
+      background: #f5f3ff !important;
       border-left: 4px solid #8b5cf6 !important;
       border-radius: 0 10px 10px 0 !important;
       padding: 10px 14px !important;
       margin-top: 10px !important;
     }
 
-    /* ── Links ── */
-    a[href="/sus.html"] { color: #a78bfa !important; }
+    a[href="/sus.html"] { color: #7c3aed !important; }
 
-    /* ── Responsive grid helpers (inline styles override) ── */
     @media (max-width: 640px) {
       [style*="grid-template-columns:repeat(4"] { grid-template-columns: repeat(2,1fr) !important; }
       [style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
@@ -250,22 +233,22 @@
   <div class="section-card">
     <div class="section-title">Core Security Metrics</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;">
-      <div class="metric-card" style="background:linear-gradient(135deg,#2d0a0a,#450a0a)!important;">
+      <div class="metric-card" style="border-left:4px solid #dc2626!important;">
         <div class="metric-value metric-far" id="farVal">—</div>
         <div class="metric-label">FAR</div>
         <div class="metric-desc">False Acceptance Rate<br/>Attacks accepted / Total attacks</div>
       </div>
-      <div class="metric-card" style="background:linear-gradient(135deg,#1c1000,#451a03)!important;">
+      <div class="metric-card" style="border-left:4px solid #d97706!important;">
         <div class="metric-value metric-frr" id="frrVal">—</div>
         <div class="metric-label">FRR</div>
         <div class="metric-desc">False Rejection Rate<br/>Legit blocked / Total legit</div>
       </div>
-      <div class="metric-card" style="background:linear-gradient(135deg,#0a2318,#064e3b)!important;">
+      <div class="metric-card" style="border-left:4px solid #059669!important;">
         <div class="metric-value metric-tpr" id="tprVal">—</div>
         <div class="metric-label">TPR</div>
         <div class="metric-desc">True Positive Rate<br/>Attacks detected / Total attacks</div>
       </div>
-      <div class="metric-card" style="background:linear-gradient(135deg,#0c1a2e,#0e3a5c)!important;">
+      <div class="metric-card" style="border-left:4px solid #2563eb!important;">
         <div class="metric-value metric-eer" id="eerVal">—</div>
         <div class="metric-label">EER</div>
         <div class="metric-desc">Equal Error Rate<br/>Approx. (FAR + FRR) / 2</div>
@@ -274,20 +257,20 @@
 
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
       <div class="metric-card">
-        <div class="metric-value" style="color:#e2e8f0;" id="totalAttacks">0</div>
+        <div class="metric-value" style="color:#374151;" id="totalAttacks">0</div>
         <div class="metric-label">Total Attacks</div>
       </div>
       <div class="metric-card">
-        <div class="metric-value" style="color:#93c5fd;" id="legitLogins">0</div>
+        <div class="metric-value" style="color:#2563eb;" id="legitLogins">0</div>
         <div class="metric-label">Legitimate Logins</div>
       </div>
-      <div class="metric-card" style="border:1.5px solid rgba(239,68,68,0.3)!important;background:rgba(239,68,68,0.08)!important;">
-        <div class="metric-value" style="color:#fca5a5;" id="falseAccept">0</div>
-        <div class="metric-label" style="color:rgba(252,165,165,0.7)!important;">False Acceptances</div>
+      <div class="metric-card" style="border:1.5px solid #fecaca!important;background:#fef2f2!important;">
+        <div class="metric-value" style="color:#dc2626;" id="falseAccept">0</div>
+        <div class="metric-label" style="color:#dc2626!important;">False Acceptances</div>
       </div>
-      <div class="metric-card" style="border:1.5px solid rgba(16,185,129,0.3)!important;background:rgba(16,185,129,0.08)!important;">
-        <div class="metric-value" style="color:#6ee7b7;" id="truePos">0</div>
-        <div class="metric-label" style="color:rgba(110,231,183,0.7)!important;">True Positives</div>
+      <div class="metric-card" style="border:1.5px solid #bbf7d0!important;background:#f0fdf4!important;">
+        <div class="metric-value" style="color:#059669;" id="truePos">0</div>
+        <div class="metric-label" style="color:#059669!important;">True Positives</div>
       </div>
     </div>
   </div>
@@ -309,7 +292,7 @@
         </thead>
         <tbody id="attackBody">
           <tr>
-            <td colspan="6" style="text-align:center;padding:24px;color:rgba(255,255,255,0.3);">
+            <td colspan="6" style="text-align:center;padding:24px;color:#94a3b8;">
               No attack data — run <code>python simulate_attacks.py</code>
             </td>
           </tr>
@@ -323,16 +306,16 @@
     <div class="section-card" style="margin-bottom:0;">
       <div class="section-title">Risk Tier Distribution</div>
       <div id="tierChart">
-        <p style="color:rgba(255,255,255,0.3);font-size:0.85rem;">No data yet.</p>
+        <p style="color:#94a3b8;font-size:0.85rem;">No data yet.</p>
       </div>
     </div>
     <div class="section-card" style="margin-bottom:0;">
       <div class="section-title">Risk Indicator Frequency</div>
-      <p style="font-size:0.78rem;color:rgba(255,255,255,0.35);margin-bottom:12px;">
+      <p style="font-size:0.78rem;color:#64748b;margin-bottom:12px;">
         Which indicators triggered most often.
       </p>
       <div id="indicatorChart">
-        <p style="color:rgba(255,255,255,0.3);font-size:0.85rem;">No data yet.</p>
+        <p style="color:#94a3b8;font-size:0.85rem;">No data yet.</p>
       </div>
     </div>
   </div>
@@ -340,15 +323,15 @@
   <!-- SUS Results -->
   <div class="section-card">
     <div class="section-title">App Rating &amp; Feedback Survey (SUS) Results</div>
-    <p style="font-size:0.84rem;color:rgba(255,255,255,0.4);margin-bottom:16px;">
+    <p style="font-size:0.84rem;color:#64748b;margin-bottom:16px;">
       A score ≥ 68 indicates good usability (Bangor et al., 2008).
       Collect responses at the
-      <a href="/sus.html" style="color:#a78bfa;">⭐ App Rating &amp; Feedback Survey</a>.
+      <a href="/sus.html" style="color:#7c3aed;font-weight:600;">⭐ App Rating &amp; Feedback Survey</a>.
     </p>
 
-    <div id="susEmpty" style="text-align:center;padding:32px;color:rgba(255,255,255,0.3);">
+    <div id="susEmpty" style="text-align:center;padding:32px;color:#94a3b8;">
       No SUS responses yet — share the
-      <a href="/sus.html" style="color:#a78bfa;">⭐ App Rating &amp; Feedback Survey</a>
+      <a href="/sus.html" style="color:#7c3aed;">⭐ App Rating &amp; Feedback Survey</a>
       with participants.
     </div>
 
@@ -356,7 +339,7 @@
       <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-bottom:20px;">
         <div>
           <div class="sus-avg" id="susAvg">—</div>
-          <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:rgba(255,255,255,0.35);margin-top:4px;">
+          <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;margin-top:4px;">
             Average SUS Score
           </div>
         </div>
@@ -366,7 +349,7 @@
           <div id="susRange"></div>
         </div>
       </div>
-      <p style="font-size:0.82rem;color:rgba(255,255,255,0.35);">
+      <p style="font-size:0.82rem;color:#64748b;">
         A SUS score ≥ 68 is considered good usability.
         ≥ 72 = "Good", ≥ 85 = "Excellent" (Bangor et al., 2008).
       </p>
@@ -386,16 +369,16 @@
 
       <div id="responsesSection" style="display:none;margin-top:20px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <div style="font-size:0.88rem;font-weight:700;color:#fff;">Individual Responses</div>
+          <div style="font-size:0.88rem;font-weight:700;color:#1e293b;">Individual Responses</div>
           <button onclick="lockResponses()"
-                  style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);
+                  style="background:#fef2f2;border:1px solid #fecaca;
                          border-radius:8px;padding:6px 14px;font-size:0.78rem;font-weight:700;
-                         color:#fca5a5;cursor:pointer;">
+                         color:#dc2626;cursor:pointer;">
             🔒 Lock
           </button>
         </div>
         <div id="responsesContainer">
-          <p style="color:rgba(255,255,255,0.3);text-align:center;padding:24px;">Loading...</p>
+          <p style="color:#94a3b8;text-align:center;padding:24px;">Loading...</p>
         </div>
       </div>
     </div>
@@ -436,7 +419,7 @@ async function loadResponses() {
   const data = await res.json();
   const el   = document.getElementById("responsesContainer");
   if (!data.responses || !data.responses.length) {
-    el.innerHTML = "<p style='color:rgba(255,255,255,0.3);text-align:center;padding:24px;'>No responses yet.</p>";
+    el.innerHTML = "<p style='color:#94a3b8;text-align:center;padding:24px;'>No responses yet.</p>";
     return;
   }
   el.innerHTML = data.responses.map(r => `
@@ -447,45 +430,45 @@ async function loadResponses() {
                       background:linear-gradient(135deg,#8b5cf6,#06b6d4);
                       display:flex;align-items:center;justify-content:center;
                       color:#fff;font-weight:800;font-size:1rem;
-                      box-shadow:0 4px 12px rgba(139,92,246,0.4);">
+                      box-shadow:0 4px 12px rgba(139,92,246,0.3);">
             ${(r.participant||"A").charAt(0).toUpperCase()}
           </div>
           <div>
-            <div style="font-weight:700;color:#fff;font-size:0.92rem;">${r.participant || "Anonymous"}</div>
-            <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);">${r.submitted_at || ""}</div>
+            <div style="font-weight:700;color:#1e293b;font-size:0.92rem;">${r.participant || "Anonymous"}</div>
+            <div style="font-size:0.75rem;color:#64748b;">${r.submitted_at || ""}</div>
           </div>
         </div>
         <div style="text-align:right;">
           <div style="font-size:1.6rem;font-weight:900;
-                      color:${r.total_score>=80?"#6ee7b7":r.total_score>=60?"#93c5fd":r.total_score>=40?"#fcd34d":"#fca5a5"};">
+                      color:${r.total_score>=80?"#059669":r.total_score>=60?"#2563eb":r.total_score>=40?"#d97706":"#dc2626"};">
             ${r.total_score}
           </div>
           <span style="font-size:0.74rem;font-weight:700;padding:2px 10px;border-radius:20px;
-                       background:${r.grade==="Excellent"?"rgba(16,185,129,0.2)":r.grade==="Good"?"rgba(59,130,246,0.2)":r.grade==="Fair"?"rgba(245,158,11,0.2)":"rgba(239,68,68,0.2)"};
-                       color:${r.grade==="Excellent"?"#6ee7b7":r.grade==="Good"?"#93c5fd":r.grade==="Fair"?"#fcd34d":"#fca5a5"};
-                       border:1px solid ${r.grade==="Excellent"?"rgba(16,185,129,0.3)":r.grade==="Good"?"rgba(59,130,246,0.3)":r.grade==="Fair"?"rgba(245,158,11,0.3)":"rgba(239,68,68,0.3)"};">
+                       background:${r.grade==="Excellent"?"#f0fdf4":r.grade==="Good"?"#eff6ff":r.grade==="Fair"?"#fffbeb":"#fef2f2"};
+                       color:${r.grade==="Excellent"?"#166534":r.grade==="Good"?"#1d4ed8":r.grade==="Fair"?"#92400e":"#991b1b"};
+                       border:1px solid ${r.grade==="Excellent"?"#bbf7d0":r.grade==="Good"?"#bfdbfe":r.grade==="Fair"?"#fde68a":"#fecaca"};">
             ${r.grade}
           </span>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-bottom:10px;">
         ${r.answers.map((a,i) => `
-          <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;
                       border-radius:6px;padding:6px 2px;text-align:center;">
-            <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);margin-bottom:2px;">Q${i+1}</div>
+            <div style="font-size:0.6rem;color:#94a3b8;margin-bottom:2px;">Q${i+1}</div>
             <div style="font-size:0.95rem;font-weight:800;
-                        color:${a>=4?"#6ee7b7":a===3?"#fcd34d":"#fca5a5"};">${a}</div>
+                        color:${a>=4?"#059669":a===3?"#d97706":"#dc2626"};">${a}</div>
           </div>`).join("")}
       </div>
-      <div style="font-size:0.8rem;color:rgba(255,255,255,0.35);margin-bottom:6px;">
+      <div style="font-size:0.8rem;color:#64748b;margin-bottom:6px;">
         Raw: ${r.raw_score}/50 → SUS Score: ${r.total_score}
       </div>
       ${r.suggestions ? `
         <div class="suggestion-box">
-          <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">💬 Suggestion</div>
-          <div style="font-size:0.86rem;color:rgba(255,255,255,0.7);line-height:1.6;">${r.suggestions}</div>
+          <div style="font-size:0.72rem;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">💬 Suggestion</div>
+          <div style="font-size:0.86rem;color:#374151;line-height:1.6;">${r.suggestions}</div>
         </div>` : `
-        <div style="font-size:0.8rem;color:rgba(255,255,255,0.25);font-style:italic;margin-top:6px;">No suggestions provided</div>`}
+        <div style="font-size:0.8rem;color:#94a3b8;font-style:italic;margin-top:6px;">No suggestions provided</div>`}
     </div>`).join("");
 }
 
@@ -498,10 +481,10 @@ async function loadMetrics() {
     if ((totals.attacks || 0) === 0) {
       document.getElementById("setupBox").style.display = "block";
     }
-    document.getElementById("farVal").textContent      = rates.FAR  != null ? rates.FAR  + "%" : "—";
-    document.getElementById("frrVal").textContent      = rates.FRR  != null ? rates.FRR  + "%" : "—";
-    document.getElementById("tprVal").textContent      = rates.TPR  != null ? rates.TPR  + "%" : "—";
-    document.getElementById("eerVal").textContent      = rates.EER  != null ? rates.EER  + "%" : "—";
+    document.getElementById("farVal").textContent       = rates.FAR  != null ? rates.FAR  + "%" : "—";
+    document.getElementById("frrVal").textContent       = rates.FRR  != null ? rates.FRR  + "%" : "—";
+    document.getElementById("tprVal").textContent       = rates.TPR  != null ? rates.TPR  + "%" : "—";
+    document.getElementById("eerVal").textContent       = rates.EER  != null ? rates.EER  + "%" : "—";
     document.getElementById("totalAttacks").textContent = totals.attacks           || 0;
     document.getElementById("legitLogins").textContent  = totals.legitimate        || 0;
     document.getElementById("falseAccept").textContent  = totals.false_acceptances || 0;
@@ -513,14 +496,14 @@ async function loadMetrics() {
     if (abEntries.length) {
       tbody.innerHTML = abEntries.map(([atype, a]) => {
         const rate  = a.total > 0 ? Math.round(((a.blocked + a.escalated) / a.total) * 100) : 0;
-        const color = rate >= 80 ? "#6ee7b7" : rate >= 60 ? "#fcd34d" : "#fca5a5";
+        const color = rate >= 80 ? "#059669" : rate >= 60 ? "#d97706" : "#dc2626";
         const label = atype.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-        return `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-          <td style="padding:12px 14px;font-weight:600;color:rgba(255,255,255,0.85);">${label}</td>
-          <td style="padding:12px 14px;text-align:center;color:rgba(255,255,255,0.7);">${a.total}</td>
-          <td style="padding:12px 14px;text-align:center;color:rgba(255,255,255,0.7);">${a.blocked}</td>
-          <td style="padding:12px 14px;text-align:center;color:rgba(255,255,255,0.7);">${a.escalated}</td>
-          <td style="padding:12px 14px;text-align:center;color:#fca5a5;">${a.accepted}</td>
+        return `<tr>
+          <td style="padding:12px 14px;font-weight:600;color:#1e293b;">${label}</td>
+          <td style="padding:12px 14px;text-align:center;color:#374151;">${a.total}</td>
+          <td style="padding:12px 14px;text-align:center;color:#374151;">${a.blocked}</td>
+          <td style="padding:12px 14px;text-align:center;color:#374151;">${a.escalated}</td>
+          <td style="padding:12px 14px;text-align:center;color:#dc2626;font-weight:600;">${a.accepted}</td>
           <td style="padding:12px 14px;text-align:center;font-weight:800;color:${color};">${rate}%</td>
         </tr>`;
       }).join("");
@@ -565,7 +548,7 @@ async function loadSUS() {
     document.getElementById("susEmpty").style.display   = "none";
     document.getElementById("susSummary").style.display = "block";
     const s     = data.summary;
-    const color = s.average >= 80 ? "#6ee7b7" : s.average >= 60 ? "#93c5fd" : s.average >= 40 ? "#fcd34d" : "#fca5a5";
+    const color = s.average >= 80 ? "#059669" : s.average >= 60 ? "#2563eb" : s.average >= 40 ? "#d97706" : "#dc2626";
     const grade = s.average >= 80 ? "Excellent" : s.average >= 72 ? "Good" : s.average >= 68 ? "OK" : s.average >= 40 ? "Fair" : "Poor";
     document.getElementById("susAvg").textContent = s.average;
     document.getElementById("susAvg").style.color = color;

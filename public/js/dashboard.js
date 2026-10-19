@@ -67,12 +67,7 @@ function toLocalTime(utcStr) {
 }
 
 function tierBadge(tier) {
-  const map = {
-    LOW:      'badge-low',
-    MEDIUM:   'badge-medium',
-    HIGH:     'badge-high',
-    CRITICAL: 'badge-critical'
-  };
+  const map = { LOW:'badge-low', MEDIUM:'badge-medium', HIGH:'badge-high', CRITICAL:'badge-critical' };
   return `<span class="badge ${map[tier]||''}">${tier||'—'}</span>`;
 }
 
@@ -128,7 +123,15 @@ function showSection(name) {
   const navEl = document.querySelector(`.nav-item[data-section="${name}"]`);
   if (navEl) navEl.classList.add('active');
 
-  if (name === 'overview') { loadRecentActivity(); loadRiskTrend(); }
+  if (name === 'overview') {
+    loadRecentActivity();
+    loadRiskTrend();
+    loadRiskGauge();
+    loadLoginMap();
+    loadTrustTimeline();
+    // Fix Leaflet map size after section becomes visible
+    setTimeout(() => { if (loginMap) loginMap.invalidateSize(); }, 150);
+  }
   if (name === 'history')  loadHistory(1);
   if (name === 'devices')  loadDevices();
   if (name === 'sessions') loadSessions();
@@ -149,6 +152,9 @@ async function loadMe() {
     if (!r.ok) return;
     const d = await r.json();
     const last = d.last_login || {};
+
+    // Welcome name
+    setText('welcomeName', d.username || '');
 
     // Sidebar username + avatar initial
     const nameEl = document.querySelector('.sidebar-user .info .name');
@@ -237,7 +243,12 @@ async function loadHistory(page = 1) {
         <td>${formatLocation(e.city, e.country)}</td>
         <td>${e.isp || '—'}</td>
         <td>${tierBadge(e.risk_tier)}</td>
-        <td>${e.risk_score ?? '—'}</td>`;
+        <td>${e.risk_score ?? '—'}</td>
+        <td><button class="btn-details">🔍 Details</button></td>`;
+      tr.querySelector('.btn-details').addEventListener('click', ev => {
+        ev.stopPropagation();
+        openRiskPanel(e);
+      });
       tbody.appendChild(tr);
     });
     renderPagination('history-pagination', current_page, pages, loadHistory);
@@ -388,7 +399,7 @@ async function loadRiskTrend() {
           label: 'Risk Score',
           data: scores,
           borderColor: '#8b5cf6',
-          backgroundColor: 'rgba(139,92,246,0.15)',
+          backgroundColor: 'rgba(139,92,246,0.1)',
           pointBackgroundColor: colors,
           pointBorderColor: colors,
           pointRadius: 5,
@@ -399,7 +410,7 @@ async function loadRiskTrend() {
       options: {
         responsive: true,
         plugins: {
-          legend: { labels: { color: '#c4b5fd' } },
+          legend: { labels: { color: '#374151' } },          // FIXED: light theme
           tooltip: {
             callbacks: {
               afterLabel: ctx => `Tier: ${(trend[ctx.dataIndex] || {}).risk_tier || ''}`
@@ -407,12 +418,367 @@ async function loadRiskTrend() {
           }
         },
         scales: {
-          x: { ticks: { color: '#a78bfa' }, grid: { color: 'rgba(167,139,250,0.1)' } },
-          y: { min: 0, max: 100, ticks: { color: '#a78bfa' }, grid: { color: 'rgba(167,139,250,0.1)' } }
+          x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(148,163,184,0.2)' } }, // FIXED
+          y: { min: 0, max: 100, ticks: { color: '#64748b' }, grid: { color: 'rgba(148,163,184,0.2)' } }
         }
       }
     });
   } catch (e) { console.error('loadRiskTrend', e); }
+}
+
+// ── Feature #2: Live Risk Gauge ───────────────────────────
+function drawGaugeSVG(score, tier) {
+  const W = 200, H = 120, R = 80, cx = 100, cy = 108;
+  const tierColors = { LOW:'#16a34a', MEDIUM:'#d97706', HIGH:'#ea580c', CRITICAL:'#dc2626' };
+  const col = tierColors[tier] || '#94a3b8';
+
+  // Convert angle to x/y coordinates on the arc
+  const toXY = deg => ({
+    x: cx + R * Math.cos(deg * Math.PI / 180),
+    y: cy + R * Math.sin(deg * Math.PI / 180)
+  });
+
+  const arcStart = toXY(-180); // leftmost point
+  const arcEnd   = toXY(0);    // rightmost point
+
+  // Background semicircle path
+  const bgPath = `M ${arcStart.x.toFixed(1)} ${arcStart.y.toFixed(1)} A ${R} ${R} 0 0 1 ${arcEnd.x.toFixed(1)} ${arcEnd.y.toFixed(1)}`;
+
+  // Fill arc — proportional to score
+  const fillDeg = Math.min(180, Math.max(0, (score / 100) * 180));
+  const fillEnd = toXY(-180 + fillDeg);
+  const largeArc = fillDeg > 180 ? 1 : 0;
+  const fillPath = `M ${arcStart.x.toFixed(1)} ${arcStart.y.toFixed(1)} A ${R} ${R} 0 ${largeArc} 1 ${fillEnd.x.toFixed(1)} ${fillEnd.y.toFixed(1)}`;
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+    <path d="${bgPath}" fill="none" stroke="#e2e8f0" stroke-width="14" stroke-linecap="round"/>
+    ${fillDeg > 0 ? `<path d="${fillPath}" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="round"/>` : ''}
+    <text x="${cx}" y="${cy - 24}" text-anchor="middle" fill="${col}"
+          font-size="32" font-weight="900" font-family="system-ui,sans-serif">${score}</text>
+    <text x="${cx}" y="${cy - 6}" text-anchor="middle" fill="#94a3b8"
+          font-size="10" font-weight="600" font-family="system-ui,sans-serif">/ 100</text>
+    <text x="${cx}" y="${cy + 10}" text-anchor="middle" fill="${col}"
+          font-size="11" font-weight="800" font-family="system-ui,sans-serif" letter-spacing="1">${tier}</text>
+    <text x="${(arcStart.x - 2).toFixed(0)}" y="${(arcStart.y + 16).toFixed(0)}"
+          text-anchor="end" fill="#cbd5e1" font-size="9" font-family="system-ui,sans-serif">0</text>
+    <text x="${(arcEnd.x + 2).toFixed(0)}" y="${(arcEnd.y + 16).toFixed(0)}"
+          text-anchor="start" fill="#cbd5e1" font-size="9" font-family="system-ui,sans-serif">100</text>
+  </svg>`;
+}
+
+async function loadRiskGauge() {
+  try {
+    const r = await fetch('/api/dashboard/recent-activity');
+    if (!r.ok) return;
+    const { events } = await r.json();
+    if (!events || !events.length) return;
+
+    const latest = events[0];
+    const score  = latest.risk_score ?? 0;
+    const tier   = (latest.risk_tier || 'LOW').toUpperCase();
+
+    const svgBox = document.getElementById('gaugeSvgBox');
+    if (svgBox) svgBox.innerHTML = drawGaugeSVG(score, tier);
+
+    const tsEl = document.getElementById('gaugeTimestamp');
+    if (tsEl) tsEl.textContent = toLocalTime(latest.timestamp);
+
+    const detailsEl = document.getElementById('gaugeDetails');
+    if (detailsEl) detailsEl.innerHTML = `
+      <div class="gauge-info-grid">
+        <div class="gauge-info-item">
+          <div class="gauge-info-label">Outcome</div>
+          <div class="gauge-info-value">${latest.outcome || '—'}</div>
+        </div>
+        <div class="gauge-info-item">
+          <div class="gauge-info-label">Auth Method</div>
+          <div class="gauge-info-value">${authMethod(latest.auth_method)}</div>
+        </div>
+        <div class="gauge-info-item">
+          <div class="gauge-info-label">Location</div>
+          <div class="gauge-info-value" style="font-size:0.79rem;">${formatLocation(latest.city, latest.country)}</div>
+        </div>
+        <div class="gauge-info-item">
+          <div class="gauge-info-label">IP Address</div>
+          <div class="gauge-info-value" style="color:#7c3aed;font-size:0.79rem;">${latest.ip || '—'}</div>
+        </div>
+      </div>`;
+  } catch(e) { console.error('loadRiskGauge', e); }
+}
+
+// ── Feature #3: Login Location Map ───────────────────────
+let loginMap = null;
+let loginMapMarkers = [];
+
+async function loadLoginMap() {
+  const mapEl = document.getElementById('loginMapContainer');
+  if (!mapEl || typeof L === 'undefined') return;
+
+  try {
+    const r = await fetch('/api/dashboard/login-locations');
+    if (!r.ok) return;
+    const { locations } = await r.json();
+
+    // Initialize map only once
+    if (!loginMap) {
+      loginMap = L.map('loginMapContainer', {
+        scrollWheelZoom: false,
+        zoomControl: true
+      }).setView([-22.5597, 17.0832], 3);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
+        maxZoom: 18
+      }).addTo(loginMap);
+    } else {
+      // Remove old markers
+      loginMapMarkers.forEach(m => m.remove());
+      loginMapMarkers = [];
+    }
+
+    const emptyNote = document.getElementById('mapEmptyNote');
+
+    if (!locations || !locations.length) {
+      if (emptyNote) emptyNote.style.display = 'inline';
+      setTimeout(() => loginMap && loginMap.invalidateSize(), 200);
+      return;
+    }
+    if (emptyNote) emptyNote.style.display = 'none';
+
+    const tierColors = { LOW:'#16a34a', MEDIUM:'#d97706', HIGH:'#ea580c', CRITICAL:'#dc2626' };
+    const bounds = [];
+
+    locations.forEach(loc => {
+      const lat = parseFloat(loc.lat);
+      const lon = parseFloat(loc.lon);
+      if (isNaN(lat) || isNaN(lon)) return;
+
+      const tier = (loc.risk_tier || 'LOW').toUpperCase();
+      const col  = tierColors[tier] || '#64748b';
+
+      const marker = L.circleMarker([lat, lon], {
+        radius: 8, fillColor: col, color: '#ffffff',
+        weight: 2, opacity: 1, fillOpacity: 0.85
+      }).bindPopup(`
+        <div style="font-size:0.82rem;min-width:150px;line-height:1.6;">
+          <div style="font-weight:700;color:#1e293b;margin-bottom:2px;">
+            ${loc.city || 'Unknown'}, ${loc.country || ''}
+          </div>
+          <div style="color:#64748b;font-size:0.74rem;margin-bottom:6px;">
+            ${toLocalTime(loc.timestamp)}
+          </div>
+          <span style="background:${col}18;color:${col};border:1px solid ${col}40;
+                border-radius:999px;padding:2px 9px;font-size:0.73rem;font-weight:700;">${tier}</span>
+          <span style="color:#64748b;font-size:0.74rem;margin-left:6px;">
+            Score: ${loc.risk_score ?? '—'}
+          </span>
+        </div>`).addTo(loginMap);
+
+      loginMapMarkers.push(marker);
+      bounds.push([lat, lon]);
+    });
+
+    if (bounds.length > 0) {
+      loginMap.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
+    }
+
+    setTimeout(() => loginMap && loginMap.invalidateSize(), 200);
+  } catch(e) { console.error('loadLoginMap', e); }
+}
+
+// ── Feature #4: Print Security Report ────────────────────
+async function printReport() {
+  try {
+    showToast('Preparing report…', 'info');
+    const r = await fetch('/api/dashboard/login-history?per_page=50');
+    if (!r.ok) { showToast('Failed to load data', 'error'); return; }
+    const { history, total } = await r.json();
+
+    const userName   = (document.querySelector('.sidebar-user .info .name') || {}).textContent || 'User';
+    const now        = new Date().toLocaleString('en-ZA', { timeZone: 'Africa/Windhoek' });
+    const tierColors = { LOW:'#16a34a', MEDIUM:'#d97706', HIGH:'#ea580c', CRITICAL:'#dc2626' };
+
+    const successCount = (history||[]).filter(e => e.outcome === 'success').length;
+    const failCount    = (history||[]).length - successCount;
+    const scoreAvg     = (history||[]).length
+      ? Math.round((history||[]).reduce((a,e) => a + (e.risk_score||0), 0) / history.length)
+      : 0;
+    const critCount    = (history||[]).filter(e => e.risk_tier === 'CRITICAL').length;
+
+    const rows = (history||[]).map(e => {
+      const tier = e.risk_tier || 'LOW';
+      const col  = tierColors[tier] || '#64748b';
+      return `<tr>
+        <td>${toLocalTime(e.timestamp)}</td>
+        <td>${e.outcome || '—'}</td>
+        <td>${authMethod(e.auth_method)}</td>
+        <td>${e.ip || '—'}</td>
+        <td>${formatLocation(e.city, e.country)}</td>
+        <td style="color:${col};font-weight:700;">${tier}</td>
+        <td style="color:${col};font-weight:700;">${e.risk_score ?? '—'}</td>
+      </tr>`;
+    }).join('');
+
+    const frame = document.getElementById('printFrame');
+    if (!frame) return;
+
+    frame.innerHTML = `
+      <div class="pr-header">
+        <h1>🔐 RBA-2FA Security Report</h1>
+        <div class="pr-meta">
+          <span><strong>User:</strong> ${userName}</span>
+          <span><strong>Generated:</strong> ${now}</span>
+          <span><strong>Showing:</strong> Last ${(history||[]).length} of ${total ?? '?'} total logins</span>
+        </div>
+      </div>
+      <div class="pr-section">Login Summary</div>
+      <div class="pr-stats">
+        <div class="pr-stat">
+          <span class="pr-stat-val">${successCount}</span>
+          <div class="pr-stat-lbl">Successful</div>
+        </div>
+        <div class="pr-stat">
+          <span class="pr-stat-val">${failCount}</span>
+          <div class="pr-stat-lbl">Failed / Blocked</div>
+        </div>
+        <div class="pr-stat">
+          <span class="pr-stat-val">${scoreAvg}</span>
+          <div class="pr-stat-lbl">Avg Risk Score</div>
+        </div>
+        <div class="pr-stat">
+          <span class="pr-stat-val">${critCount}</span>
+          <div class="pr-stat-lbl">Critical Events</div>
+        </div>
+      </div>
+      <div class="pr-section">Login Details</div>
+      <table class="pr-table">
+        <thead>
+          <tr>
+            <th>Timestamp</th><th>Outcome</th><th>Auth Method</th>
+            <th>IP Address</th><th>Location</th><th>Risk Tier</th><th>Score</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+
+    window.print();
+  } catch(e) { console.error('printReport', e); showToast('Could not generate report', 'error'); }
+}
+
+// ── Feature #5: Trust Timeline ────────────────────────────
+async function loadTrustTimeline() {
+  try {
+    const r = await fetch('/api/dashboard/recent-activity');
+    if (!r.ok) return;
+    const { events } = await r.json();
+
+    const container = document.getElementById('trustTimeline');
+    if (!container) return;
+
+    if (!events || !events.length) {
+      container.innerHTML = '<div style="color:#94a3b8;font-size:0.85rem;padding:12px 0;">No activity recorded yet.</div>';
+      return;
+    }
+
+    container.innerHTML = events.slice(0, 5).map(e => {
+      const tier = (e.risk_tier || 'LOW').toUpperCase();
+      return `
+        <div class="tl-item">
+          <div class="tl-dot ${tier}"></div>
+          <div class="tl-content">
+            <div class="tl-time">${toLocalTime(e.timestamp)}</div>
+            <div class="tl-main">
+              ${outcomeBadge(e.outcome)}
+              <span style="color:#374151;font-size:0.82rem;">${authMethod(e.auth_method)}</span>
+              ${tierBadge(e.risk_tier)}
+            </div>
+            <div class="tl-loc">📍 ${formatLocation(e.city, e.country)}</div>
+          </div>
+        </div>`;
+    }).join('');
+  } catch(e) { console.error('loadTrustTimeline', e); }
+}
+
+// ── Feature #1: Risk Breakdown Panel ─────────────────────
+// (Defined at global scope so onclick="closeRiskPanel()" in HTML works)
+function openRiskPanel(entry) {
+  const tier  = (entry.risk_tier  || 'LOW').toUpperCase();
+  const score = entry.risk_score ?? 0;
+
+  let reasons = [];
+  try {
+    reasons = typeof entry.risk_reasons === 'string'
+      ? JSON.parse(entry.risk_reasons)
+      : (entry.risk_reasons || []);
+  } catch {}
+
+  let factors = [];
+  try {
+    factors = typeof entry.required_factors === 'string'
+      ? JSON.parse(entry.required_factors)
+      : (entry.required_factors || []);
+  } catch {}
+
+  const reasonsHtml = reasons.length
+    ? reasons.map(r => `<div class="rp-reason">${r}</div>`).join('')
+    : `<div class="rp-reason clean">✅ No risk factors detected — login matched normal pattern</div>`;
+
+  const factorsHtml = factors.length
+    ? factors.map(f => `<span class="rp-chip">✅ ${f.replace(/_/g,' ')}</span>`).join('')
+    : `<span class="rp-chip">✅ password</span>`;
+
+  document.getElementById('riskPanelBody').innerHTML = `
+    <div class="rp-score-box">
+      <div class="rp-score-num ${tier}">${score}</div>
+      <div style="font-size:0.72rem;color:#64748b;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;">Risk Score / 100</div>
+      <div class="rp-bar-track">
+        <div class="rp-bar-fill ${tier}" style="width:${score}%"></div>
+      </div>
+      <span class="badge badge-${tier.toLowerCase()}">${tier}</span>
+    </div>
+
+    <div class="rp-label">Login Details</div>
+    <div class="rp-grid">
+      <div class="rp-cell">
+        <div class="rp-cl">Date &amp; Time</div>
+        <div class="rp-cv" style="font-size:0.76rem;">${toLocalTime(entry.timestamp)}</div>
+      </div>
+      <div class="rp-cell">
+        <div class="rp-cl">Outcome</div>
+        <div class="rp-cv">${entry.outcome || '—'}</div>
+      </div>
+      <div class="rp-cell">
+        <div class="rp-cl">IP Address</div>
+        <div class="rp-cv" style="color:#7c3aed;font-size:0.78rem;">${entry.ip || '—'}</div>
+      </div>
+      <div class="rp-cell">
+        <div class="rp-cl">Location</div>
+        <div class="rp-cv" style="font-size:0.78rem;">${formatLocation(entry.city, entry.country)}</div>
+      </div>
+      <div class="rp-cell">
+        <div class="rp-cl">ISP / Network</div>
+        <div class="rp-cv" style="font-size:0.78rem;">${entry.isp || '—'}</div>
+      </div>
+      <div class="rp-cell">
+        <div class="rp-cl">Auth Method</div>
+        <div class="rp-cv" style="font-size:0.78rem;">${authMethod(entry.auth_method)}</div>
+      </div>
+    </div>
+
+    <div class="rp-label">⚠️ Risk Factors That Triggered</div>
+    ${reasonsHtml}
+
+    <div class="rp-label">🔐 Authentication Factors Used</div>
+    <div style="padding-bottom:24px;">${factorsHtml}</div>
+  `;
+
+  document.getElementById('riskPanel').classList.add('open');
+  document.getElementById('riskPanelOverlay').classList.add('open');
+}
+
+function closeRiskPanel() {
+  document.getElementById('riskPanel').classList.remove('open');
+  document.getElementById('riskPanelOverlay').classList.remove('open');
 }
 
 // ── TOTP Section (status + backup codes) ─────────────────
@@ -520,7 +886,7 @@ async function loadAdminUsers() {
   } catch (e) { console.error('loadAdminUsers', e); }
 }
 
-// ── TOTP Setup ────────────────────────────────────────────
+// ── TOTP Setup ────────────────────────────────────────
 async function setupTotp() {
   try {
     const r = await fetch('/api/auth/totp/setup', { method: 'POST' });
@@ -529,8 +895,8 @@ async function setupTotp() {
     const qrImg        = document.getElementById('totp-qr');
     const secretEl     = document.getElementById('totp-secret');
     const setupSection = document.getElementById('totp-setup-section');
-    if (qrImg)        qrImg.src = d.qrDataUrl;           // FIX: was d.qr_code
-    if (secretEl)     secretEl.textContent = d.secretBase32; // FIX: was d.secret
+    if (qrImg)        qrImg.src = d.qrDataUrl;
+    if (secretEl)     secretEl.textContent = d.secretBase32;
     if (setupSection) setupSection.style.display = 'block';
   } catch { showToast('Network error', 'error'); }
 }
@@ -543,7 +909,7 @@ async function confirmTotp() {
     const r = await fetch('/api/auth/totp/confirm', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: code })  // FIX: was { code } — backend expects "token"
+      body: JSON.stringify({ token: code })
     });
     const d = await r.json();
     if (!r.ok) { showToast(d.error || 'Invalid code', 'error'); return; }
@@ -555,7 +921,7 @@ async function confirmTotp() {
       const container = document.getElementById('backup-codes-display');
       if (container) {
         container.innerHTML = `
-          <p><strong style="color:#c4b5fd;">Your backup codes — save these now:</strong></p>
+          <p><strong style="color:#7c3aed;">Your backup codes — save these now:</strong></p>
           <div class="backup-codes-grid">
             ${backupCodes.map(c => `<code class="backup-code">${c}</code>`).join('')}
           </div>
@@ -568,13 +934,12 @@ async function confirmTotp() {
   } catch { showToast('Network error', 'error'); }
 }
 
-// ── Logout ────────────────────────────────────────────────
 async function doLogout() {
   try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {}
   window.location.href = '/';
 }
 
-// ── DOMContentLoaded ──────────────────────────────────────
+// ── Boot ───────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   init();
 
@@ -586,14 +951,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('click', fn);
   };
+
   btn('btn-export-csv',            exportCSV);
   btn('btn-logout',                doLogout);
   btn('btn-setup-totp',            setupTotp);
   btn('btn-confirm-totp',          confirmTotp);
   btn('btn-generate-backup-codes', generateBackupCodes);
+  btn('btn-print-report',          printReport);   // ← Feature #4
 
   const stayBtn = document.getElementById('btn-stay-logged-in');
   if (stayBtn) stayBtn.addEventListener('click', resetInactivityTimer);
+
+  setInterval(loadRiskGauge, 30000);  // ← Feature #2: auto-refresh gauge every 30s
 
   showSection('overview');
 });

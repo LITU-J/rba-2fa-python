@@ -140,5 +140,17 @@ def init_db(app):
     conn = sqlite3.connect(DB_PATH)
     conn.executescript(SCHEMA)
     conn.commit()
+
+    # Migration — add trusted device columns if not already there
+    for col_sql in [
+        "ALTER TABLE known_devices ADD COLUMN trusted INTEGER DEFAULT 0",
+        "ALTER TABLE known_devices ADD COLUMN label TEXT",
+    ]:
+        try:
+            conn.execute(col_sql)
+            conn.commit()
+        except Exception:
+            pass  # column already exists
+
     conn.close()
     app.teardown_appcontext(close_db)

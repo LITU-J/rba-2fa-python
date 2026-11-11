@@ -355,7 +355,7 @@ def register():
 
     ph  = bcrypt.hashpw(password.encode(), bcrypt.gensalt(rounds=12)).decode()
     cur = db.execute(
-        "INSERT INTO users (username, email, phone, password_hash) VALUES (?,?,?,?)",
+        "INSERT INTO users (username, email, phone, password_hash, created_at) VALUES (?,?,?,?,datetime('now'))",
         (username, email, phone, ph)
     )
     db.commit()
@@ -461,13 +461,27 @@ def login():
         reasons.append("🖥️ Hosting/datacenter IP detected")
         if tier == "LOW":
             tier = "MEDIUM"
-
     # ── Normalize tier to match final score ──────────────────────────
     _TIER_ORDER = ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
     _score_tier = ("CRITICAL" if score >= 85 else
                    "HIGH"     if score >= 60 else
                    "MEDIUM"   if score >= 30 else "LOW")
     tier = _TIER_ORDER[max(_TIER_ORDER.index(tier), _TIER_ORDER.index(_score_tier))]
+
+    # ── Trusted device — reduce risk if device is marked trusted ─────
+    trusted_row = db.execute(
+        "SELECT trusted FROM known_devices WHERE user_id=? AND device_hash=? AND trusted=1",
+        (user["id"], dhash)
+    ).fetchone()
+    if trusted_row:
+        score   = max(0, score - 30)
+        reasons = [r for r in reasons if "new device" not in r.lower()]
+        reasons.append("✅ Trusted device recognized")
+        _score_tier2 = ("CRITICAL" if score >= 85 else
+                        "HIGH"     if score >= 60 else
+                        "MEDIUM"   if score >= 30 else "LOW")
+        tier = _TIER_ORDER[min(_TIER_ORDER.index(tier), _TIER_ORDER.index(_score_tier2))]
+    # ─────────────────────────────────────────────────────────────────
 
     if tier == "CRITICAL":
         _log(db, user["id"], username, ip, geo, dhash,
@@ -818,7 +832,7 @@ def reset_password_request():
     code    = str(_secrets_module.randbelow(10**6)).zfill(6)
     expires = (datetime.now(timezone.utc) + timedelta(minutes=15)).strftime("%Y-%m-%d %H:%M:%S")
     db.execute("UPDATE users SET totp_secret=? WHERE id=?",
-               (f"RESET:{code}:{expires}", user["id"]))
+             (f"RESET:{code}:{expires}", user["id"]))
     db.commit()
 
     try:
@@ -1092,3 +1106,98 @@ def _complete_login(user, ip, geo, dhash, score, tier, reasons, required_factors
         ).start()
     except Exception as e:
         print(f"[LOGIN ALERT ERROR] {e}")
+        
+        # ------------------------------------------------------------------
+# Trusted Device Management
+# ------------------------------------------------------------------
+
+@auth_bp.get("/devices")
+@require_auth
+def list_devices():
+    db      = get_db()
+    devices = db.execute(
+        "SELECT device_hash, first_seen, last_seen, login_count, trusted, label "
+        "FROM known_devices WHERE user_id=? ORDER BY last_seen DESC",
+        (session["user_id"],)
+    ).fetchall()
+    current = compute_device_hash()
+    return jsonify({"devices": [dict(d) for d in devices], "currentDeviceHash": current})
+
+
+@auth_bp.post("/devices/trust")
+@require_auth
+def trust_device():
+    b           = request.get_json(force=True, silent=True) or {}
+    device_hash = b.get("deviceHash")
+    label       = b.get("label", "Trusted Device")
+    if not device_hash:
+        return jsonify({"error": "deviceHash required"}), 400
+    db = get_db()
+    db.execute(
+        "UPDATE known_devices SET trusted=1, label=? WHERE user_id=? AND device_hash=?",
+        (label, session["user_id"], device_hash)
+    )
+    db.commit()
+    return jsonify({"message": "Device marked as trusted"})
+
+
+@auth_bp.post("/devices/untrust")
+@require_auth
+def untrust_device():
+    b           = request.get_json(force=True, silent=True) or {}
+    device_hash = b.get("deviceHash")
+    if not device_hash:
+        return jsonify({"error": "deviceHash required"}), 400
+    db = get_db()
+    db.execute(
+        "UPDATE known_devices SET trusted=0 WHERE user_id=? AND device_hash=?",
+        (session["user_id"], device_hash)
+    )
+    db.commit()
+    return jsonify({"message": "Device untrusted"})
+
+
+@auth_bp.post("/devices/remove")
+@require_auth
+def remove_device():
+    b           = request.get_json(force=True, silent=True) or {}
+    device_hash = b.get("deviceHash")
+    if not device_hash:
+        return jsonify({"error": "deviceHash required"}), 400
+    db = get_db()
+    db.execute(
+        "DELETE FROM known_devices WHERE user_id=? AND device_hash=?",
+        (session["user_id"], device_hash)
+    )
+    db.commit()
+    return jsonify({"message": "Device removed"})
+
+
+# ------------------------------------------------------------------
+# Login History
+# ------------------------------------------------------------------
+
+@auth_bp.get("/login-history")
+@require_auth
+def login_history():
+    db       = get_db()
+    page     = max(1, int(request.args.get("page", 1)))
+    per_page = 20
+    offset   = (page - 1) * per_page
+    logs     = db.execute(
+        "SELECT timestamp, ip, city, country, device_hash, "
+        "risk_score, risk_tier, risk_reasons, auth_method, outcome "
+        "FROM login_logs WHERE user_id=? "
+        "ORDER BY timestamp DESC LIMIT ? OFFSET ?",
+        (session["user_id"], per_page, offset)
+    ).fetchall()
+    total = db.execute(
+        "SELECT COUNT(*) as cnt FROM login_logs WHERE user_id=?",
+        (session["user_id"],)
+    ).fetchone()["cnt"]
+    return jsonify({
+        "logs":  [dict(l) for l in logs],
+        "total": total,
+        "page":  page,
+        "pages": max(1, (total + per_page - 1) // per_page),
+    })

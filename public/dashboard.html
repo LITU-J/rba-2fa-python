@@ -915,6 +915,106 @@
 </div>
 
 <script src="/js/dashboard.js"></script>
+<script>
+// ── Trusted Device Management (additive) ─────────────────────────
+let _curDevHash = null;
+
+async function loadDevicesWithTrust() {
+  const tbody = document.querySelector('#tbl-devices tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#94a3b8;">Loading…</td></tr>';
+  try {
+    const res  = await fetch('/api/auth/devices');
+    const data = await res.json();
+    _curDevHash = data.currentDeviceHash;
+    if (!data.devices || !data.devices.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#94a3b8;">No devices on record.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.devices.map(d => {
+      const isCurrent = d.device_hash === _curDevHash;
+      const isTrusted = d.trusted === 1;
+      const label     = d.label || (isCurrent ? 'This Device' : 'Unknown Device');
+      const lastSeen  = (d.last_seen  || '').substring(0, 16);
+      const firstSeen = (d.first_seen || '').substring(0, 10);
+      const logins    = d.login_count || 1;
+
+      const trustBtn = isTrusted
+        ? `<button onclick="untrustDev('${d.device_hash}')"
+             style="font-size:0.78rem;padding:4px 10px;background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;border-radius:8px;cursor:pointer;">Untrust</button>`
+        : `<button onclick="showTrustInput('${d.device_hash}')"
+             style="font-size:0.78rem;padding:4px 10px;background:#f5f3ff;color:#6d28d9;border:1px solid rgba(139,92,246,0.3);border-radius:8px;cursor:pointer;">Trust</button>`;
+
+      return `<tr>
+        <td>
+          <div style="font-weight:600;color:#1e293b;">
+            ${isCurrent ? '🖥️' : '📱'} ${label}
+            ${isTrusted ? '<span class="badge badge-LOW" style="margin-left:6px;">✅ Trusted</span>' : ''}
+            ${isCurrent ? '<span style="font-size:0.73rem;color:#4f46e5;margin-left:6px;">← this browser</span>' : ''}
+          </div>
+          <div id="ti-${d.device_hash}" style="display:none;margin-top:8px;gap:6px;align-items:center;">
+            <input id="tl-${d.device_hash}" type="text" placeholder="Name this device"
+              value="${isCurrent ? 'My Current Device' : ''}"
+              style="padding:5px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.82rem;width:160px;"/>
+            <button onclick="confirmTrustDev('${d.device_hash}')"
+              style="padding:5px 12px;background:#7c3aed;color:#fff;border:none;border-radius:8px;font-size:0.82rem;cursor:pointer;">Confirm</button>
+            <button onclick="cancelTrustInput('${d.device_hash}')"
+              style="padding:5px 10px;background:#f1f5f9;color:#64748b;border:none;border-radius:8px;font-size:0.82rem;cursor:pointer;">Cancel</button>
+          </div>
+        </td>
+        <td>${firstSeen}</td>
+        <td>${lastSeen}</td>
+        <td>${logins}</td>
+        <td style="white-space:nowrap;">
+          ${trustBtn}
+          <button onclick="removeDev('${d.device_hash}')"
+            style="margin-left:4px;font-size:0.78rem;padding:4px 10px;background:#fff1f2;color:#9f1239;border:1px solid #fecdd3;border-radius:8px;cursor:pointer;">Remove</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#94a3b8;">Could not load devices.</td></tr>';
+  }
+}
+
+function showTrustInput(h)   { const el = document.getElementById('ti-'+h); if(el) el.style.display='flex'; }
+function cancelTrustInput(h) { const el = document.getElementById('ti-'+h); if(el) el.style.display='none'; }
+
+async function confirmTrustDev(hash) {
+  const labelEl = document.getElementById('tl-' + hash);
+  const label   = labelEl ? labelEl.value.trim() || 'Trusted Device' : 'Trusted Device';
+  const res     = await fetch('/api/auth/devices/trust', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ deviceHash: hash, label }),
+  });
+  if (res.ok) { showToast('✅ Device trusted!', 'success'); loadDevicesWithTrust(); }
+  else        { showToast('❌ Could not trust device', 'error'); }
+}
+
+async function untrustDev(hash) {
+  const res = await fetch('/api/auth/devices/untrust', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ deviceHash: hash }),
+  });
+  if (res.ok) { showToast('Device untrusted.', 'success'); loadDevicesWithTrust(); }
+}
+
+async function removeDev(hash) {
+  if (!confirm('Remove this device from your account?')) return;
+  const res = await fetch('/api/auth/devices/remove', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ deviceHash: hash }),
+  });
+  if (res.ok) { showToast('Device removed.', 'success'); loadDevicesWithTrust(); }
+}
+
+// Hook into sidebar — load when Known Devices section opens
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.nav-item[data-section="devices"]').forEach(btn => {
+    btn.addEventListener('click', () => setTimeout(loadDevicesWithTrust, 150));
+  });
+});
+</script>
 
 <script>
 function toggleGroup(groupId, header) {

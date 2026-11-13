@@ -1,11 +1,11 @@
 async function doLogin() {
-  const username       = document.getElementById("username").value.trim();
-  const password       = document.getElementById("password").value;
-  const debugLocationEl = document.getElementById("debugLocation");
+  const username        = document.getElementById("username").value.trim();
+  const password        = document.getElementById("password").value;
+  const debugLocationEl = document.getElementById("debugIp") || document.getElementById("debugLocation");
   const debugLocation   = debugLocationEl ? debugLocationEl.value.trim() : "";
-  const btn       = document.getElementById("loginBtn");
-  const msg       = document.getElementById("msg");
-  msg.innerHTML   = "";
+  const btn  = document.getElementById("loginBtn");
+  const msg  = document.getElementById("msg");
+  msg.innerHTML = "";
 
   if (!username || !password) {
     showMsg("error", "Please enter your username and password.");
@@ -26,8 +26,9 @@ async function doLogin() {
     });
     const data = await res.json();
 
+    // ── Case 1: Already locked → show countdown timer ──────────────────────
     if (res.status === 403 && data.locked && data.minutes_remaining !== undefined) {
-      let totalSeconds = (data.minutes_remaining * 60) + data.seconds_remaining;
+      let totalSeconds = (data.minutes_remaining * 60) + (data.seconds_remaining || 0);
       const timerBox = document.createElement("div");
       timerBox.className           = "alert alert-error";
       timerBox.style.marginTop     = "14px";
@@ -38,7 +39,7 @@ async function doLogin() {
         "<strong>Account Temporarily Locked</strong>" +
         "<p style='margin:0;color:inherit;'>Too many failed login attempts. Your account will automatically unlock in:</p>" +
         "<div id='lockoutTimer' style='font-size:2rem;font-weight:900;color:#991b1b;text-align:center;width:100%;padding:8px 0;background:rgba(153,27,27,0.08);border-radius:8px;'>" +
-          data.minutes_remaining + "m " + String(data.seconds_remaining).padStart(2, "0") + "s" +
+          data.minutes_remaining + "m " + String(data.seconds_remaining || 0).padStart(2, "0") + "s" +
         "</div>" +
         "<p style='margin:0;color:inherit;font-size:0.85rem;'>This lockout protects your account against brute-force attacks.</p>";
       msg.innerHTML = "";
@@ -61,30 +62,69 @@ async function doLogin() {
       return;
     }
 
+    // ── Case 2: 5th wrong attempt → locked NOW (no minutes_remaining yet) ──
+    if (res.status === 403 && data.locked) {
+      var reasons = "";
+      if (data.reasons && data.reasons.length > 0) {
+        for (var i = 0; i < data.reasons.length; i++) {
+          reasons += "<li style='margin-bottom:4px;'>" + data.reasons[i] + "</li>";
+        }
+      } else {
+        reasons = "<li>Too many consecutive failed login attempts.</li>";
+      }
+      msg.innerHTML =
+        "<div class='alert alert-error' style='margin-top:14px;flex-direction:column;align-items:flex-start;gap:8px;'>" +
+          "<strong>🔒 Account Locked</strong>" +
+          "<p style='margin:0;color:inherit;'>Your account has been locked for " + (data.lockoutMinutes || 15) + " minutes. Reasons:</p>" +
+          "<ul style='padding-left:18px;margin:0;line-height:1.8;'>" + reasons + "</ul>" +
+        "</div>";
+      return;
+    }
+
+    // ── Case 3: CRITICAL risk block (not a lockout) ─────────────────────────
     if (res.status === 403) {
       var reasons = "";
       if (data.reasons && data.reasons.length > 0) {
         for (var i = 0; i < data.reasons.length; i++) {
           reasons += "<li style='margin-bottom:4px;'>" + data.reasons[i] + "</li>";
         }
+      } else {
+        reasons = "<li>Unusual login behaviour detected.</li>";
       }
       msg.innerHTML =
         "<div class='alert alert-error' style='margin-top:14px;flex-direction:column;align-items:flex-start;gap:8px;'>" +
-          "<strong>Login Blocked — Critical Risk (Score: " + data.riskScore + "/100)</strong>" +
+          "<strong>⛔ Login Blocked — Critical Risk (Score: " + (data.riskScore || "100") + "/100)</strong>" +
           "<p style='margin:0;color:inherit;'>This login was blocked due to the following risk indicators:</p>" +
           "<ul style='padding-left:18px;margin:0;line-height:1.8;'>" + reasons + "</ul>" +
         "</div>";
       return;
     }
 
-    if (!res.ok) {
-      showMsg("error", data.error || "Login failed");
+    // ── Case 4: Wrong password (401) ─────────────────────────────────────────
+    if (res.status === 401) {
+      var html = "<div class='alert alert-error' style='margin-top:14px;flex-direction:column;align-items:flex-start;gap:6px;'>";
+      html += "<strong>" + (data.error || "Incorrect username or password.") + "</strong>";
+      if (data.warning) {
+        html += "<p style='margin:0;color:inherit;font-size:0.88rem;'>⚠️ " + data.warning + "</p>";
+      }
+      if (data.attemptsRemaining !== undefined && data.attemptsRemaining > 0) {
+        html += "<p style='margin:0;color:inherit;font-size:0.88rem;'>You have <strong>" + data.attemptsRemaining + " attempt" + (data.attemptsRemaining === 1 ? "" : "s") + "</strong> remaining before lockout.</p>";
+      }
+      html += "</div>";
+      msg.innerHTML = html;
       return;
     }
 
+    // ── Case 5: Other errors ──────────────────────────────────────────────────
+    if (!res.ok) {
+      showMsg("error", data.error || "Login failed. Please try again.");
+      return;
+    }
+
+    // ── Success ───────────────────────────────────────────────────────────────
     if (data.status === "authenticated") {
       showMsg("success",
-        "Signed in! Risk: " + data.riskScore + "/100 (" + data.riskTier + "). Redirecting...");
+        "✅ Signed in! Risk score: " + data.riskScore + "/100 (" + data.riskTier + "). Redirecting...");
       setTimeout(function() { location.href = "/dashboard.html"; }, 900);
       return;
     }
@@ -97,31 +137,24 @@ async function doLogin() {
   } catch (e) {
     showMsg("error", "Network error. Please check your connection.");
   } finally {
-    btn.innerHTML = "Sign In";
+    btn.innerHTML = "Sign In →";
     btn.disabled  = false;
   }
 }
 
 function showMsg(type, text) {
-  document.getElementById("msg").innerHTML =
-    "<div class='alert alert-" + type + "' style='margin-top:14px;'>" + text + "</div>";
+  var el = document.getElementById("msg");
+  if (el) el.innerHTML = "<div class='alert alert-" + type + "' style='margin-top:14px;'>" + text + "</div>";
 }
 
-// Wire up button click AND prevent any form submit
 document.addEventListener("DOMContentLoaded", function() {
   var btn = document.getElementById("loginBtn");
   if (btn) {
-    btn.addEventListener("click", function(e) {
-      e.preventDefault();
-      doLogin();
-    });
+    btn.addEventListener("click", function(e) { e.preventDefault(); doLogin(); });
   }
   var form = document.querySelector("form");
   if (form) {
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
-      doLogin();
-    });
+    form.addEventListener("submit", function(e) { e.preventDefault(); doLogin(); });
   }
 });
 

@@ -431,6 +431,11 @@ def login():
                 "error": f"Account temporarily locked for {LOCKOUT_MINUTES} minutes due to too many failed attempts.",
                 "locked": True, "riskScore": 100, "riskTier": "CRITICAL",
                 "attemptsRemaining": 0,
+                "lockoutMinutes": LOCKOUT_MINUTES,
+                "reasons": [
+                    f"🔒 Account locked: {LOCKOUT_ATTEMPTS} consecutive failed attempts "
+                    f"— brute-force protection activated (+100)"
+                ],
             }), 403
         warning = None
         if remaining <= 2:
@@ -1106,8 +1111,9 @@ def _complete_login(user, ip, geo, dhash, score, tier, reasons, required_factors
         ).start()
     except Exception as e:
         print(f"[LOGIN ALERT ERROR] {e}")
-        
-        # ------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------
 # Trusted Device Management
 # ------------------------------------------------------------------
 

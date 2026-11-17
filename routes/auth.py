@@ -424,8 +424,13 @@ def login():
             "SELECT outcome FROM login_logs WHERE user_id=? ORDER BY timestamp DESC LIMIT ?",
             (user["id"], LOCKOUT_ATTEMPTS)
         ).fetchall()
-        consecutive = sum(1 for r in recent if r["outcome"] and r["outcome"].startswith("failed"))
-        remaining   = max(0, LOCKOUT_ATTEMPTS - consecutive)
+        consecutive = 0
+        for r in recent:
+            if r["outcome"] and r["outcome"].startswith("failed"):
+                consecutive += 1
+            else:
+                break
+        remaining = max(0, LOCKOUT_ATTEMPTS - consecutive)
         if consecutive >= LOCKOUT_ATTEMPTS:
             return jsonify({
                 "error": f"Account temporarily locked for {LOCKOUT_MINUTES} minutes due to too many failed attempts.",

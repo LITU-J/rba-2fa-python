@@ -379,18 +379,16 @@
     </div>
 
     <button class="sim-toggle" onclick="toggleSim()">
-      🔬 Risk Engine Demo — Simulate IP location
+      🔬 Risk Engine Demo — Simulate location
     </button>
 
     <div class="sim-panel" id="simPanel">
-      <input type="text" id="debugIp" placeholder="e.g. 41.182.0.1 (Windhoek)"/>
+      <input type="text" id="debugIp" placeholder="e.g. windhoek, sa, japan"/>
       <div class="ip-chips">
-        <button class="ip-chip" onclick="setIp('41.182.0.1')">Windhoek</button>
-        <button class="ip-chip" onclick="setIp('41.182.0.2')">Swakopmund</button>
-        <button class="ip-chip" onclick="setIp('41.182.0.4')">Oshakati</button>
-        <button class="ip-chip" onclick="setIp('196.216.2.1')">South Africa</button>
-        <button class="ip-chip" onclick="setIp('203.0.113.5')">Japan</button>
-        <button class="ip-chip" onclick="setIp('8.8.8.8')">USA</button>
+        <button class="ip-chip" onclick="setIp('windhoek')">Windhoek</button>
+        <button class="ip-chip" onclick="setIp('swakopmund')">Swakopmund</button>
+        <button class="ip-chip" onclick="setIp('sa')">South Africa</button>
+        <button class="ip-chip" onclick="setIp('japan')">Japan</button>
       </div>
     </div>
 
@@ -430,8 +428,8 @@ function toggleSim() {
   document.getElementById("simPanel").classList.toggle("open");
 }
 
-function setIp(ip) {
-  document.getElementById("debugIp").value = ip;
+function setIp(location) {
+  document.getElementById("debugIp").value = location;
   document.getElementById("simPanel").classList.add("open");
 }
 

@@ -560,6 +560,49 @@
       .pr-table tr:nth-child(even) td { background: #fafafa; }
       .pr-table tr { page-break-inside: avoid; }
     }
+    @media (max-width: 768px) {
+  .dash-layout {
+    grid-template-columns: 1fr !important;
+  }
+  .dash-sidebar {
+    display: none !important;
+  }
+  .dash-main {
+    padding: 16px !important;
+  }
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .admin-tier-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .admin-stat-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .gauge-body {
+    flex-direction: column !important;
+  }
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  .table-card {
+    overflow-x: auto !important;
+  }
+  .session-ctx-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .location-card {
+    flex-direction: column !important;
+    padding: 18px !important;
+  }
+  .navbar .nav-actions {
+    gap: 6px !important;
+  }
+  #riskPanel {
+    width: 100vw !important;
+  }
+}
   </style>
 </head>
 <body>

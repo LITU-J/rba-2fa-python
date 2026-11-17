@@ -1,4 +1,9 @@
+let submitting = false;   // ← ADD THIS at the top
+
 async function doLogin() {
+  if (submitting) return;   // ← blocks the second call
+  submitting = true;        // ← set before anything else
+
   const username        = document.getElementById("username").value.trim();
   const password        = document.getElementById("password").value;
   const debugLocationEl = document.getElementById("debugIp") || document.getElementById("debugLocation");
@@ -8,6 +13,7 @@ async function doLogin() {
   msg.innerHTML = "";
 
   if (!username || !password) {
+    submitting = false;    // ← reset if we return early
     showMsg("error", "Please enter your username and password.");
     return;
   }
@@ -137,6 +143,7 @@ async function doLogin() {
   } catch (e) {
     showMsg("error", "Network error. Please check your connection.");
   } finally {
+    submitting = false;    // ← always reset
     btn.innerHTML = "Sign In →";
     btn.disabled  = false;
   }
@@ -159,5 +166,9 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 document.addEventListener("keydown", function(e) {
-  if (e.key === "Enter") doLogin();
+  if (e.key === "Enter") {
+    var btn = document.getElementById("loginBtn");
+    if (btn && btn.disabled) return;   // ← don't fire if already in progress
+    doLogin();
+  }
 });
